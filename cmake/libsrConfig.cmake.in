@@ -1,0 +1,12 @@
+# Config file for the package
+set (pkg libsr)
+
+# Compute paths
+get_filename_component (${pkg}_CMAKE_DIR
+    "${CMAKE_CURRENT_LIST_FILE}" PATH
+)
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+if (NOT TARGET ${pkg} AND NOT ${pkg}_BINARY_DIR)
+    include ("${${pkg}_CMAKE_DIR}/${pkg}Targets.cmake")
+endif ()
