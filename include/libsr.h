@@ -1,4 +1,6 @@
+#pragma once
 
-namespace libsr {
+namespace libsr
+{
     int add(int a, int b);
 }

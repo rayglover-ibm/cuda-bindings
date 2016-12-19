@@ -7,13 +7,17 @@ set (tgt libsr)
 project (${tgt} C CXX)
 
 # cmake options
-option (${tgt}_WITH_TESTS "Enable unit tests" OFF)
+option (${tgt}_WITH_TESTS  "Enable unit tests" ON)
+option (${tgt}_WITH_PYTHON "Enable python binding" ON)
+option (${tgt}_WITH_CUDA   "Enable cuda support" ON)
 
 # version
 set (${tgt}_VERSION_MAJOR 0)
 set (${tgt}_VERSION_MINOR 1)
 
 set (SRC
+    src/add.cpp
+    src/kernels.cpp
     src/libsr.cpp
 )
 
@@ -21,21 +25,38 @@ set (SRC
 add_library (${tgt} STATIC ${SRC})
 set_target_properties (${tgt} PROPERTIES LINKER_LANGUAGE CXX)
 
-# header config
+# config header
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/include/${tgt}_config.h.in
     "include/${tgt}_config.h"
 )
 
 # project includes
 target_include_directories (${tgt}
-    # public includes
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-           ${CMAKE_CURRENT_BINARY_DIR}/include
+    PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PUBLIC  ${CMAKE_CURRENT_BINARY_DIR}/include
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
+
+# add cuda
+if (${tgt}_WITH_CUDA)
+    include("cuda.cmake")
+    target_link_libraries (${tgt} 
+        PUBLIC ${tgt}_cuda
+    )
+    export (TARGETS ${tgt}_cuda
+        FILE "${PROJECT_BINARY_DIR}/${tgt}_cudaTargets.cmake"
+    )
+endif ()
 
 # unit tests
 if (${tgt}_WITH_TESTS)
+    enable_testing ()
     add_subdirectory (test)
+endif ()
+
+# python binding
+if (${tgt}_WITH_PYTHON)
+    add_subdirectory (bindings/python)
 endif ()
 
 # Add all targets to the build-tree export set
