@@ -8,8 +8,9 @@ project (${tgt} C CXX)
 
 # cmake options
 option (${tgt}_WITH_TESTS  "Enable unit tests" ON)
-option (${tgt}_WITH_PYTHON "Enable python binding" ON)
 option (${tgt}_WITH_CUDA   "Enable cuda support" ON)
+option (${tgt}_WITH_PYTHON "Enable python binding" ON)
+option (${tgt}_WITH_NODEJS "Enable nodejs binding" ON)
 
 # version
 set (${tgt}_VERSION_MAJOR 0)
@@ -57,6 +58,11 @@ endif ()
 # python binding
 if (${tgt}_WITH_PYTHON)
     add_subdirectory (bindings/python)
+endif ()
+
+# nodejs binding
+if (${tgt}_WITH_NODEJS)
+    add_subdirectory (bindings/nodejs)
 endif ()
 
 # Add all targets to the build-tree export set

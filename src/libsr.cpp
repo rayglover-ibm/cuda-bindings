@@ -9,7 +9,7 @@ namespace libsr
     int add(int a, int b) {
         int result;
 
-        run<kernels::add>(a, b, &result);
+        run_logged<kernels::add>(a, b, &result);
         return result;
     }
 }

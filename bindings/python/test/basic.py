@@ -1,2 +1,6 @@
 import libsrpy
-print("[py] {}".format(libsrpy.add(1,6)))
+
+x = libsrpy.add(3, 5)
+assert(x == 8)
+
+print("[py] {}".format(x))

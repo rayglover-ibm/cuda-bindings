@@ -88,7 +88,7 @@ namespace kernels
     template <compute_mode M, typename = void>
     struct control;
 
-    /*  Enabled when the compute_mode is enabled at compilation-time  */
+    /*  Used when the compute_mode is enabled at compilation-time  */
     template <compute_mode M>
     struct control<M, typename std::enable_if< compute_traits<M>::enabled >::type>
     {
@@ -102,7 +102,7 @@ namespace kernels
         }
     };
 
-    /*  Enabled when the compute_mode wasn't enabled at compilation-time  */
+    /*  Used when the compute_mode isn't enabled at compilation-time  */
     template <compute_mode M>
     struct control<M, typename std::enable_if< !compute_traits<M>::enabled >::type>
     {
@@ -157,6 +157,7 @@ namespace kernels
         {
             using kt = kernel_traits<Op>;
             printf("[%s] mode=%s\n", kt::name, to_str(m));
+            fflush(stdout);
             return true;
         }
 
@@ -165,6 +166,7 @@ namespace kernels
         {
             using kt = kernel_traits<Op>;
             printf("[%s] status=%s\n", kt::name, to_str(s));
+            fflush(stdout);
         }
     };
 

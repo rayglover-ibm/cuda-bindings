@@ -1,0 +1,5 @@
+{
+  "name": "@PROJECT_NAME@",
+  "version": "@libsr_VERSION_MAJOR@.@libsr_VERSION_MINOR@.0",
+  "description": "Node.js native cuda binding example."
+}
