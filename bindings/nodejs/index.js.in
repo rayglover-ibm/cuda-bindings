@@ -37,4 +37,4 @@ var findModule = function(pattern) {
     }
 }
 
-module.exports = require(findModule(/^.*[\\/]core\.node$/));
+module.exports = require(findModule(/^.*[\\/]binding\.node$/));

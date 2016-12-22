@@ -1,20 +1,20 @@
-cmake_minimum_required (VERSION 2.8.12)
+cmake_minimum_required (VERSION 3.0)
+cmake_policy(SET CMP0048 NEW) # project versioning
 
 # Make the scripts available in the 'cmake' directory available for the
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
 set (tgt libsr)
 
-project (${tgt} C CXX)
+project (${tgt}
+    LANGUAGES C CXX
+    VERSION 0.1.0
+)
 
 # cmake options
 option (${tgt}_WITH_TESTS  "Enable unit tests" ON)
 option (${tgt}_WITH_CUDA   "Enable cuda support" ON)
 option (${tgt}_WITH_PYTHON "Enable python binding" ON)
 option (${tgt}_WITH_NODEJS "Enable nodejs binding" ON)
-
-# version
-set (${tgt}_VERSION_MAJOR 0)
-set (${tgt}_VERSION_MINOR 1)
 
 set (SRC
     src/add.cpp
@@ -41,7 +41,7 @@ target_include_directories (${tgt}
 # add cuda
 if (${tgt}_WITH_CUDA)
     include("cuda.cmake")
-    target_link_libraries (${tgt} 
+    target_link_libraries (${tgt}
         PUBLIC ${tgt}_cuda
     )
     export (TARGETS ${tgt}_cuda
