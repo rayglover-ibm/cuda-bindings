@@ -7,5 +7,6 @@
 
 #define libsr_VERSION_MAJOR @libsr_VERSION_MAJOR@
 #define libsr_VERSION_MINOR @libsr_VERSION_MINOR@
+#define libsr_VERSION_PATCH @libsr_VERSION_PATCH@
 
 #cmakedefine libsr_WITH_CUDA

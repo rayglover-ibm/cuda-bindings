@@ -1,6 +1,8 @@
 const assert = require('assert');
 var libsrjs = require('libsrjs');
 
+console.info('[js] version = ' + libsrjs.version());
+
 assert.throws(function() { libsrjs.add(); }, 'number of arguments');
 assert.throws(function() { libsrjs.add('', 2); }, 'types of arguments');
 

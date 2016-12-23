@@ -1,7 +1,23 @@
+/*
+ *   For more nan examples, see: 
+ *   https://github.com/nodejs/nan/tree/master/test/cpp
+ */
 #include <nan.h>
+
 #include "libsr.h"
+#include "libsr_config.h"
 
 using namespace Nan;
+
+NAN_METHOD(version)
+{
+    auto arr = New<v8::Array>(3);
+    arr->Set(0, New<v8::Number>(libsr_VERSION_MAJOR));
+    arr->Set(1, New<v8::Number>(libsr_VERSION_MINOR));
+    arr->Set(2, New<v8::Number>(libsr_VERSION_PATCH));
+
+    info.GetReturnValue().Set(arr);
+}
 
 NAN_METHOD(add)
 {
@@ -12,8 +28,8 @@ NAN_METHOD(add)
 
     int32_t a = To<int32_t>(info[0]).FromJust();
     int32_t b = To<int32_t>(info[1]).FromJust();
-
     int32_t c = libsr::add(a, b);
+
     info.GetReturnValue().Set(c);
 }
 
@@ -22,6 +38,10 @@ NAN_MODULE_INIT(InitAll)
     Set(target,
         New<v8::String>("add").ToLocalChecked(),
         GetFunction(New<v8::FunctionTemplate>(add)).ToLocalChecked());
+
+    Set(target,
+        New<v8::String>("version").ToLocalChecked(),
+        GetFunction(New<v8::FunctionTemplate>(version)).ToLocalChecked());
 }
 
 NODE_MODULE(addon, InitAll)

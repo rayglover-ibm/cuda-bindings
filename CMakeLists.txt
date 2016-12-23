@@ -2,7 +2,9 @@ cmake_minimum_required (VERSION 3.0)
 cmake_policy(SET CMP0048 NEW) # project versioning
 
 # Make the scripts available in the 'cmake' directory available for the
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
+# Name of the core c++ library
 set (tgt libsr)
 
 project (${tgt}
@@ -27,7 +29,7 @@ add_library (${tgt} STATIC ${SRC})
 set_target_properties (${tgt} PROPERTIES LINKER_LANGUAGE CXX)
 
 # config header
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/include/${tgt}_config.h.in
+configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/include/${tgt}_config.h.in"
     "include/${tgt}_config.h"
 )
 
@@ -75,6 +77,6 @@ export (TARGETS ${tgt}
 export (PACKAGE ${tgt})
 
 # Create the <pkg>Config.cmake and <pkg>ConfigVersion files
-configure_file (cmake/${tgt}Config.cmake.in
+configure_file ("cmake/${tgt}Config.cmake.in"
     "${PROJECT_BINARY_DIR}/${tgt}Config.cmake" @ONLY
 )

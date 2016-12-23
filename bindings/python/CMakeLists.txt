@@ -1,16 +1,19 @@
 cmake_minimum_required (VERSION 3.1)
 
-project ("libsrpy"
-    VERSION "${libsr_VERSION_MAJOR}.${libsr_VERSION_MINOR}.${libsr_VERSION_PATCH}"
+# capture the name of the core c++ library
+set (core "${CMAKE_PROJECT_NAME}")
+
+project ("${core}py"
+    VERSION "${${core}_VERSION_MAJOR}.${${core}_VERSION_MINOR}.${${core}_VERSION_PATCH}"
 )
 
-set (tgt libsrpy)
+set (tgt ${PROJECT_NAME})
 
 add_subdirectory (thirdparty/pybind11)
 pybind11_add_module (${tgt} "src/binding.cpp")
 
 target_link_libraries (${tgt}
-    PRIVATE libsr
+    PRIVATE ${core}
 )
 
 if (libsr_WITH_TESTS)
