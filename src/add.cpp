@@ -1,6 +1,6 @@
 #include "add.h"
 
-namespace libsr {
+namespace cufoo {
 namespace kernels
 {
     KERNEL_IMPL(add, compute_mode::CPU)(

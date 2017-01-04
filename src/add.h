@@ -1,7 +1,7 @@
 #pragma once
 #include "kernels.h"
 
-namespace libsr {
+namespace cufoo {
 namespace kernels
 {
     KERNEL_DECL(add, int, int, int*);

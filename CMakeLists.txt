@@ -5,7 +5,7 @@ cmake_policy(SET CMP0048 NEW) # project versioning
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 # Name of the core c++ library
-set (tgt libsr)
+set (tgt cufoo)
 
 project (${tgt}
     LANGUAGES C CXX
@@ -21,7 +21,7 @@ option (${tgt}_WITH_NODEJS "Enable nodejs binding" ON)
 set (SRC
     src/add.cpp
     src/kernels.cpp
-    src/libsr.cpp
+    src/cufoo.cpp
 )
 
 # create the library

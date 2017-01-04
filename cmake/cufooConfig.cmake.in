@@ -1,5 +1,5 @@
 # Config file for the package
-set (pkg libsr)
+set (pkg cufoo)
 
 # Compute paths
 get_filename_component (${pkg}_CMAKE_DIR

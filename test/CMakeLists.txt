@@ -24,18 +24,18 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 endif ()
 
 # main test suite
-add_executable (libsr_test
-	"libsr/basic.cpp"
+add_executable (cufoo_test
+	"cufoo/basic.cpp"
 )
-target_link_libraries (libsr_test
-	libsr
+target_link_libraries (cufoo_test
+	cufoo
 	gtest
 	gmock_main
 )
 
 add_test (
 	NAME full_test_suite
-	COMMAND libsr_test
+	COMMAND cufoo_test
 )
 add_custom_target (copy-test-files ALL
     COMMAND cmake -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "libsr_config.h"
+#include "cufoo_config.h"
 #include "device_util.h"
 
 #include <memory>
 #include <type_traits>
 
-namespace libsr {
+namespace cufoo {
 namespace kernels
 {
     enum class status {
@@ -32,7 +32,7 @@ namespace kernels
         static bool available() { return true; }
     };
 
-#if !defined(libsr_WITH_CUDA)
+#if !defined(cufoo_WITH_CUDA)
     template <>
     struct compute_traits<compute_mode::CUDA> {
         static constexpr bool enabled = false;

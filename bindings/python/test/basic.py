@@ -1,8 +1,8 @@
-import libsrpy
+import cufoopy
 
-print("[py] version = {}".format(libsrpy.version()), flush=True)
+print("[py] version = {}".format(cufoopy.version()), flush=True)
 
-x = libsrpy.add(3, 5)
+x = cufoopy.add(3, 5)
 assert(x == 8)
 
 print("[py] {}".format(x), flush=True)

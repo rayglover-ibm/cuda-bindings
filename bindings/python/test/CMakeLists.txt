@@ -6,10 +6,10 @@ set (TEST_FILES
     basic.py
 )
 add_test (
-    NAME libsrpy_test_suite
+    NAME cufoopy_test_suite
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     COMMAND python "${TEST_FILES}"
 )
-set_tests_properties (libsrpy_test_suite
-    PROPERTIES ENVIRONMENT "PYTHONPATH=${libsrpy_BINARY_DIR}/$<CONFIGURATION>"
+set_tests_properties (cufoopy_test_suite
+    PROPERTIES ENVIRONMENT "PYTHONPATH=${cufoopy_BINARY_DIR}/$<CONFIGURATION>"
 )

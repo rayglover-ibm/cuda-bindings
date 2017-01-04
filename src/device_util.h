@@ -27,7 +27,7 @@ inline void __checkCudaErrors(cudaError_t err, const char *file, const int line)
 
 #endif
 
-namespace libsr {
+namespace cufoo {
 namespace device_util
 {
     bool init_cudart();

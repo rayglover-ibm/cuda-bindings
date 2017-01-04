@@ -31,6 +31,6 @@ target_link_libraries (${tgt}
 )
 
 # tests
-if (libsr_WITH_TESTS)
+if (cufoo_WITH_TESTS)
     add_subdirectory (test)
 endif ()

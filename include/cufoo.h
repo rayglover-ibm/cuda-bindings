@@ -1,6 +1,6 @@
 #pragma once
 
-namespace libsr
+namespace cufoo
 {
     int add(int a, int b);
 }

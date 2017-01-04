@@ -1,6 +1,6 @@
 #include "kernels.h"
 
-namespace libsr {
+namespace cufoo {
 namespace kernels
 {
     const char* to_str(const status s) {

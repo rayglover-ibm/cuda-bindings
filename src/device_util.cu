@@ -2,7 +2,7 @@
 
 #include <mutex>
 
-namespace libsr {
+namespace cufoo {
 namespace device_util
 {
     bool init_cudart(void)

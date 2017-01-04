@@ -10,7 +10,7 @@ namespace {
     }
 }
 
-namespace libsr {
+namespace cufoo {
 namespace kernels
 {
     KERNEL_IMPL(add, compute_mode::CUDA)(
