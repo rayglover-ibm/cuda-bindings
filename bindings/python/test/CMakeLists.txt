@@ -1,9 +1,8 @@
 cmake_minimum_required (VERSION 3.2)
-
 include (CTest)
 
 set (TEST_FILES
-    basic.py
+    "basic.py"
 )
 add_test (
     NAME cufoopy_test_suite

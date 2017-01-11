@@ -4,3 +4,6 @@
 [submodule "nan"]
 	path = bindings/nodejs/third_party/nan
 	url = https://github.com/nodejs/nan
+[submodule "bindings/java/third_party/jni.hpp"]
+	path = bindings/java/third_party/jni.hpp
+	url = git@github.ibm.com:ray-glover/jni.hpp.git

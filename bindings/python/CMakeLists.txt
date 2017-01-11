@@ -9,7 +9,8 @@ project ("${core}py"
 
 set (tgt ${PROJECT_NAME})
 
-add_subdirectory (thirdparty/pybind11)
+add_subdirectory ("thirdparty/pybind11")
+
 pybind11_add_module (${tgt} "src/binding.cpp")
 
 target_link_libraries (${tgt}

@@ -17,6 +17,7 @@ option (${tgt}_WITH_TESTS  "Enable unit tests" ON)
 option (${tgt}_WITH_CUDA   "Enable cuda support" ON)
 option (${tgt}_WITH_PYTHON "Enable python binding" ON)
 option (${tgt}_WITH_NODEJS "Enable nodejs binding" ON)
+option (${tgt}_WITH_JAVA   "Enable Java binding" ON)
 
 set (SRC
     src/add.cpp
@@ -51,7 +52,7 @@ if (${tgt}_WITH_CUDA)
     )
 endif ()
 
-# unit tests
+# core library unit tests
 if (${tgt}_WITH_TESTS)
     enable_testing ()
     add_subdirectory (test)
@@ -65,6 +66,11 @@ endif ()
 # nodejs binding
 if (${tgt}_WITH_NODEJS)
     add_subdirectory (bindings/nodejs)
+endif ()
+
+# Java binding
+if (${tgt}_WITH_JAVA)
+    add_subdirectory (bindings/java)
 endif ()
 
 # Add all targets to the build-tree export set

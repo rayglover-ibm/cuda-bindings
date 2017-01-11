@@ -17,11 +17,12 @@ configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/index.js.in" "${PROJECT_NAME}/index
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/package.json.in" "${PROJECT_NAME}/package.json" @ONLY)
 
 # A submodule, "binding", will contain the nodejs binding.
-set (tgt "binding")
-add_nodejs_module (${tgt} src/binding.cpp)
+set (tgt "binding-nodejs")
+add_nodejs_module (${tgt} "src/binding.cpp")
 
 set_target_properties (${tgt} PROPERTIES 
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}"
+    OUTPUT_NAME "binding"
 )
 target_include_directories (${tgt} 
     PUBLIC "${CMAKE_CURRENT_LIST_DIR}/third_party/nan"
