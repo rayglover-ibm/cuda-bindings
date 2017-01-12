@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.0)
-cmake_policy(SET CMP0048 NEW) # project versioning
+cmake_policy (SET CMP0048 NEW) # project versioning
 
 # Make the scripts available in the 'cmake' directory available for the
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")

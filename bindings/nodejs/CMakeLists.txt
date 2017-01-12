@@ -13,7 +13,7 @@ include (NodeJS)
 nodejs_init ()
 
 # Binding package.json and index.js
-configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/index.js.in" "${PROJECT_NAME}/index.js" @ONLY)
+configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/index.js" "${PROJECT_NAME}/index.js" COPYONLY)
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/package.json.in" "${PROJECT_NAME}/package.json" @ONLY)
 
 # A submodule, "binding", will contain the nodejs binding.
@@ -29,6 +29,9 @@ target_include_directories (${tgt}
 )
 target_link_libraries (${tgt}
     ${core}
+)
+add_custom_command (TARGET ${tgt} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${tgt}>" "${PROJECT_NAME}"
 )
 
 # tests

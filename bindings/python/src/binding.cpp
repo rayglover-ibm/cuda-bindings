@@ -18,8 +18,8 @@ namespace {
     }
 }
 
-PYBIND11_PLUGIN(cufoopy) {
-    py::module m("cufoopy", "python binding example");
+PYBIND11_PLUGIN(binding) {
+    py::module m("binding", "python binding example");
 
     m.def("version", &::get_version, "module version");
     m.def("add", static_cast<int (*)(int, int)>(&cufoo::add), "A function which adds two numbers");

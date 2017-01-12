@@ -10,5 +10,5 @@ add_test (
     COMMAND python "${TEST_FILES}"
 )
 set_tests_properties (cufoopy_test_suite
-    PROPERTIES ENVIRONMENT "PYTHONPATH=${cufoopy_BINARY_DIR}/$<CONFIGURATION>"
+    PROPERTIES ENVIRONMENT "PYTHONPATH=${cufoopy_BINARY_DIR}"
 )
