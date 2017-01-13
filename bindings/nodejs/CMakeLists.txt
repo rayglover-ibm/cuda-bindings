@@ -34,7 +34,19 @@ add_custom_command (TARGET ${tgt} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${tgt}>" "${PROJECT_NAME}"
 )
 
-# tests
+# unit tests
 if (cufoo_WITH_TESTS)
-    add_subdirectory (test)
+    include (CTest)
+
+    set (TEST_FILES
+        "src/binding_test.js"
+    )
+    add_test (
+        NAME ${PROJECT_NAME}_test_suite
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        COMMAND node "${TEST_FILES}"
+    )
+    set_tests_properties (${PROJECT_NAME}_test_suite
+        PROPERTIES ENVIRONMENT "NODE_PATH=${PROJECT_BINARY_DIR}"
+    )
 endif ()

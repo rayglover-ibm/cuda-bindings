@@ -1,6 +1,6 @@
-package cufoo;
+package com.cufoo;
 
-public class CuFoo {
+public class Binding {
     static { System.loadLibrary("binding"); }
 
     public static native int[] version();

@@ -26,5 +26,17 @@ add_custom_command (TARGET ${tgt} POST_BUILD
 )
 
 if (cufoo_WITH_TESTS)
-    add_subdirectory (test)
+    include (CTest)
+
+    set (TEST_FILES
+        "src/binding_test.py"
+    )
+    add_test (
+        NAME cufoopy_test_suite
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        COMMAND python "${TEST_FILES}"
+    )
+    set_tests_properties (cufoopy_test_suite
+        PROPERTIES ENVIRONMENT "PYTHONPATH=${cufoopy_BINARY_DIR}"
+    )
 endif ()

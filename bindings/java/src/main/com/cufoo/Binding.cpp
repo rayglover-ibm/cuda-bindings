@@ -4,7 +4,7 @@
 #include <jni/jni.hpp>
 
 namespace {
-    struct fascade { static constexpr auto Name() { return "cufoo/CuFoo"; } };
+    struct fascade { static constexpr auto Name() { return "com/cufoo/Binding"; } };
 
     void register_fascade(JavaVM* vm)
     {
@@ -12,7 +12,11 @@ namespace {
             return cufoo::add(a, b);
         };
         auto get_version = [](jni::JNIEnv& env, jni::Class<fascade>) -> jni::Array<jni::jint> {
-            auto vec = std::vector<jni::jint>{ cufoo_VERSION_MAJOR, cufoo_VERSION_MINOR, cufoo_VERSION_PATCH };
+            auto vec = std::vector<jni::jint>{ 
+                cufoo_VERSION_MAJOR,
+                cufoo_VERSION_MINOR,
+                cufoo_VERSION_PATCH
+            };
             return jni::Make<jni::Array<jni::jint>>(env, vec);
         };
         
