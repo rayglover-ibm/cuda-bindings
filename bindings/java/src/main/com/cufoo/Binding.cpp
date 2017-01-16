@@ -3,7 +3,8 @@
 
 #include <jni/jni.hpp>
 
-namespace {
+namespace
+{
     struct fascade { static constexpr auto Name() { return "com/cufoo/Binding"; } };
 
     void register_fascade(JavaVM* vm)

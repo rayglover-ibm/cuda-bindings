@@ -1,5 +1,5 @@
 {
-  "name": "@PROJECT_NAME@",
+  "name": "cufoo",
   "version": "@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@",
   "description": "Node.js native cuda binding example."
 }
