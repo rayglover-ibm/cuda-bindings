@@ -5,84 +5,84 @@ cmake_policy (SET CMP0048 NEW) # project versioning
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 # Name of the core c++ library
-set (tgt cufoo)
+set (core cufoo)
 
-project (${tgt}
+project (${core}
     LANGUAGES C CXX
     VERSION 0.1.0
 )
 
 # cmake options
-option (${tgt}_WITH_TESTS  "Enable unit tests" ON)
-option (${tgt}_WITH_CUDA   "Enable cuda support" ON)
-option (${tgt}_WITH_PYTHON "Enable python binding" ON)
-option (${tgt}_WITH_NODEJS "Enable nodejs binding" ON)
-option (${tgt}_WITH_JAVA   "Enable Java binding" ON)
+option (${core}_WITH_TESTS  "Enable unit tests"     ON)
+option (${core}_WITH_CUDA   "Enable cuda support"   ON)
+option (${core}_WITH_PYTHON "Enable python binding" ON)
+option (${core}_WITH_NODEJS "Enable nodejs binding" ON)
+option (${core}_WITH_JAVA   "Enable Java binding"   ON)
 
 set (SRC
-    src/add.cpp
-    src/kernels.cpp
-    src/cufoo.cpp
+    "src/add.cpp"
+    "src/kernels.cpp"
+    "src/cufoo.cpp"
 )
 
 # create the library
-add_library (${tgt} STATIC ${SRC})
-set_target_properties (${tgt} PROPERTIES LINKER_LANGUAGE CXX)
+add_library (${core} STATIC ${SRC})
+set_target_properties (${core} PROPERTIES LINKER_LANGUAGE CXX)
 
 # config header
-configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/include/${tgt}_config.h.in"
-    "include/${tgt}_config.h"
+configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/include/${core}_config.h.in"
+    "include/${core}_config.h"
 )
 
 # project includes
-target_include_directories (${tgt}
-    PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PUBLIC  ${CMAKE_CURRENT_BINARY_DIR}/include
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+target_include_directories (${core}
+    PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    PUBLIC  "${CMAKE_CURRENT_BINARY_DIR}/include"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 
 # add cuda
-if (${tgt}_WITH_CUDA)
-    include("cuda.cmake")
-    target_link_libraries (${tgt}
-        PUBLIC ${tgt}_cuda
+if (${core}_WITH_CUDA)
+    include ("cuda.cmake")
+    target_link_libraries (${core}
+        PUBLIC ${core}_cuda
     )
-    export (TARGETS ${tgt}_cuda
-        FILE "${PROJECT_BINARY_DIR}/${tgt}_cudaTargets.cmake"
+    export (TARGETS ${core}_cuda
+        FILE "${PROJECT_BINARY_DIR}/${core}_cudaTargets.cmake"
     )
 endif ()
 
 # core library unit tests
-if (${tgt}_WITH_TESTS)
+if (${core}_WITH_TESTS)
     enable_testing ()
     add_subdirectory (test)
 endif ()
 
 # python binding
-if (${tgt}_WITH_PYTHON)
+if (${core}_WITH_PYTHON)
     add_subdirectory (bindings/python)
 endif ()
 
 # nodejs binding
-if (${tgt}_WITH_NODEJS)
+if (${core}_WITH_NODEJS)
     add_subdirectory (bindings/nodejs)
 endif ()
 
 # Java binding
-if (${tgt}_WITH_JAVA)
+if (${core}_WITH_JAVA)
     add_subdirectory (bindings/java)
 endif ()
 
 # Add all targets to the build-tree export set
-export (TARGETS ${tgt}
-    FILE "${PROJECT_BINARY_DIR}/${tgt}Targets.cmake"
+export (TARGETS ${core}
+    FILE "${PROJECT_BINARY_DIR}/${core}Targets.cmake"
 )
 
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
-export (PACKAGE ${tgt})
+export (PACKAGE ${core})
 
 # Create the <pkg>Config.cmake and <pkg>ConfigVersion files
-configure_file ("cmake/${tgt}Config.cmake.in"
-    "${PROJECT_BINARY_DIR}/${tgt}Config.cmake" @ONLY
+configure_file ("cmake/${core}Config.cmake.in"
+    "${PROJECT_BINARY_DIR}/${core}Config.cmake" @ONLY
 )

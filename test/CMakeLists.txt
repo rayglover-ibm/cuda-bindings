@@ -16,7 +16,7 @@ download_project (
 set (gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 # setup unit test libraries
-add_subdirectory (${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+add_subdirectory ("${googletest_SOURCE_DIR}" "${googletest_BINARY_DIR}")
 
 # Turn on all warnings when using gcc.
 if (CMAKE_COMPILER_IS_GNUCXX)
@@ -38,5 +38,5 @@ add_test (
 	COMMAND cufoo_test
 )
 add_custom_target (copy-test-files ALL
-    COMMAND cmake -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data
+    COMMAND cmake -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/data" "${CMAKE_CURRENT_BINARY_DIR}/data"
 )
