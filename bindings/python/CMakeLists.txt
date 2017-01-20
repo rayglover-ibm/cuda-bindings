@@ -39,6 +39,6 @@ if (cufoo_WITH_TESTS)
         COMMAND python "${TEST_SRC}"
     )
     set_tests_properties (cufoopy_test_suite
-        PROPERTIES ENVIRONMENT "PYTHONPATH=${cufoopy_BINARY_DIR}"
+        PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}"
     )
 endif ()

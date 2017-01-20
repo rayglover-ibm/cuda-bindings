@@ -1,1 +1,1 @@
-from cufoopy.binding import *
+from cufoo.binding import *

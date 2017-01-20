@@ -1,8 +1,8 @@
-import cufoopy
+import cufoo
 
-print("[py] version={}".format(cufoopy.version()), flush=True)
+print("[py] version={}".format(cufoo.version()), flush=True)
 
-x = cufoopy.add(3, 5)
+x = cufoo.add(3, 5)
 assert(x == 8)
 
 print("[py] {}".format(x), flush=True)
