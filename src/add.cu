@@ -1,5 +1,5 @@
 #include "add.h"
-#include "kernels.h"
+#include "kernel.h"
 #include "device_util.h"
 
 #include <stdio.h>
@@ -13,7 +13,7 @@ namespace {
 namespace cufoo {
 namespace kernels
 {
-    KERNEL_IMPL(add, compute_mode::CUDA)(
+    template <> status add::run<compute_mode::CUDA>(
         int a, int b, int* c
         )
     {

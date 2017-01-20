@@ -7,7 +7,7 @@
 #include <type_traits>
 
 namespace cufoo {
-namespace kernels
+namespace kernel
 {
     enum class status {
         SUCCESS = 1,
@@ -46,38 +46,44 @@ namespace kernels
     };
 #endif
 
+    namespace detail
+    {
+        template<compute_mode T, compute_mode U>
+        constexpr bool eq() { return T == U; }
+
+        template<compute_mode... Ts>
+        struct has_mode : std::false_type {};
+
+        template<compute_mode T0, compute_mode T1, compute_mode... Ts>
+        struct has_mode<T0, T1, Ts...> :
+            std::integral_constant<bool, eq<T0, T1>() || has_mode<T0, Ts...>::value>
+        {};
+    }
+    
     /* KERNEL -------------------------------------------------------------- */
 
-    template <typename Op>
-    struct kernel_traits
+    template<typename Op, typename Traits, compute_mode... Modes>
+    struct impl
     {
-        static constexpr const char* name = "undefined";
-        using parameters = std::tuple<>;
-    };
+        using traits = Traits;
 
-    template <typename Op, typename... Args>
-    struct kernel_specialization_check
-    {
-        using expect = typename kernel_traits<Op>::parameters;
-        using recieved = std::tuple<Args...>;
-
-        static constexpr bool value = std::is_same<expect, recieved>::value;
-        static_assert(value, "Calls to and implementations of a kernal must match the kernel signature.");
-    };
-
-    template <typename Op>
-    struct kernel
-    {
-        template <
-            compute_mode M,
-            typename... Args,
-            bool b = kernel_specialization_check<Op, Args...>::value
+        template<
+            compute_mode M, typename... Args,
+            std::enable_if_t< detail::has_mode<M, Modes... >::value, int> = 0
             >
-        static status run(Args...) {
+        static auto apply(Args... args) {
+            return Op::template run<M>(std::forward<Args>(args)...);
+        }
+
+        template<
+            compute_mode M, typename... Args,
+            std::enable_if_t< !detail::has_mode<M, Modes... >::value, int> = 0
+            >
+        static auto apply(Args... args) {
             return status::KERNEL_NOT_DEFINED;
         }
     };
-
+    
     /* CONTROL ------------------------------------------------------------- */
 
     namespace detail
@@ -90,46 +96,46 @@ namespace kernels
 
     /*  Used when the compute_mode is enabled at compilation-time  */
     template <compute_mode M>
-    struct control<M, typename std::enable_if< compute_traits<M>::enabled >::type>
+    struct control<M, std::enable_if_t< compute_traits<M>::enabled >>
     {
-        template <typename Runner, typename Op, typename... Args>
+        template <typename Runner, typename Kernel, typename... Args>
         static status call(Runner& r, Args... args)
         {
-            if (!r.template begin<Op>(M)) { return status::CANCELLED; }
-            auto s = kernel<Op>::template run<M, Args...>(std::forward<Args>(args)...);
-            r.template end<Op>(s);
+            if (!r.template begin<Kernel>(M)) { return status::CANCELLED; }
+            status s = Kernel::template apply<M, Args...>(std::forward<Args>(args)...);
+            r.template end<Kernel>(s);
             return s;
         }
     };
 
     /*  Used when the compute_mode isn't enabled at compilation-time  */
     template <compute_mode M>
-    struct control<M, typename std::enable_if< !compute_traits<M>::enabled >::type>
+    struct control<M, std::enable_if_t< !compute_traits<M>::enabled >>
     {
-        template <typename Runner, typename Op, typename... Args>
+        template <typename Runner, typename Kernel, typename... Args>
         static status call(Runner& r, Args... args)
         {
-            if (!r.template begin<Op>(M)) { return status::CANCELLED; }
+            if (!r.template begin<Kernel>(M)) { return status::CANCELLED; }
             status s = status::KERNEL_UNAVILABLE;
-            r.template end<Op>(s);
+            r.template end<Kernel>(s);
             return s;
         }
     };
 
     /*  Specialization for AUTO: determines compute_mode at runtime  */
-    template <> template <typename Runner, typename Op, typename... Args>
+    template <> template <typename Runner, typename Kernel, typename... Args>
     status control<compute_mode::AUTO>::call(Runner& r, Args... args)
     {
         status s;
 
         switch (detail::runtime_mode()) {
         case compute_mode::CPU:
-            s = control<compute_mode::CPU>::call<Runner, Op, Args...>(
+            s = control<compute_mode::CPU>::call<Runner, Kernel, Args...>(
                     r, std::forward<Args>(args)...);
             break;
 
         case compute_mode::CUDA:
-            s = control<compute_mode::CUDA>::call<Runner, Op, Args...>(
+            s = control<compute_mode::CUDA>::call<Runner, Kernel, Args...>(
                     r, std::forward<Args>(args)...);
             break;
 
@@ -152,26 +158,26 @@ namespace kernels
 
     struct log_runner
     {
-        template<typename Op>
+        template<typename Kernel>
         bool begin(compute_mode m)
         {
-            using kt = kernel_traits<Op>;
+            using kt = typename Kernel::traits;
             printf("[%s] mode=%s\n", kt::name, to_str(m));
             fflush(stdout);
             return true;
         }
 
-        template<typename Op>
+        template<typename Kernel>
         void end(status s)
         {
-            using kt = kernel_traits<Op>;
+            using kt = typename Kernel::traits;
             printf("[%s] status=%s\n", kt::name, to_str(s));
             fflush(stdout);
         }
     };
 
     template <
-        typename Op,
+        typename Kernel,
         compute_mode M = compute_mode::AUTO,
         typename... Args
         >
@@ -179,12 +185,12 @@ namespace kernels
     {
         runner r;
 
-        return control<M>::template call<runner, Op>(
+        return control<M>::template call<runner, Kernel>(
                 r, std::forward<Args>(args)...);
     }
 
     template <
-        typename Op,
+        typename Kernel,
         compute_mode M = compute_mode::AUTO,
         typename... Args
         >
@@ -192,20 +198,16 @@ namespace kernels
     {
         log_runner r;
 
-        return control<M>::template call<log_runner, Op>(
+        return control<M>::template call<log_runner, Kernel>(
                 r, std::forward<Args>(args)...);
     }
 
-
-#define KERNEL_DECL(Name, ...) \
-    struct Name;                                    \
-    template <> struct kernel_traits< Name > {      \
-        static constexpr const char* name = #Name;  \
-        using parameters = std::tuple<__VA_ARGS__>; \
-    }
-
-#define KERNEL_IMPL(Name, Mode) \
-    template <> template <> status kernel<Name>::run<Mode>
-
+    #define KERNEL_DECL(Name, ...) \
+        struct Name_traits_ {                            \
+            using return_type = ::cufoo::kernel::status; \
+            static constexpr const char* name = #Name;   \
+        };                                               \
+        struct Name : ::cufoo::kernel::impl<Name, Name_traits_, __VA_ARGS__ >
 }
 }
+

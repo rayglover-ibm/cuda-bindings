@@ -1,7 +1,7 @@
-#include "kernels.h"
+#include "kernel.h"
 
 namespace cufoo {
-namespace kernels
+namespace kernel
 {
     const char* to_str(const status s) {
         switch (s) {

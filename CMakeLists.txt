@@ -21,7 +21,7 @@ option (${core}_WITH_JAVA   "Enable Java binding"   ON)
 
 set (SRC
     "src/add.cpp"
-    "src/kernels.cpp"
+    "src/kernel.cpp"
     "src/cufoo.cpp"
 )
 
