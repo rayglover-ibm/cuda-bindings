@@ -20,7 +20,7 @@ add_subdirectory ("${googletest_SOURCE_DIR}" "${googletest_BINARY_DIR}")
 
 # Turn on all warnings when using gcc.
 if (CMAKE_COMPILER_IS_GNUCXX)
-   add_definitions ("--std=c++14 -W -Wall -pedantic")
+	add_definitions ("--std=c++14 -W -Wall -pedantic")
 endif ()
 
 # main test suite

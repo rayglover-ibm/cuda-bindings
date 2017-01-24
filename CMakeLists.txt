@@ -38,7 +38,8 @@ configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/include/${core}_config.h.in"
 target_include_directories (${core}
     PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/include"
     PUBLIC  "${CMAKE_CURRENT_BINARY_DIR}/include"
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/third_party/gsl_lite/include"
 )
 
 # add cuda
