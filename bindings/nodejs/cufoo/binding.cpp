@@ -2,10 +2,10 @@
  *   For more nan examples, see: 
  *   https://github.com/nodejs/nan/tree/master/test/cpp
  */
-#include <nan.h>
-
 #include "cufoo.h"
 #include "cufoo_config.h"
+
+#include <nan.h>
 
 using namespace Nan;
 
