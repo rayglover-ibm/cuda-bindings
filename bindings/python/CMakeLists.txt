@@ -36,7 +36,7 @@ if (cufoo_WITH_TESTS)
     add_test (
         NAME cufoopy_test_suite
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        COMMAND python "${TEST_SRC}"
+        COMMAND python "-u" "${TEST_SRC}"
     )
     set_tests_properties (cufoopy_test_suite
         PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}"

@@ -5,5 +5,8 @@ namespace cufoo
 {
     int add(int a, int b);
     
-    void add(gsl::span<int> a, gsl::span<int> b, gsl::span<int> result);
+    void add(const gsl::span<int> a,
+             const gsl::span<int> b,
+                   gsl::span<int> result
+            );
 }
