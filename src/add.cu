@@ -7,8 +7,8 @@
 
 namespace
 {
-    __global__ void add(int a, int b, gsl::span<int> result) {
-        result[0] = a + b;
+    __global__ void add(int a, int b, int* result) {
+        *result = a + b;
     }
 
     __global__ void add_span(
@@ -26,15 +26,15 @@ namespace
 namespace cufoo {
 namespace kernels
 {
-    using device_util::dev_ptr;
+    using device_util::device_ptr;
 
     template <> status add::run<compute_mode::CUDA>(
         int a, int b, int* c
         )
     {
-        dev_ptr<int> dev_c(1);
+        device_ptr<int> dev_c;
 
-        ::add<<< 1, 1 >>>(a, b, dev_c.span());
+        ::add<<< 1, 1 >>>(a, b, dev_c.data());
         if (!checkCudaLastError()) return status::KERNEL_FAILED;
 
         cudaDeviceSynchronize();
@@ -44,14 +44,14 @@ namespace kernels
     }
 
     template <> status add::run<compute_mode::CUDA>(
-        gsl::span<int> a, gsl::span<int> b, gsl::span<int> result
+        const gsl::span<int> a, const gsl::span<int> b, gsl::span<int> result
         )
     {
         size_t N = result.size();
 
-        dev_ptr<int> dev_a(a);
-        dev_ptr<int> dev_b(b);
-        dev_ptr<int> dev_result(N);
+        device_ptr<int> dev_a(a);
+        device_ptr<int> dev_b(b);
+        device_ptr<int> dev_result(N);
 
         int blockSize, minGridSize, gridSize;
 

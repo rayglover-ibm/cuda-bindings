@@ -51,7 +51,7 @@ namespace device_util
 {
     bool init_cudart();
 
-    template<typename T> class dev_ptr final
+    template<typename T> class device_ptr final
     {
         struct cuda_deleter final {
             void operator()(T* b) noexcept { checkCudaErrors(cudaFree(b)); }
@@ -61,7 +61,7 @@ namespace device_util
         size_t m_size;
 
     public:
-        dev_ptr(size_t n)
+        device_ptr(size_t n)
             : m_ptr(nullptr), m_size(n)
         {
             T* p;
@@ -69,32 +69,50 @@ namespace device_util
             m_ptr.reset(p);
         }
 
-        dev_ptr(gsl::span<T> span) : dev_ptr(span.size()) {
+        device_ptr()
+            : device_ptr(1)
+        {}
+
+        device_ptr(device_ptr<T>&& other)
+            : m_ptr(std::move(other.m_ptr)), m_size(other.m_size)
+        {}
+
+        device_ptr(gsl::span<T> span) : device_ptr(span.size()) {
             copy_from(span);
         }
 
-        inline gsl::span<T> span() {
-            return gsl::span<T>{ m_ptr.get(), m_size };
+        gsl::span<T> span() {
+            return { m_ptr.get(), m_size };
         }
 
-        inline void copy_from(gsl::span<T> from)
+        const gsl::span<T> span() const {
+            return { m_ptr.get(), m_size };
+        }
+
+        T* data() {
+            return m_ptr.get();
+        }
+
+        void copy_from(gsl::span<T> from)
         {
             if (from.size() > m_size) {
                 fprintf(stderr, "Invalid size.");
                 exit(-1);
             }
             checkCudaErrors(cudaMemcpy(
-                m_ptr.get(), from.data(), from.size_bytes(), cudaMemcpyHostToDevice));
+                m_ptr.get(), from.data(), from.size_bytes(),
+                cudaMemcpyHostToDevice));
         }
 
-        inline void copy_to(gsl::span<T> to)
+        void copy_to(gsl::span<T> to)
         {
             if (to.size() > m_size) {
                 fprintf(stderr, "Invalid size.");
                 exit(-1);
             }
             checkCudaErrors(cudaMemcpy(
-                to.data(), m_ptr.get(), to.size_bytes(), cudaMemcpyDeviceToHost));
+                to.data(), m_ptr.get(), to.size_bytes(),
+                cudaMemcpyDeviceToHost));
         }
     };
 }

@@ -23,7 +23,7 @@ namespace kernels
             );
         
         template<compute_mode> static status run(
-            gsl::span<int> a, gsl::span<int> b, gsl::span<int> result
+            const gsl::span<int> a, const gsl::span<int> b, gsl::span<int> result
             );
     };
 }

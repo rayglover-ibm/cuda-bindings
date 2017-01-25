@@ -11,7 +11,7 @@ namespace kernels
     }
 
     template <> status add::run<compute_mode::CPU>(
-        gsl::span<int> a, gsl::span<int> b, gsl::span<int> result)
+        const gsl::span<int> a, const gsl::span<int> b, gsl::span<int> result)
     {
         const size_t N = a.length();
         
