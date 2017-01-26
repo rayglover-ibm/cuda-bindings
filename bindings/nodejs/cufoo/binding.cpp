@@ -28,9 +28,37 @@ NAN_METHOD(add)
 
     int32_t a = To<int32_t>(info[0]).FromJust();
     int32_t b = To<int32_t>(info[1]).FromJust();
-    int32_t c = cufoo::add(a, b);
+    int32_t result = cufoo::add(a, b);
 
-    info.GetReturnValue().Set(c);
+    info.GetReturnValue().Set(result);
+}
+
+namespace util
+{
+    template<typename T>
+    gsl::span<T> as_span(TypedArrayContents<T>& info) {
+        return gsl::span<T>{ (*info), info.length() };
+    }
+}
+
+NAN_METHOD(add_all)
+{
+    if (info.Length() != 2 || !info[0]->IsArrayBufferView() || !info[1]->IsArrayBufferView()) {
+        ThrowTypeError("expected (ArrayBufferView, ArrayBufferView)");
+        return;
+    }
+    TypedArrayContents<int> a(info[0]);
+    TypedArrayContents<int> b(info[1]);
+
+    v8::Local<v8::ArrayBuffer> buffer = v8::ArrayBuffer::New(
+        v8::Isolate::GetCurrent(), a.length() * sizeof(int));
+
+    auto result = v8::Int32Array::New(buffer, 0, a.length());
+    TypedArrayContents<int> view(result);
+
+    cufoo::add(util::as_span(a), util::as_span(b), util::as_span(view));
+
+    info.GetReturnValue().Set(result);
 }
 
 NAN_MODULE_INIT(InitAll)
@@ -38,6 +66,10 @@ NAN_MODULE_INIT(InitAll)
     Set(target,
         New<v8::String>("add").ToLocalChecked(),
         GetFunction(New<v8::FunctionTemplate>(add)).ToLocalChecked());
+
+    Set(target,
+        New<v8::String>("add_all").ToLocalChecked(),
+        GetFunction(New<v8::FunctionTemplate>(add_all)).ToLocalChecked());
 
     Set(target,
         New<v8::String>("version").ToLocalChecked(),
