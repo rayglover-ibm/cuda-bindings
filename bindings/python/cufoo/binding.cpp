@@ -34,10 +34,6 @@ namespace
         if (buf1.ndim != 1 || buf2.ndim != 1)
             throw std::runtime_error("Number of dimensions must be one");
 
-        if (buf1.size != buf2.size)
-            throw std::runtime_error("Input shapes must match");
-
-        /* No pointer is passed, so NumPy will allocate the buffer */
         auto result = py::array_t<int>(buf1.size);
         auto buf3 = result.request();
 

@@ -49,6 +49,9 @@ namespace kernels
     {
         size_t N = result.size();
 
+        if (N != a.length() || N != b.length())
+            return status::KERNEL_FAILED;
+
         device_ptr<int> dev_a(a);
         device_ptr<int> dev_b(b);
         device_ptr<int> dev_result(N);
