@@ -28,7 +28,10 @@ target_include_directories (${binding}
 target_link_libraries (${binding}
     ${core}
 )
-add_jar ("${core}-java" "src/main/com/cufoo/Binding.java"
+add_jar ("${core}-java"
+    "src/main/com/cufoo/BindingUtil.java"
+    "src/main/com/cufoo/Binding.java"
+
     OUTPUT_NAME "${core}"
 )
 
@@ -49,7 +52,8 @@ if (cufoo_WITH_TESTS)
     )
     add_test (
         NAME ${PROJECT_NAME}_test_suite
-        COMMAND java -Xcheck:jni
+        COMMAND java -enableassertions
+                     -Xcheck:jni
                      -Djava.library.path=$<TARGET_FILE_DIR:binding-java>
                      -cp "${cp}"
                      "com.cufoo.tests.BindingTest"

@@ -1,12 +1,30 @@
 package com.cufoo.tests;
 
-import static com.cufoo.Binding.*;
+import java.nio.IntBuffer;
+import java.util.Arrays;
 
-public class BindingTest {
-    public static void main(String[] args) {
-        System.out.println("[java] version=" + java.util.Arrays.toString(version()));
-        
+import static com.cufoo.Binding.*;
+import static com.cufoo.BindingUtil.*;
+
+public class BindingTest
+{
+    public static void addTest() {
         int c = add(5, 3);
-        assert(c == 8);
+        assert c == 8;
+    }
+
+    public static void addAllTest() {
+        IntBuffer a = allocateDirectBufferFrom(new int[]{ 0, 1, 2, 3 });
+        IntBuffer b = allocateDirectBufferFrom(new int[]{ 4, 5, 6, 7 });
+
+        IntBuffer c = addAll(a, b);
+        assert c.equals(allocateDirectBufferFrom(new int[]{ 4, 6, 8, 10 }));
+    }
+
+    public static void main(String[] args) {
+        System.out.println("[java] version=" + Arrays.toString(version()));
+        
+        addTest();
+        addAllTest();
     }
 }
