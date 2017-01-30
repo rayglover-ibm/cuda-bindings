@@ -126,21 +126,20 @@ namespace kernel
     template <> template <typename Runner, typename Kernel, typename... Args>
     status control<compute_mode::AUTO>::call(Runner& r, Args... args)
     {
-        status s;
+        status s{ status::KERNEL_UNAVILABLE };
 
-        switch (detail::runtime_mode()) {
-        case compute_mode::CPU:
-            s = control<compute_mode::CPU>::call<Runner, Kernel, Args...>(
-                    r, std::forward<Args>(args)...);
-            break;
-
-        case compute_mode::CUDA:
+        /* Attempt to run cuda kernel */
+        if (compute_traits<compute_mode::CUDA>::available())
+        {
             s = control<compute_mode::CUDA>::call<Runner, Kernel, Args...>(
                     r, std::forward<Args>(args)...);
-            break;
-
-        default:
-            s = status::KERNEL_UNAVILABLE;
+        }
+        /* Attempt/fallback to run cpu kernel */
+        if (s == status::KERNEL_NOT_DEFINED &&
+            compute_traits<compute_mode::CPU>::available())
+        {
+            s = control<compute_mode::CPU>::call<Runner, Kernel, Args...>(
+                    r, std::forward<Args>(args)...);
         }
         return s;
     }
