@@ -4,7 +4,7 @@ set (CUDA_VERBOSE_BUILD ON)
 find_package (CUDA REQUIRED)
 
 set (SRC_CUDA
-    "src/add.cu"
+    "src/kernels/add.cu"
     "src/device_util.cu"
 )
 cuda_include_directories (

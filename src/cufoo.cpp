@@ -1,8 +1,8 @@
 #include "cufoo.h"
 #include "kernel.h"
-#include "add.h"
+#include "kernels/add.h"
 
-#include "gsl.h"
+#include <gsl.h>
 
 namespace cufoo
 {

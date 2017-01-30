@@ -20,7 +20,7 @@ option (${core}_WITH_NODEJS "Enable nodejs binding" ON)
 option (${core}_WITH_JAVA   "Enable Java binding"   ON)
 
 set (SRC
-    "src/add.cpp"
+    "src/kernels/add.cpp"
     "src/kernel.cpp"
     "src/cufoo.cpp"
 )

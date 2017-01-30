@@ -1,4 +1,4 @@
-#include "add.h"
+#include "kernels/add.h"
 
 namespace cufoo {
 namespace kernels
