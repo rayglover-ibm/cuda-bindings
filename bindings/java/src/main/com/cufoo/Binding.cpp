@@ -4,14 +4,12 @@
 #include <jni/jni.hpp>
 
 namespace {
-    struct IntBuffer {
+    struct IntBuffer
+    {
         static constexpr auto Name() { return "java/nio/IntBuffer"; }
         using element_type = int32_t;
     };
-}
-
-namespace util
-{
+    
     template<
         typename Buffer,
         typename Elem = Buffer::element_type
@@ -35,9 +33,7 @@ namespace
     {
         auto get_version = [](jni::JNIEnv& env, jni::Class<fascade>) -> jni::Array<jni::jint> {
             auto vec = std::vector<jni::jint>{ 
-                cufoo_VERSION_MAJOR,
-                cufoo_VERSION_MINOR,
-                cufoo_VERSION_PATCH
+                cufoo_VERSION_MAJOR, cufoo_VERSION_MINOR, cufoo_VERSION_PATCH
             };
             return jni::Make<jni::Array<jni::jint>>(env, vec);
         };
@@ -51,9 +47,9 @@ namespace
         auto add_all = [](jni::JNIEnv& env, jni::Class<fascade>, 
                 jni::Object<IntBuffer> a, jni::Object<IntBuffer> b, jni::Object<IntBuffer> result) -> void
         {
-            cufoo::add(util::to_span<::IntBuffer>(env, a), 
-                       util::to_span<::IntBuffer>(env, b),
-                       util::to_span<::IntBuffer>(env, result));
+            cufoo::add(::to_span<::IntBuffer>(env, a), 
+                       ::to_span<::IntBuffer>(env, b),
+                       ::to_span<::IntBuffer>(env, result));
         };
         
         jni::JNIEnv& env { jni::GetEnv(*vm) };
@@ -64,7 +60,8 @@ namespace
     }
 }
 
-extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
+extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*)
+{
     register_fascade(vm);
     return jni::Unwrap(jni::jni_version_1_2);
 }
