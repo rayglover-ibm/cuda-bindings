@@ -19,12 +19,10 @@ namespace device_util
 
             if (CUDA_SUCCESS != err) {
                 fprintf(stderr, "[E] cuda failed to initialize. Is cuda installed? code: %04d\n", err);
-                success = false;
                 return;
             }
             if (n == 0) {
                 fprintf(stderr, "[E] 0 cuda devices detected\n");
-                success = false;
                 return;
             }
             success = true;
