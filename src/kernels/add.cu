@@ -37,7 +37,6 @@ namespace kernels
         ::add<<< 1, 1 >>>(a, b, dev_c.data());
         if (!checkCudaLastError()) return status::KERNEL_FAILED;
 
-        cudaDeviceSynchronize();
         dev_c.copy_to({ c, 1 });
 
         return status::SUCCESS;
@@ -69,7 +68,6 @@ namespace kernels
 
         if (!checkCudaLastError()) return status::KERNEL_FAILED;
 
-        cudaDeviceSynchronize();
         dev_result.copy_to(result);
 
         return status::SUCCESS;
