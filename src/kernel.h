@@ -9,19 +9,28 @@
 namespace cufoo {
 namespace kernel
 {
-    enum class status {
+    enum class status
+    {
+        /* The kernel ran and completed successfully */
         SUCCESS = 1,
-        KERNEL_UNAVILABLE,
+        
+        /* The kernel was invoked with a compute mode that wasn't
+           enabled at compile time or is unavailable at run-time  */
+        COMPUTE_MODE_DISABLED,
+
+        /* The kernel does not support being invoked with the
+           specified compute mode or arguments */
         KERNEL_NOT_DEFINED,
+        
+        /* The kernel was invoked but failed during execution. */
         KERNEL_FAILED,
-        CANCELLED
+        
+        /* The kernel was invoked but was cancelled before it
+           began executing. */
+        CANCELLED              
     };
 
-    enum class compute_mode {
-        AUTO = 1,
-        CUDA,
-        CPU
-    };
+    enum class compute_mode { AUTO = 1, CUDA, CPU };
 
     const char* to_str(const status s);
     const char* to_str(const compute_mode m);
@@ -116,7 +125,7 @@ namespace kernel
         static status call(Runner& r, Args... args)
         {
             if (!r.template begin<Kernel>(M)) { return status::CANCELLED; }
-            status s = status::KERNEL_UNAVILABLE;
+            status s = status::COMPUTE_MODE_DISABLED;
             r.template end<Kernel>(s);
             return s;
         }
@@ -126,7 +135,7 @@ namespace kernel
     template <> template <typename Runner, typename Kernel, typename... Args>
     status control<compute_mode::AUTO>::call(Runner& r, Args... args)
     {
-        status s{ status::KERNEL_UNAVILABLE };
+        status s{ status::KERNEL_NOT_DEFINED };
 
         /* Attempt to run cuda kernel */
         if (compute_traits<compute_mode::CUDA>::available())
