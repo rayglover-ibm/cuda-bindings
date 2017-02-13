@@ -14,9 +14,9 @@ cuda_include_directories (
     "${CMAKE_CURRENT_SOURCE_DIR}/third_party/gsl_lite/include"
 )
 list (APPEND
-    CUDA_NVCC_FLAGS "--default-stream per-thread"
+    CUDA_NVCC_FLAGS "--expt-relaxed-constexpr --default-stream per-thread"
 )
 cuda_add_library (${core}_cuda
     STATIC ${SRC_CUDA}
-    OPTIONS "-gencode arch=compute_30,code=sm_30 -cudart static"
+    OPTIONS "-gencode arch=compute_30,code=compute_30 -cudart static"
 )
