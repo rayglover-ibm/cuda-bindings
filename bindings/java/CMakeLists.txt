@@ -7,9 +7,14 @@ project ("${core}-java"
     VERSION "${${core}_VERSION_MAJOR}.${${core}_VERSION_MINOR}.${${core}_VERSION_PATCH}"
 )
 
-find_package (JNI REQUIRED)
-find_package (Java REQUIRED)
+if (ANDROID_TOOLCHAIN)
+    set (JNI_INCLUDE_DIRS "")
+else ()
+    find_package (JNI REQUIRED)
+endif ()
 
+
+find_package (Java REQUIRED)
 include (UseJava)
 
 # a jni library 'binding' and associated .jar

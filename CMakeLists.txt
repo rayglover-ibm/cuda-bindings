@@ -25,6 +25,11 @@ set (SRC
     "src/cufoo.cpp"
 )
 
+# language requirements
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    add_definitions (-std=c++14)
+endif ()
+
 # create the library
 add_library (${core} STATIC ${SRC})
 set_target_properties (${core} PROPERTIES LINKER_LANGUAGE CXX)
