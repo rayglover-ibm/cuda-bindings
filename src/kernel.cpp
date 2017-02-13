@@ -6,7 +6,7 @@ namespace kernel
     const char* to_str(const status s) {
         switch (s) {
             case status::KERNEL_FAILED: return "Kernel Failed";
-            case status::KERNEL_UNAVILABLE: return "Kernel Unavilable";
+            case status::COMPUTE_MODE_DISABLED: return "Compute Mode Disabled";
             case status::KERNEL_NOT_DEFINED: return "Kernel Not Defined";
             case status::CANCELLED: return "Cancelled";
             case status::SUCCESS: return "Success";

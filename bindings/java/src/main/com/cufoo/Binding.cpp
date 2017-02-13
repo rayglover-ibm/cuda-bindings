@@ -12,7 +12,7 @@ namespace {
     
     template<
         typename Buffer,
-        typename Elem = Buffer::element_type
+        typename Elem = typename Buffer::element_type
         >
     gsl::span<Elem> to_span(
         jni::JNIEnv& env, jni::Object<Buffer>& o

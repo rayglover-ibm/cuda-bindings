@@ -57,11 +57,12 @@ namespace kernels
 
         int blockSize, minGridSize, gridSize;
 
-        cudaOccupancyMaxPotentialBlockSize(
-            &minGridSize, &blockSize, ::add_span, 0, 0);
+        if (!checkCudaErrors(cudaOccupancyMaxPotentialBlockSize(
+            &minGridSize, &blockSize, ::add_span, 0, 0)))
+            return status::KERNEL_FAILED;
 
         /* Round up according to array size */
-        gridSize = (N + blockSize - 1) / blockSize;
+        gridSize = ((int) N + blockSize - 1) / blockSize;
 
         ::add_span<<< gridSize, blockSize >>>(
             dev_a.span(), dev_b.span(), dev_result.span());
