@@ -1,6 +1,5 @@
 build/
-build_tests/
-build_cpu/
+build_*/
 .vscode/
 *.sublime-project
 *.sublime-workspace
