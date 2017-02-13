@@ -17,6 +17,7 @@ inline bool __checkCudaErrors(CUresult err, const char *file, const int line) {
             "[E] CUDA Driver API error = %04d from file <%s:%i>.\n",
             err, file, line
             );
+        fflush(stderr);
         return false;
     }
     return true;
@@ -28,6 +29,7 @@ inline bool __checkCudaErrors(cudaError_t err, const char *file, const int line)
             "[E] CUDA error = %s from file <%s:%i>.\n",
             cudaGetErrorString(err), file, line
             );
+        fflush(stderr);
         return false;
     }
     return true;
@@ -36,21 +38,20 @@ inline bool __checkCudaErrors(cudaError_t err, const char *file, const int line)
 inline bool __checkLastCudaError(const char *file, const int line) {
     if (cudaPeekAtLastError() != cudaSuccess) {
         fprintf(stderr, 
-            "[E] %s <%s:%i>",
+            "[E] %s <%s:%i>\n",
             cudaGetErrorString(cudaGetLastError()), file, line
             );
+        fflush(stderr);
         return false;
     }
     return true;
 }
 
-#endif
+
 
 namespace cufoo {
 namespace device_util
 {
-    bool init_cudart();
-
     template<typename T> class device_ptr final
     {
         struct cuda_deleter final {
@@ -115,5 +116,14 @@ namespace device_util
                 cudaMemcpyDeviceToHost));
         }
     };
+}
+}
+
+#endif
+
+namespace cufoo {
+namespace device_util
+{
+    bool init_cudart();
 }
 }
