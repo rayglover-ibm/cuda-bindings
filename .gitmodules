@@ -6,7 +6,7 @@
 	url = https://github.com/nodejs/nan
 [submodule "bindings/java/third_party/jni.hpp"]
 	path = bindings/java/third_party/jni.hpp
-	url = git@github.ibm.com:ray-glover/jni.hpp.git
+	url = https://github.com/rayglover-ibm/jni.hpp.git
 [submodule "third_party/gsl_lite"]
 	path = third_party/gsl_lite
 	url = https://github.com/martinmoene/gsl-lite
