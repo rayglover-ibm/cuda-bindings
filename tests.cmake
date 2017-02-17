@@ -25,7 +25,7 @@ endif ()
 
 # main test suite
 add_executable (cufoo_test
-	"cufoo/basic.cpp"
+	"src/kernels/add_test.cpp"
 )
 target_link_libraries (cufoo_test
 	cufoo

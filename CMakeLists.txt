@@ -61,7 +61,7 @@ endif ()
 # core library unit tests
 if (${core}_WITH_TESTS)
     enable_testing ()
-    add_subdirectory (test)
+    include ("tests.cmake")
 endif ()
 
 # python binding

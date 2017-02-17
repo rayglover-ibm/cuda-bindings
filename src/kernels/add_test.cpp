@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+
 #include "cufoo.h"
 #include "cufoo_config.h"
 
