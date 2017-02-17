@@ -45,6 +45,7 @@ target_include_directories (${core}
     PUBLIC  "${CMAKE_CURRENT_BINARY_DIR}/include"
     PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/src"
     PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/third_party/gsl_lite/include"
+    PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/third_party/variant/include"
 )
 
 # add cuda
