@@ -22,14 +22,5 @@ namespace kernel
         }
         return "Unknown";
     }
-
-    compute_mode detail::runtime_mode()
-    {
-        if (compute_traits<compute_mode::CUDA>::enabled)
-            return compute_traits<compute_mode::CUDA>::available() ?
-                compute_mode::CUDA : compute_mode::CPU;
-        else
-            return compute_mode::CPU;
-    }
 }
 }
