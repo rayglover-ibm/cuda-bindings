@@ -18,13 +18,15 @@ namespace kernels
     KERNEL_DECL(add,
         compute_mode::CPU, compute_mode::CUDA)
     {
-        template<compute_mode> static status run(
-            int a, int b, int* result
+        template <compute_mode> static int run(
+            int a, int b
             );
         
-        template<compute_mode> static status run(
+        template <compute_mode> static status run(
             const gsl::span<int> a, const gsl::span<int> b, gsl::span<int> result
             );
     };
+
+
 }
 }

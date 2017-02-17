@@ -12,8 +12,9 @@ public class Binding {
 
     public static native int add(int a, int b);
     private static native void addAll(IntBuffer a, IntBuffer b, IntBuffer result);
-    
-    public static IntBuffer addAll(IntBuffer a, IntBuffer b) {
+
+    public static IntBuffer addAll(IntBuffer a, IntBuffer b)
+    {
         IntBuffer result = BindingUtil.allocateDirectIntBuffer(a.capacity());
         addAll(a, b, result);
         return result;

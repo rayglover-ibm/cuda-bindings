@@ -3,11 +3,10 @@
 namespace cufoo {
 namespace kernels
 {
-    template <> status add::run<compute_mode::CPU>(
-        int a, int b, int* c)
+    template <> int add::run<compute_mode::CPU>(
+        int a, int b)
     {
-        *c = a + b;
-        return status::SUCCESS;
+        return a + b;
     }
 
     template <> status add::run<compute_mode::CPU>(

@@ -1,5 +1,5 @@
 /*
- *   For more nan examples, see: 
+ *   For more nan examples, see:
  *   https://github.com/nodejs/nan/tree/master/test/cpp
  */
 #include "cufoo.h"
@@ -8,6 +8,34 @@
 #include <nan.h>
 
 using namespace Nan;
+
+namespace util
+{
+    template <typename T>
+    gsl::span<T> as_span(TypedArrayContents<T>& info) {
+        return gsl::span<T>{ (*info), info.length() };
+    }
+
+    template <typename R>
+    bool try_throw(const cufoo::maybe<R>& r)
+    {
+        if (r.is<cufoo::error>()) {
+            Nan::ThrowError(r.get<cufoo::error>().data());
+            return true;
+        }
+        return false;
+    }
+
+    inline
+    bool try_throw(const cufoo::failable& r)
+    {
+        if (r) {
+            Nan::ThrowError(r.get().data());
+            return true;
+        }
+        return false;
+    }
+}
 
 NAN_METHOD(version)
 {
@@ -28,21 +56,18 @@ NAN_METHOD(add)
 
     int32_t a = To<int32_t>(info[0]).FromJust();
     int32_t b = To<int32_t>(info[1]).FromJust();
-    int32_t result = cufoo::add(a, b);
 
-    info.GetReturnValue().Set(result);
-}
+    cufoo::maybe<int> result = cufoo::add(a, b);
 
-namespace util
-{
-    template<typename T>
-    gsl::span<T> as_span(TypedArrayContents<T>& info) {
-        return gsl::span<T>{ (*info), info.length() };
+    if (!util::try_throw(result)) {
+        info.GetReturnValue().Set(result.get<int>());
     }
 }
 
 NAN_METHOD(add_all)
 {
+    using namespace util;
+
     if (info.Length() != 2 || !info[0]->IsArrayBufferView() || !info[1]->IsArrayBufferView()) {
         ThrowTypeError("expected (ArrayBufferView, ArrayBufferView)");
         return;
@@ -56,9 +81,8 @@ NAN_METHOD(add_all)
     auto result = v8::Int32Array::New(buffer, 0, a.length());
     TypedArrayContents<int> view(result);
 
-    cufoo::add(util::as_span(a), util::as_span(b), util::as_span(view));
-
-    info.GetReturnValue().Set(result);
+    if (!try_throw(cufoo::add(as_span(a), as_span(b), as_span(view))))
+        info.GetReturnValue().Set(result);
 }
 
 NAN_MODULE_INIT(InitAll)

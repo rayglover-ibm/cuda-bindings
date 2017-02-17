@@ -28,18 +28,19 @@ namespace kernels
 {
     using device_util::device_ptr;
 
-    template <> status add::run<compute_mode::CUDA>(
-        int a, int b, int* c
+    template <> int add::run<compute_mode::CUDA>(
+        int a, int b
         )
     {
         device_ptr<int> dev_c;
 
         ::add<<< 1, 1 >>>(a, b, dev_c.data());
-        if (!checkCudaLastError()) return status::KERNEL_FAILED;
+        if (!checkCudaLastError()) return -1; //return status::KERNEL_FAILED;
 
-        dev_c.copy_to({ c, 1 });
-
-        return status::SUCCESS;
+        int c;
+        dev_c.copy_to({ &c, 1 });
+        
+        return c;
     }
 
     template <> status add::run<compute_mode::CUDA>(

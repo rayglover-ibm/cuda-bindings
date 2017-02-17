@@ -3,13 +3,13 @@
 
 #include <jni/jni.hpp>
 
-namespace {
+namespace util {
     struct IntBuffer
     {
         static constexpr auto Name() { return "java/nio/IntBuffer"; }
         using element_type = int32_t;
     };
-    
+
     template<
         typename Buffer,
         typename Elem = typename Buffer::element_type
@@ -23,6 +23,30 @@ namespace {
 
         return gsl::span<Elem>{ reinterpret_cast<Elem*>(buff) , len };
     }
+
+    template<typename R>
+    bool try_throw(jni::JNIEnv& env, const cufoo::maybe<R>& r)
+    {
+        if (r.is<cufoo::error>()) {
+            jni::ThrowNew(env,
+                jni::FindClass(env, "java/lang/Error"),
+                r.get<cufoo::error>().data());
+            return true;
+        }
+        return false;
+    }
+
+    inline
+    bool try_throw(jni::JNIEnv& env, const cufoo::failable& r)
+    {
+        if (r) {
+            jni::ThrowNew(env,
+                jni::FindClass(env, "java/lang/Error"),
+                r.get().data());
+            return true;
+        }
+        return false;
+    }
 }
 
 namespace
@@ -31,27 +55,32 @@ namespace
 
     void register_fascade(JavaVM* vm)
     {
+        using namespace cufoo;
+        using namespace ::util;
+
         auto get_version = [](jni::JNIEnv& env, jni::Class<fascade>) -> jni::Array<jni::jint> {
-            auto vec = std::vector<jni::jint>{ 
+            auto vec = std::vector<jni::jint>{
                 cufoo_VERSION_MAJOR, cufoo_VERSION_MINOR, cufoo_VERSION_PATCH
             };
             return jni::Make<jni::Array<jni::jint>>(env, vec);
         };
-        
-        auto add = [] (jni::JNIEnv&, jni::Class<fascade>,
+
+        auto add = [] (jni::JNIEnv& env, jni::Class<fascade>,
                 jni::jint a, jni::jint b) -> jni::jint
         {
-            return cufoo::add(a, b);
+            maybe<int> r = cufoo::add(a, b);
+            if (!try_throw(env, r)) return r.get<int>();
         };
 
-        auto add_all = [](jni::JNIEnv& env, jni::Class<fascade>, 
+        auto add_all = [](jni::JNIEnv& env, jni::Class<fascade>,
                 jni::Object<IntBuffer> a, jni::Object<IntBuffer> b, jni::Object<IntBuffer> result) -> void
         {
-            cufoo::add(::to_span<::IntBuffer>(env, a), 
-                       ::to_span<::IntBuffer>(env, b),
-                       ::to_span<::IntBuffer>(env, result));
+            try_throw(env, cufoo::add(
+                to_span<IntBuffer>(env, a),
+                to_span<IntBuffer>(env, b),
+                to_span<IntBuffer>(env, result)));
         };
-        
+
         jni::JNIEnv& env { jni::GetEnv(*vm) };
         jni::RegisterNatives(env, jni::Class<fascade>::Find(env),
             jni::MakeNativeMethod("add", add),

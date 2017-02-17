@@ -23,7 +23,7 @@ public class BindingTest
 
     public static void main(String[] args) {
         System.out.println("[java] version=" + Arrays.toString(version()));
-        
+
         addTest();
         addAllTest();
     }
