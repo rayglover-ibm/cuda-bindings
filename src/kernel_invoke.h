@@ -15,7 +15,16 @@ namespace kernel
     {
         template <typename R> struct result_traits
         {
-            using output_type = mapbox::util::variant<status, R>;
+            using output_type = variant<status, R>;
+            using public_type = maybe<R>;
+
+            static status get_status(const output_type& s) {
+                return s.is<status>() ? s.get<status>() : status::SUCCESS;
+            }
+        };
+        template <typename R> struct result_traits<variant<status, R>>
+        {
+            using output_type = variant<status, R>;
             using public_type = maybe<R>;
 
             static status get_status(const output_type& s) {
@@ -158,7 +167,7 @@ namespace kernel
     namespace detail
     {
         template <typename R>
-        maybe<R> convert(mapbox::util::variant<status, R>&& r)
+        maybe<R> convert(variant<status, R>&& r)
         {
             struct cvt {
                 maybe<R> operator()(status s)  const { return to_str(s); }
