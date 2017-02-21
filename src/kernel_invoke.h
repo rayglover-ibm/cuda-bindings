@@ -15,35 +15,35 @@ namespace kernel
     {
         template <typename R> struct result_traits
         {
-            using output_type = variant<status, R>;
+            using output_type = variant<error_code, R>;
             using public_type = maybe<R>;
 
-            static status get_status(const output_type& s) {
-                return s.is<status>() ? s.get<status>() : status::SUCCESS;
+            static error_code get_status(const output_type& s) {
+                return s.is<error_code>() ? s.get<error_code>() : error_code::NONE;
             }
         };
-        template <typename R> struct result_traits<variant<status, R>>
+        template <typename R> struct result_traits<variant<error_code, R>>
         {
-            using output_type = variant<status, R>;
+            using output_type = variant<error_code, R>;
             using public_type = maybe<R>;
 
-            static status get_status(const output_type& s) {
-                return s.is<status>() ? s.get<status>() : status::SUCCESS;
+            static error_code get_status(const output_type& s) {
+                return s.is<error_code>() ? s.get<error_code>() : error_code::NONE;
             }
         };
         template <> struct result_traits<void>
         {
-            using output_type = status;
+            using output_type = error_code;
             using public_type = failable;
 
-            static status get_status(const output_type& s) { return s; }
+            static error_code get_status(const output_type& s) { return s; }
         };
-        template <> struct result_traits<status>
+        template <> struct result_traits<error_code>
         {
-            using output_type = status;
+            using output_type = error_code;
             using public_type = failable;
 
-            static status get_status(const output_type& s) { return s; }
+            static error_code get_status(const output_type& s) { return s; }
         };
     }
 
@@ -70,7 +70,7 @@ namespace kernel
         static auto call(Runner& r, Args... args)
             -> result<Kernel, Args...>
         {
-            if (!r.begin(M)) { return status::CANCELLED; }
+            if (!r.begin(M)) { return error_code::CANCELLED; }
             auto s = r.apply<M, Args...>(std::forward<Args>(args)...);
             r.end(result_traits<Kernel, Args...>::get_status(s));
             return s;
@@ -85,7 +85,7 @@ namespace kernel
         static auto call(Runner& r, Args... args)
             -> result<Kernel, Args...>
         {
-            return status::COMPUTE_MODE_DISABLED;
+            return error_code::COMPUTE_MODE_DISABLED;
         }
     };
 
@@ -95,7 +95,7 @@ namespace kernel
     auto control<compute_mode::AUTO>::call(Runner& r, Args... args)
         -> result<Kernel, Args...>
     {
-        typename result<Kernel, Args...> s = status::KERNEL_NOT_DEFINED;
+        typename result<Kernel, Args...> s = error_code::KERNEL_NOT_DEFINED;
 
         /* Attempt to run cuda kernel */
         if (compute_traits<compute_mode::CUDA>::available())
@@ -104,7 +104,7 @@ namespace kernel
                     r, std::forward<Args>(args)...);
         }
         /* Attempt/fallback to run cpu kernel */
-        if (s == status::KERNEL_NOT_DEFINED &&
+        if (s == error_code::KERNEL_NOT_DEFINED &&
             compute_traits<compute_mode::CPU>::available())
         {
             s = control<compute_mode::CPU>::call<Runner, Kernel, Args...>(
@@ -121,14 +121,14 @@ namespace kernel
         using traits = typename K::traits;
 
         bool begin(compute_mode m) { return true; }
-        void end(status s) {}
+        void end(error_code s) {}
 
         template <
             compute_mode M, typename... Args,
             std::enable_if_t< !K::template supports<M>::value, int> = 0
             >
         auto apply(Args... args) -> result<K, Args...> {
-            return status::KERNEL_NOT_DEFINED;
+            return error_code::KERNEL_NOT_DEFINED;
         }
 
         template <
@@ -153,7 +153,7 @@ namespace kernel
             return true;
         }
 
-        void end(status s)
+        void end(error_code s)
         {
             *m_out << '[' << traits::name << "] status="
                    << to_str(s) << std::endl;
@@ -167,18 +167,18 @@ namespace kernel
     namespace detail
     {
         template <typename R>
-        maybe<R> convert(variant<status, R>&& r)
+        maybe<R> convert(variant<error_code, R>&& r)
         {
             struct cvt {
-                maybe<R> operator()(status s)  const { return to_str(s); }
+                maybe<R> operator()(error_code s)  const { return to_str(s); }
                 maybe<R> operator()(R& result) const { return std::move(result); }
             };
             return mapbox::util::apply_visitor(cvt{}, r);
         }
 
-        failable convert(status r)
+        failable convert(error_code r)
         {
-            return r == status::SUCCESS ?
+            return r == error_code::NONE ?
                 failable() : failable{ to_str(r) };
         };
     }

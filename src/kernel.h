@@ -12,10 +12,10 @@ namespace kernel
     /* the suppported compute modes */
     enum class compute_mode { AUTO = 1, CUDA, CPU };
 
-    enum class status
+    enum class error_code : uint8_t
     {
         /* The kernel ran and completed successfully */
-        SUCCESS = 1,
+        NONE = 0,
 
         /* The kernel was invoked with a compute mode that wasn't
            enabled at compile time or is unavailable at run-time  */
@@ -33,7 +33,7 @@ namespace kernel
         CANCELLED
     };
 
-    const char* to_str(const status s);
+    const char* to_str(const error_code s);
     const char* to_str(const compute_mode m);
 
     template <compute_mode>

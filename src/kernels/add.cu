@@ -29,14 +29,14 @@ namespace kernels
 {
     using device_util::device_ptr;
 
-    template <> variant<status, int> add::run<compute_mode::CUDA>(
+    template <> variant<error_code, int> add::run<compute_mode::CUDA>(
         int a, int b
         )
     {
         device_ptr<int> dev_c;
 
         ::add<<< 1, 1 >>>(a, b, dev_c.get());
-        if (!checkCudaLastError()) return status::KERNEL_FAILED;
+        if (!checkCudaLastError()) return error_code::KERNEL_FAILED;
 
         int c;
         dev_c.copy_to({ &c, 1 });
@@ -44,14 +44,14 @@ namespace kernels
         return c;
     }
 
-    template <> status add::run<compute_mode::CUDA>(
+    template <> error_code add::run<compute_mode::CUDA>(
         const gsl::span<int> a, const gsl::span<int> b, gsl::span<int> result
         )
     {
         size_t N = result.size();
 
         if (N != a.length() || N != b.length())
-            return status::KERNEL_FAILED;
+            return error_code::KERNEL_FAILED;
 
         device_ptr<int> dev_a(a);
         device_ptr<int> dev_b(b);
@@ -61,7 +61,7 @@ namespace kernels
 
         if (!checkCudaErrors(cudaOccupancyMaxPotentialBlockSize(
             &minGridSize, &blockSize, ::add_span, 0, 0)))
-            return status::KERNEL_FAILED;
+            return error_code::KERNEL_FAILED;
 
         /* Round up according to array size */
         gridSize = ((int) N + blockSize - 1) / blockSize;
@@ -69,11 +69,11 @@ namespace kernels
         ::add_span<<< gridSize, blockSize >>>(
             dev_a.span(), dev_b.span(), dev_result.span());
 
-        if (!checkCudaLastError()) return status::KERNEL_FAILED;
+        if (!checkCudaLastError()) return error_code::KERNEL_FAILED;
 
         dev_result.copy_to(result);
 
-        return status::SUCCESS;
+        return error_code::NONE;
     }
 }
 }
