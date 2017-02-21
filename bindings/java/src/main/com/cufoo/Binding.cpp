@@ -69,7 +69,7 @@ namespace
                 jni::jint a, jni::jint b) -> jni::jint
         {
             maybe<int> r = cufoo::add(a, b);
-            if (!try_throw(env, r)) return r.get<int>();
+            return try_throw(env, r) ? 0 : r.get<int>();
         };
 
         auto add_all = [](jni::JNIEnv& env, jni::Class<fascade>,
