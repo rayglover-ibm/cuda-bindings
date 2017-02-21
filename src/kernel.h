@@ -87,6 +87,29 @@ namespace kernel
         };                                               \
         struct Name : ::cufoo::kernel::impl<Name_traits_, __VA_ARGS__ >
 
+
+    /* Implementation detail ----------------------------------------------- */
+
+
+    inline const char* to_str(const error_code s) {
+        switch (s) {
+        case error_code::KERNEL_FAILED: return "Kernel Failed";
+        case error_code::COMPUTE_MODE_DISABLED: return "Compute Mode Disabled";
+        case error_code::KERNEL_NOT_DEFINED: return "Kernel Not Defined";
+        case error_code::CANCELLED: return "Cancelled";
+        case error_code::NONE: return "Success";
+        }
+        return "Unknown";
+    }
+
+    inline const char* to_str(const compute_mode m) {
+        switch (m) {
+        case compute_mode::CPU: return "CPU";
+        case compute_mode::CUDA: return "Cuda";
+        case compute_mode::AUTO: return "Auto";
+        }
+        return "Unknown";
+    }
 }
 }
 
