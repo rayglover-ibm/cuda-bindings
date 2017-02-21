@@ -18,7 +18,7 @@ namespace kernel
             using output_type = variant<error_code, R>;
             using public_type = maybe<R>;
 
-            static error_code get_status(const output_type& s) {
+            static error_code get_errc(const output_type& s) {
                 return s.is<error_code>() ? s.get<error_code>() : error_code::NONE;
             }
         };
@@ -27,7 +27,7 @@ namespace kernel
             using output_type = variant<error_code, R>;
             using public_type = maybe<R>;
 
-            static error_code get_status(const output_type& s) {
+            static error_code get_errc(const output_type& s) {
                 return s.is<error_code>() ? s.get<error_code>() : error_code::NONE;
             }
         };
@@ -36,14 +36,14 @@ namespace kernel
             using output_type = error_code;
             using public_type = status;
 
-            static error_code get_status(const output_type& s) { return s; }
+            static error_code get_errc(const output_type& s) { return s; }
         };
         template <> struct result_traits<error_code>
         {
             using output_type = error_code;
             using public_type = status;
 
-            static error_code get_status(const output_type& s) { return s; }
+            static error_code get_errc(const output_type& s) { return s; }
         };
     }
 
@@ -72,7 +72,7 @@ namespace kernel
         {
             if (!r.begin(M)) { return error_code::CANCELLED; }
             auto s = r.apply<M, Args...>(std::forward<Args>(args)...);
-            r.end(result_traits<Kernel, Args...>::get_status(s));
+            r.end(result_traits<Kernel, Args...>::get_errc(s));
             return s;
         }
     };
