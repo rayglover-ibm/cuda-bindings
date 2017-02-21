@@ -78,7 +78,9 @@ namespace device_util
             : m_ptr(std::move(other.m_ptr)), m_size(other.m_size)
         {}
 
-        device_ptr(gsl::span<T> span) : device_ptr(span.size()) {
+        device_ptr(gsl::span<T> span)
+            : device_ptr(span.size())
+        {
             copy_from(span);
         }
 
@@ -90,27 +92,21 @@ namespace device_util
             return { m_ptr.get(), m_size };
         }
 
-        T* data() {
+        T* get() {
             return m_ptr.get();
         }
 
-        void copy_from(gsl::span<T> from)
+        void copy_from(const gsl::span<T> from)
         {
-            if (from.size() > m_size) {
-                fprintf(stderr, "Invalid size.");
-                exit(-1);
-            }
+            assert(m_size == from.size());
             checkCudaErrors(cudaMemcpy(
                 m_ptr.get(), from.data(), from.size_bytes(),
                 cudaMemcpyHostToDevice));
         }
 
-        void copy_to(gsl::span<T> to)
+        void copy_to(gsl::span<T> to) const
         {
-            if (to.size() > m_size) {
-                fprintf(stderr, "Invalid size.");
-                exit(-1);
-            }
+            assert(m_size == to.size());
             checkCudaErrors(cudaMemcpy(
                 to.data(), m_ptr.get(), to.size_bytes(),
                 cudaMemcpyDeviceToHost));
