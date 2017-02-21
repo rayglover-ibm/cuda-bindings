@@ -1,9 +1,10 @@
+#include "types.h"
 #include "kernels/add.h"
 
 namespace cufoo {
 namespace kernels
 {
-    template <> int add::run<compute_mode::CPU>(
+    template <> variant<status, int> add::run<compute_mode::CPU>(
         int a, int b)
     {
         return a + b;

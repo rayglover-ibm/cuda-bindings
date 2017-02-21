@@ -1,5 +1,6 @@
 #include "add.h"
 #include "kernel.h"
+#include "types.h"
 #include "device_util.h"
 
 #include <gsl.h>
@@ -28,14 +29,14 @@ namespace kernels
 {
     using device_util::device_ptr;
 
-    template <> int add::run<compute_mode::CUDA>(
+    template <> variant<status, int> add::run<compute_mode::CUDA>(
         int a, int b
         )
     {
         device_ptr<int> dev_c;
 
-        ::add<<< 1, 1 >>>(a, b, dev_c.data());
-        if (!checkCudaLastError()) return -1; //return status::KERNEL_FAILED;
+        ::add<<< 1, 1 >>>(a, b, dev_c.get());
+        if (!checkCudaLastError()) return status::KERNEL_FAILED;
 
         int c;
         dev_c.copy_to({ &c, 1 });

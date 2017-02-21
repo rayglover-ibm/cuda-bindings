@@ -18,9 +18,9 @@ namespace cufoo
     {
         log_runner<kernels::add> log(&std::cout);
 
-        /* use CPU for small inputs */
-        return a.size() < 1000
-            ? run_with<kernels::add, compute_mode::CPU>(log, a, b, result)
+        /* force CPU for small inputs */
+        return (a.size() < 1000) ?
+              run_with<kernels::add, compute_mode::CPU>(log, a, b, result)
             : run_with<kernels::add>(log, a, b, result);
     }
 }

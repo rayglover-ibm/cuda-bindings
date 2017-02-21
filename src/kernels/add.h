@@ -1,6 +1,8 @@
 #pragma once
 
+#include "types.h"
 #include "kernel.h"
+
 #include <gsl.h>
 
 namespace cufoo {
@@ -18,7 +20,7 @@ namespace kernels
     KERNEL_DECL(add,
         compute_mode::CPU, compute_mode::CUDA)
     {
-        template <compute_mode> static int run(
+        template <compute_mode> static variant<status, int> run(
             int a, int b
             );
         
