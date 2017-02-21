@@ -27,7 +27,7 @@ namespace util
     }
 
     inline
-    bool try_throw(const cufoo::failable& r)
+    bool try_throw(const cufoo::status& r)
     {
         if (r) {
             Nan::ThrowError(r.get().data());

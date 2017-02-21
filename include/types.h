@@ -17,5 +17,5 @@ namespace cufoo
     template <typename T> using maybe = variant<T, error>;
 
     /* an optional error */
-    using failable = mapbox::util::optional<error>;
+    using status = mapbox::util::optional<error>;
 }

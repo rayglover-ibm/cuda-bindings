@@ -37,7 +37,7 @@ namespace util {
     }
 
     inline
-    bool try_throw(jni::JNIEnv& env, const cufoo::failable& r)
+    bool try_throw(jni::JNIEnv& env, const cufoo::status& r)
     {
         if (r) {
             jni::ThrowNew(env,

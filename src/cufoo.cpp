@@ -14,7 +14,7 @@ namespace cufoo
         return run<kernels::add>(a, b);
     }
 
-    failable add(gsl::span<int> a, gsl::span<int> b, gsl::span<int> result)
+    status add(gsl::span<int> a, gsl::span<int> b, gsl::span<int> result)
     {
         log_runner<kernels::add> log(&std::cout);
 

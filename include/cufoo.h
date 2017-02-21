@@ -9,8 +9,8 @@ namespace cufoo
     
     maybe<int> add(int a, int b);
     
-    failable add(const gsl::span<int> a,
-                 const gsl::span<int> b,
-                       gsl::span<int> result
-                );
+    status add(const gsl::span<int> a,
+               const gsl::span<int> b,
+                     gsl::span<int> result
+              );
 }

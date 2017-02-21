@@ -33,8 +33,8 @@ namespace kernel
         CANCELLED
     };
 
-    const char* to_str(const error_code s);
-    const char* to_str(const compute_mode m);
+    inline const char* to_str(const error_code s);
+    inline const char* to_str(const compute_mode m);
 
     template <compute_mode>
     struct compute_traits {
@@ -70,7 +70,7 @@ namespace kernel
         {};
     }
 
-    /* Kernel declarations ------------------------------------------------- */
+    /*  Kernel declarations ------------------------------------------------ */
 
     template<typename Traits, compute_mode... Modes>
     struct impl
@@ -88,7 +88,7 @@ namespace kernel
         struct Name : ::cufoo::kernel::impl<Name_traits_, __VA_ARGS__ >
 
 
-    /* Implementation detail ----------------------------------------------- */
+    /*  Implementation detail ---------------------------------------------- */
 
 
     inline const char* to_str(const error_code s) {

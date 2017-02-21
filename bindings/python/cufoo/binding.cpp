@@ -24,7 +24,7 @@ namespace util
     }
 
     inline
-    void try_throw(const cufoo::failable& r) {
+    void try_throw(const cufoo::status& r) {
         if (r) throw std::runtime_error(r.get().data());
     }
 }

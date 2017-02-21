@@ -34,14 +34,14 @@ namespace kernel
         template <> struct result_traits<void>
         {
             using output_type = error_code;
-            using public_type = failable;
+            using public_type = status;
 
             static error_code get_status(const output_type& s) { return s; }
         };
         template <> struct result_traits<error_code>
         {
             using output_type = error_code;
-            using public_type = failable;
+            using public_type = status;
 
             static error_code get_status(const output_type& s) { return s; }
         };
@@ -57,7 +57,7 @@ namespace kernel
     using result = typename result_traits<Op, Args...>::output_type;
 
 
-    /* Runtime kernel selection -------------------------------------------- */
+    /*  Runtime kernel selection ------------------------------------------- */
 
     template <compute_mode M, typename = void>
     struct control;
@@ -113,7 +113,7 @@ namespace kernel
         return s;
     }
 
-    /* kernel runner ------------------------------------------------------- */
+    /*  kernel runner ------------------------------------------------------ */
 
     template <typename K>
     struct runner
@@ -162,7 +162,7 @@ namespace kernel
         private: std::ostream* m_out;
     };
 
-    /* public api ---------------------------------------------------------- */
+    /*  public api --------------------------------------------------------- */
 
     namespace detail
     {
@@ -176,10 +176,10 @@ namespace kernel
             return mapbox::util::apply_visitor(cvt{}, r);
         }
 
-        failable convert(error_code r)
+        status convert(error_code r)
         {
             return r == error_code::NONE ?
-                failable() : failable{ to_str(r) };
+                status() : status{ to_str(r) };
         };
     }
 
