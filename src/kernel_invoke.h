@@ -15,6 +15,7 @@ namespace kernel
     {
         template <typename R> struct result_traits
         {
+            static constexpr bool is_void = false;
             using output_type = variant<error_code, R>;
             using public_type = maybe<R>;
 
@@ -24,6 +25,7 @@ namespace kernel
         };
         template <typename R> struct result_traits<variant<error_code, R>>
         {
+            static constexpr bool is_void = false;
             using output_type = variant<error_code, R>;
             using public_type = maybe<R>;
 
@@ -33,6 +35,7 @@ namespace kernel
         };
         template <> struct result_traits<void>
         {
+            static constexpr bool is_void = true;
             using output_type = error_code;
             using public_type = status;
 
@@ -40,6 +43,7 @@ namespace kernel
         };
         template <> struct result_traits<error_code>
         {
+            static constexpr bool is_void = false;
             using output_type = error_code;
             using public_type = status;
 
@@ -47,14 +51,14 @@ namespace kernel
         };
     }
 
-    template <typename Op, typename... Args>
+    template <typename K, typename... Args>
     using result_traits =
         typename detail::result_traits<
-            decltype(Op::run<compute_mode::AUTO>(std::declval<Args>()...))
+            decltype(K::run<compute_mode::AUTO>(std::declval<Args>()...))
             >;
 
-    template <typename Op, typename... Args>
-    using result = typename result_traits<Op, Args...>::output_type;
+    template <typename K, typename... Args>
+    using result = typename result_traits<K, Args...>::output_type;
 
 
     /*  Runtime kernel selection ------------------------------------------- */
@@ -66,13 +70,13 @@ namespace kernel
     template <compute_mode M>
     struct control<M, std::enable_if_t< compute_traits<M>::enabled >>
     {
-        template <typename Runner, typename Kernel, typename... Args>
-        static auto call(Runner& r, Args... args)
-            -> result<Kernel, Args...>
+        template <typename Runner, typename K, typename... Args>
+        static auto call(Runner& r, Args&&... args)
+            -> result<K, Args...>
         {
             if (!r.begin(M)) { return error_code::CANCELLED; }
-            auto s = r.apply<M, Args...>(std::forward<Args>(args)...);
-            r.end(result_traits<Kernel, Args...>::get_errc(s));
+            result<K, Args...> s = r.apply<M, Args...>(std::forward<Args>(args)...);
+            r.end(result_traits<K, Args...>::get_errc(s));
             return s;
         }
     };
@@ -82,7 +86,7 @@ namespace kernel
     struct control<M, std::enable_if_t< !compute_traits<M>::enabled >>
     {
         template <typename Runner, typename Kernel, typename... Args>
-        static auto call(Runner& r, Args... args)
+        static auto call(Runner& r, Args&&... args)
             -> result<Kernel, Args...>
         {
             return error_code::COMPUTE_MODE_DISABLED;
@@ -92,7 +96,7 @@ namespace kernel
     /*  Specialization for AUTO: determines compute_mode at runtime  */
     template <>
     template <typename Runner, typename Kernel, typename... Args>
-    auto control<compute_mode::AUTO>::call(Runner& r, Args... args)
+    auto control<compute_mode::AUTO>::call(Runner& r, Args&&... args)
         -> result<Kernel, Args...>
     {
         typename result<Kernel, Args...> s = error_code::KERNEL_NOT_DEFINED;
@@ -127,16 +131,32 @@ namespace kernel
             compute_mode M, typename... Args,
             std::enable_if_t< !K::template supports<M>::value, int> = 0
             >
-        auto apply(Args... args) -> result<K, Args...> {
+        auto apply(Args&&... args) -> result<K, Args...> {
             return error_code::KERNEL_NOT_DEFINED;
         }
 
         template <
             compute_mode M, typename... Args,
-            std::enable_if_t< K::template supports<M>::value, int> = 0
+            std::enable_if_t<
+                K::template supports<M>::value &&
+                !result_traits<K, Args...>::is_void, int
+                > = 0
             >
-        auto apply(Args... args) -> result<K, Args...> {
+        auto apply(Args&&... args) -> result<K, Args...> {
             return K::template run<M>(std::forward<Args>(args)...);
+        }
+
+        template <
+            compute_mode M, typename... Args,
+            std::enable_if_t<
+                K::template supports<M>::value &&
+                result_traits<K, Args...>::is_void, int
+                > = 0
+            >
+        auto apply(Args&&... args) -> result<K, Args...>
+        {
+            K::template run<M>(std::forward<Args>(args)...);
+            return error_code::NONE;
         }
     };
 
@@ -176,7 +196,7 @@ namespace kernel
             return mapbox::util::apply_visitor(cvt{}, r);
         }
 
-        status convert(error_code r)
+        inline status convert(error_code r)
         {
             return r == error_code::NONE ?
                 status() : status{ to_str(r) };
@@ -190,7 +210,7 @@ namespace kernel
         typename... Args
         >
     typename result_traits<K, Args...>::public_type run_with(
-        Runner& r, Args... args)
+        Runner& r, Args&&... args)
     {
         return detail::convert(
             control<M>::template call<Runner, K>(r, std::forward<Args>(args)...)
@@ -203,7 +223,7 @@ namespace kernel
         typename... Args
         >
     typename result_traits<K, Args...>::public_type run(
-        Args... args)
+        Args&&... args)
     {
         runner<K> r;
 
