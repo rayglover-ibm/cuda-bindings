@@ -23,7 +23,7 @@ namespace
     }
 
     template <> int foo::run<compute_mode::CPU>(std::vector<float>& v) {
-        return v.size();
+        return (int)v.size();
     }
 }
 
