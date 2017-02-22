@@ -82,10 +82,10 @@ namespace kernel
     };
 
     #define KERNEL_DECL(Name, ...) \
-        struct Name_traits_ {                            \
+        struct Name ## _traits_ {                        \
             static constexpr const char* name = #Name;   \
         };                                               \
-        struct Name : ::cufoo::kernel::impl<Name_traits_, __VA_ARGS__ >
+        struct Name : ::cufoo::kernel::impl<Name ## _traits_, __VA_ARGS__ >
 
 
     /*  Implementation detail ---------------------------------------------- */
