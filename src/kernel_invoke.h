@@ -13,7 +13,7 @@ namespace kernel
 
     namespace detail
     {
-        template <typename R> struct result_traits
+        template <typename R> struct op_traits
         {
             static constexpr bool is_void = false;
             using output_type = variant<error_code, R>;
@@ -23,7 +23,7 @@ namespace kernel
                 return s.is<error_code>() ? s.get<error_code>() : error_code::NONE;
             }
         };
-        template <typename R> struct result_traits<variant<error_code, R>>
+        template <typename R> struct op_traits<variant<error_code, R>>
         {
             static constexpr bool is_void = false;
             using output_type = variant<error_code, R>;
@@ -33,7 +33,7 @@ namespace kernel
                 return s.is<error_code>() ? s.get<error_code>() : error_code::NONE;
             }
         };
-        template <> struct result_traits<void>
+        template <> struct op_traits<void>
         {
             static constexpr bool is_void = true;
             using output_type = error_code;
@@ -41,7 +41,7 @@ namespace kernel
 
             static error_code get_errc(const output_type& s) { return s; }
         };
-        template <> struct result_traits<error_code>
+        template <> struct op_traits<error_code>
         {
             static constexpr bool is_void = false;
             using output_type = error_code;
@@ -52,13 +52,13 @@ namespace kernel
     }
 
     template <typename K, typename... Args>
-    using result_traits =
-        typename detail::result_traits<
+    using op_traits =
+        typename detail::op_traits<
             decltype(K::run<compute_mode::AUTO>(std::declval<Args>()...))
             >;
 
     template <typename K, typename... Args>
-    using result = typename result_traits<K, Args...>::output_type;
+    using result = typename op_traits<K, Args...>::output_type;
 
 
     /*  Runtime kernel selection ------------------------------------------- */
@@ -76,7 +76,7 @@ namespace kernel
         {
             if (!r.begin(M)) { return error_code::CANCELLED; }
             result<K, Args...> s = r.apply<M, Args...>(std::forward<Args>(args)...);
-            r.end(result_traits<K, Args...>::get_errc(s));
+            r.end(op_traits<K, Args...>::get_errc(s));
             return s;
         }
     };
@@ -139,7 +139,7 @@ namespace kernel
             compute_mode M, typename... Args,
             std::enable_if_t<
                 K::template supports<M>::value &&
-                !result_traits<K, Args...>::is_void, int
+                !op_traits<K, Args...>::is_void, int
                 > = 0
             >
         auto apply(Args&&... args) -> result<K, Args...> {
@@ -150,7 +150,7 @@ namespace kernel
             compute_mode M, typename... Args,
             std::enable_if_t<
                 K::template supports<M>::value &&
-                result_traits<K, Args...>::is_void, int
+                op_traits<K, Args...>::is_void, int
                 > = 0
             >
         auto apply(Args&&... args) -> result<K, Args...>
@@ -209,7 +209,7 @@ namespace kernel
         typename Runner,
         typename... Args
         >
-    typename result_traits<K, Args...>::public_type run_with(
+    typename op_traits<K, Args...>::public_type run_with(
         Runner& r, Args&&... args)
     {
         return detail::convert(
@@ -222,7 +222,7 @@ namespace kernel
         compute_mode M = compute_mode::AUTO,
         typename... Args
         >
-    typename result_traits<K, Args...>::public_type run(
+    typename op_traits<K, Args...>::public_type run(
         Args&&... args)
     {
         runner<K> r;
