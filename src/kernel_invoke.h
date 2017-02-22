@@ -15,38 +15,38 @@ namespace kernel
     {
         template <typename R> struct op_traits
         {
-            static constexpr bool is_void = false;
-            using output_type = variant<error_code, R>;
+            using output_type = variant<R, error_code>;
             using public_type = maybe<R>;
 
+            static constexpr bool is_void = false;
             static error_code get_errc(const output_type& s) {
                 return s.is<error_code>() ? s.get<error_code>() : error_code::NONE;
             }
         };
-        template <typename R> struct op_traits<variant<error_code, R>>
+        template <typename R> struct op_traits<variant<R, error_code>>
         {
-            static constexpr bool is_void = false;
-            using output_type = variant<error_code, R>;
+            using output_type = variant<R, error_code>;
             using public_type = maybe<R>;
 
+            static constexpr bool is_void = false;
             static error_code get_errc(const output_type& s) {
                 return s.is<error_code>() ? s.get<error_code>() : error_code::NONE;
             }
         };
         template <> struct op_traits<void>
         {
-            static constexpr bool is_void = true;
             using output_type = error_code;
             using public_type = status;
 
+            static constexpr bool is_void = true;
             static error_code get_errc(const output_type& s) { return s; }
         };
         template <> struct op_traits<error_code>
         {
-            static constexpr bool is_void = false;
             using output_type = error_code;
             using public_type = status;
 
+            static constexpr bool is_void = false;
             static error_code get_errc(const output_type& s) { return s; }
         };
     }
@@ -187,7 +187,7 @@ namespace kernel
     namespace detail
     {
         template <typename R>
-        maybe<R> convert(variant<error_code, R>&& r)
+        maybe<R> convert(variant<R, error_code>&& r)
         {
             struct cvt {
                 maybe<R> operator()(error_code s)  const { return to_str(s); }
@@ -196,10 +196,8 @@ namespace kernel
             return mapbox::util::apply_visitor(cvt{}, r);
         }
 
-        inline status convert(error_code r)
-        {
-            return r == error_code::NONE ?
-                status() : status{ to_str(r) };
+        inline status convert(error_code r) {
+            return r == error_code::NONE ? status() : status{ to_str(r) };
         };
     }
 

@@ -29,7 +29,7 @@ namespace kernels
 {
     using device_util::device_ptr;
 
-    template <> variant<error_code, int> add::run<compute_mode::CUDA>(
+    template <> variant<int, error_code> add::run<compute_mode::CUDA>(
         int a, int b
         )
     {

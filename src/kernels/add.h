@@ -20,7 +20,7 @@ namespace kernels
     KERNEL_DECL(add,
         compute_mode::CPU, compute_mode::CUDA)
     {
-        template <compute_mode> static variant<error_code, int> run(
+        template <compute_mode> static variant<int, error_code> run(
             int a, int b
             );
         

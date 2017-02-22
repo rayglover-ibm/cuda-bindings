@@ -4,7 +4,7 @@
 namespace cufoo {
 namespace kernels
 {
-    template <> variant<error_code, int> add::run<compute_mode::CPU>(
+    template <> variant<int, error_code> add::run<compute_mode::CPU>(
         int a, int b)
     {
         return a + b;
