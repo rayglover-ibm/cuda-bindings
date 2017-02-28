@@ -19,13 +19,17 @@ namespace util
     }
 
     template<typename R>
-    void try_throw(const cufoo::maybe<R>& r) {
+    bool try_throw(const cufoo::maybe<R>& r)
+    {
         if (r.is<cufoo::error>()) throw std::runtime_error(r.get<cufoo::error>().data());
+        return false;
     }
 
     inline
-    void try_throw(const cufoo::status& r) {
+    bool try_throw(const cufoo::status& r)
+    {
         if (r) throw std::runtime_error(r.get().data());
+        return false;
     }
 }
 
@@ -57,9 +61,7 @@ namespace
     int add(int a, int b)
     {
         cufoo::maybe<int> r = cufoo::add(a, b);
-        util::try_throw(r);
-
-        return r.get<int>();
+        return util::try_throw(r) ? 0 : r.get<int>();
     }
 }
 

@@ -64,7 +64,7 @@ NAN_METHOD(add)
     }
 }
 
-NAN_METHOD(add_all)
+NAN_METHOD(addAll)
 {
     using namespace util;
 
@@ -92,12 +92,12 @@ NAN_MODULE_INIT(InitAll)
         GetFunction(New<v8::FunctionTemplate>(add)).ToLocalChecked());
 
     Set(target,
-        New<v8::String>("add_all").ToLocalChecked(),
-        GetFunction(New<v8::FunctionTemplate>(add_all)).ToLocalChecked());
+        New<v8::String>("addAll").ToLocalChecked(),
+        GetFunction(New<v8::FunctionTemplate>(addAll)).ToLocalChecked());
 
     Set(target,
         New<v8::String>("version").ToLocalChecked(),
         GetFunction(New<v8::FunctionTemplate>(version)).ToLocalChecked());
 }
 
-NODE_MODULE(addon, InitAll)
+NODE_MODULE(binding, InitAll)
