@@ -5,23 +5,38 @@
 #include "cufoo.h"
 #include "cufoo_config.h"
 
-#include <nan.h>
-
-using namespace Nan;
+#include <v8.h>
+#include <node.h>
+#include <v8pp/module.hpp>
 
 namespace util
 {
     template <typename T>
-    gsl::span<T> as_span(TypedArrayContents<T>& info) {
-        return gsl::span<T>{ (*info), info.length() };
+    gsl::span<T> as_span(v8::Isolate* iso, v8::Local<v8::ArrayBufferView>& from)
+    {
+        void* data = nullptr;
+        size_t length = 0;
+
+        const size_t    byte_length = from->ByteLength();
+        const ptrdiff_t byte_offset = from->ByteOffset();
+
+        v8::HandleScope scope(iso);
+        v8::Local<v8::ArrayBuffer> buffer = from->Buffer();
+
+        length = byte_length / sizeof(T);
+        data = static_cast<char*>(buffer->GetContents().Data()) + byte_offset;
+
+        /* todo: alignment check */
+        assert(reinterpret_cast<uintptr_t>(data) % sizeof(T) == 0);
+
+        return gsl::span<T>{ static_cast<T*>(data), length };
     }
 
     template <typename R>
     bool try_throw(const cufoo::maybe<R>& r)
     {
         if (r.is<cufoo::error>()) {
-            Nan::ThrowError(r.get<cufoo::error>().data());
-            return true;
+            throw std::invalid_argument(r.get<cufoo::error>().data());
         }
         return false;
     }
@@ -29,75 +44,75 @@ namespace util
     inline
     bool try_throw(const cufoo::status& r)
     {
-        if (r) {
-            Nan::ThrowError(r.get().data());
-            return true;
-        }
+        if (r) { throw std::invalid_argument(r.get().data()); }
         return false;
     }
 }
 
-NAN_METHOD(version)
+/*
+ *  Conversion to span<T> from a ArrayBufferView.
+ *  Doesn't permit ArrayBufferView to span<T>.
+ */
+template<typename T>
+struct ::v8pp::convert<gsl::span<T>>
 {
-    auto arr = New<v8::Array>(3);
-    arr->Set(0, New<v8::Number>(cufoo_VERSION_MAJOR));
-    arr->Set(1, New<v8::Number>(cufoo_VERSION_MINOR));
-    arr->Set(2, New<v8::Number>(cufoo_VERSION_PATCH));
+    using from_type = gsl::span<T>;
+    using to_type = v8::Local<v8::ArrayBufferView>;
 
-    info.GetReturnValue().Set(arr);
-}
-
-NAN_METHOD(add)
-{
-    if (info.Length() != 2 || !info[0]->IsNumber() || !info[1]->IsNumber()) {
-        ThrowTypeError("expected (number, number)");
-        return;
+    static bool is_valid(v8::Isolate*, v8::Local<v8::Value> value) {
+        return value->IsArrayBufferView();
     }
 
-    int32_t a = To<int32_t>(info[0]).FromJust();
-    int32_t b = To<int32_t>(info[1]).FromJust();
+    static from_type from_v8(v8::Isolate* iso, v8::Local<v8::Value> from)
+    {
+        if (!is_valid(iso, from)) {
+            throw std::invalid_argument("expected ArrayBufferView");
+        }
+        v8::HandleScope scope(iso);
+        auto view = v8::Local<v8::ArrayBufferView>::Cast(from);
 
-    cufoo::maybe<int> result = cufoo::add(a, b);
+        return util::as_span<T>(iso, view);
+    }
+};
 
-    if (!util::try_throw(result)) {
-        info.GetReturnValue().Set(result.get<int>());
+template<typename T>
+struct ::v8pp::is_wrapped_class<gsl::span<T>> : std::false_type {};
+
+namespace
+{
+    std::vector<int> version() {
+        return { cufoo_VERSION_MAJOR, cufoo_VERSION_MINOR, cufoo_VERSION_PATCH };
+    }
+
+    int add(int a, int b)
+    {
+        cufoo::maybe<int> r = cufoo::add(a, b);
+        return util::try_throw(r) ? 0 : r.get<int>();
+    }
+
+    v8::Local<v8::ArrayBufferView> add_all(
+        v8::Isolate* iso, gsl::span<int> a, gsl::span<int> b)
+    {
+        using namespace v8;
+        EscapableHandleScope hatch(iso);
+
+        Local<ArrayBuffer> buffer = ArrayBuffer::New(iso, a.length() * sizeof(int));
+        Local<ArrayBufferView> result = Int32Array::New(buffer, 0, a.length());
+
+        util::try_throw(cufoo::add(a, b, util::as_span<int>(iso, result)));
+        return hatch.Escape(result);
     }
 }
 
-NAN_METHOD(addAll)
+void init(v8::Handle<v8::Object> exports)
 {
-    using namespace util;
+    v8pp::module addon(v8::Isolate::GetCurrent());
 
-    if (info.Length() != 2 || !info[0]->IsArrayBufferView() || !info[1]->IsArrayBufferView()) {
-        ThrowTypeError("expected (ArrayBufferView, ArrayBufferView)");
-        return;
-    }
-    TypedArrayContents<int> a(info[0]);
-    TypedArrayContents<int> b(info[1]);
+    addon.set("version", &version);
+    addon.set("addAll", &add_all);
+    addon.set("add", &add);
 
-    v8::Local<v8::ArrayBuffer> buffer = v8::ArrayBuffer::New(
-        v8::Isolate::GetCurrent(), a.length() * sizeof(int));
-
-    auto result = v8::Int32Array::New(buffer, 0, a.length());
-    TypedArrayContents<int> view(result);
-
-    if (!try_throw(cufoo::add(as_span(a), as_span(b), as_span(view))))
-        info.GetReturnValue().Set(result);
+    exports->SetPrototype(addon.new_instance());
 }
 
-NAN_MODULE_INIT(InitAll)
-{
-    Set(target,
-        New<v8::String>("add").ToLocalChecked(),
-        GetFunction(New<v8::FunctionTemplate>(add)).ToLocalChecked());
-
-    Set(target,
-        New<v8::String>("addAll").ToLocalChecked(),
-        GetFunction(New<v8::FunctionTemplate>(addAll)).ToLocalChecked());
-
-    Set(target,
-        New<v8::String>("version").ToLocalChecked(),
-        GetFunction(New<v8::FunctionTemplate>(version)).ToLocalChecked());
-}
-
-NODE_MODULE(binding, InitAll)
+NODE_MODULE(binding, init)

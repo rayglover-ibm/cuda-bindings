@@ -26,7 +26,8 @@ set_target_properties (${binding} PROPERTIES
     OUTPUT_NAME "binding"
 )
 target_include_directories (${binding} 
-    PUBLIC "${CMAKE_CURRENT_LIST_DIR}/third_party/nan"
+    #PUBLIC "${CMAKE_CURRENT_LIST_DIR}/third_party/nan"
+    PUBLIC "${CMAKE_CURRENT_LIST_DIR}/third_party/v8pp"
 )
 target_link_libraries (${binding}
     ${core}
