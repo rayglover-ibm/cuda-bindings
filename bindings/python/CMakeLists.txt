@@ -2,20 +2,17 @@ cmake_minimum_required (VERSION 3.1)
 
 # capture the name of the core c++ library
 set (core "${CMAKE_PROJECT_NAME}")
-
-project ("${core}-python"
-    VERSION "${${core}_VERSION_MAJOR}.${${core}_VERSION_MINOR}.${${core}_VERSION_PATCH}"
-)
-
-add_subdirectory ("thirdparty/pybind11")
-
 set (binding "binding-python")
 
+project ("${core}-${binding}" VERSION "${PROJECT_VERSION}")
+add_subdirectory ("thirdparty/pybind11")
+
+set (src      "${core}/binding.cpp")
+set (src_test "${core}/binding_test.py")
+
+pybind11_add_module (${binding} ${src})
 configure_file ("${core}/__init__.py" "${core}/__init__.py" COPYONLY)
 
-pybind11_add_module (${binding} 
-    "${core}/binding.cpp"
-)
 set_target_properties (${binding} PROPERTIES 
     OUTPUT_NAME "binding"
 )
@@ -29,16 +26,12 @@ add_custom_command (TARGET ${binding} POST_BUILD
 # tests
 if (cufoo_WITH_TESTS)
     include (CTest)
-
-    set (TEST_SRC
-        "${core}/binding_test.py"
-    )
     add_test (
-        NAME cufoopy_test_suite
+        NAME ${PROJECT_NAME}_test_suite
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        COMMAND python "-u" "${TEST_SRC}"
+        COMMAND python "-u" "${src_test}"
     )
-    set_tests_properties (cufoopy_test_suite
+    set_tests_properties (${PROJECT_NAME}_test_suite
         PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}"
     )
 endif ()

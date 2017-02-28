@@ -35,7 +35,7 @@ target_link_libraries (cufoo_test
 )
 
 add_test (
-	NAME full_test_suite
+	NAME cufoo_test_suite
 	COMMAND cufoo_test
 )
 add_custom_target (copy-test-files ALL

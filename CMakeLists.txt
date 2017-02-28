@@ -14,12 +14,12 @@ project (${core}
 
 # cmake options
 option (${core}_WITH_TESTS  "Enable unit tests"     ON)
-option (${core}_WITH_CUDA   "Enable cuda support"   ON)
-option (${core}_WITH_PYTHON "Enable python binding" ON)
-option (${core}_WITH_NODEJS "Enable nodejs binding" ON)
-option (${core}_WITH_JAVA   "Enable Java binding"   ON)
+option (${core}_WITH_CUDA   "Enable cuda support"   OFF)
+option (${core}_WITH_PYTHON "Enable python binding" OFF)
+option (${core}_WITH_NODEJS "Enable nodejs binding" OFF)
+option (${core}_WITH_JAVA   "Enable Java binding"   OFF)
 
-set (SRC
+set (src
     "src/kernels/add.cpp"
     "src/cufoo.cpp"
 )
@@ -30,7 +30,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 endif ()
 
 # create the library
-add_library (${core} STATIC ${SRC})
+add_library (${core} STATIC ${src})
 set_target_properties (${core} PROPERTIES LINKER_LANGUAGE CXX)
 
 # config header
@@ -40,11 +40,11 @@ configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/include/${core}_config.h.in"
 
 # project includes
 target_include_directories (${core}
-    PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    PUBLIC  "${CMAKE_CURRENT_BINARY_DIR}/include"
-    PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/src"
-    PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/third_party/gsl_lite/include"
-    PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/third_party/variant/include"
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/include"
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/third_party/gsl_lite/include"
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/third_party/variant/include"
 )
 
 # add cuda
@@ -64,19 +64,15 @@ if (${core}_WITH_TESTS)
     include ("tests.cmake")
 endif ()
 
-# python binding
+# language bindings
 if (${core}_WITH_PYTHON)
-    add_subdirectory (bindings/python)
+    add_subdirectory ("bindings/python")
 endif ()
-
-# nodejs binding
 if (${core}_WITH_NODEJS)
-    add_subdirectory (bindings/nodejs)
+    add_subdirectory ("bindings/nodejs")
 endif ()
-
-# Java binding
-if (${core}_WITH_JAVA)
-    add_subdirectory (bindings/java)
+if (${core}_WITH_JAVA) 
+    add_subdirectory ("bindings/java")
 endif ()
 
 # Add all targets to the build-tree export set

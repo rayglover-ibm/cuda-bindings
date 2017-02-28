@@ -2,27 +2,25 @@ cmake_minimum_required (VERSION 3.1)
 
 # capture the name of the core c++ library
 set (core "${CMAKE_PROJECT_NAME}")
+set (binding "binding-java")
 
-project ("${core}-java"
-    VERSION "${${core}_VERSION_MAJOR}.${${core}_VERSION_MINOR}.${${core}_VERSION_PATCH}"
-)
+project ("${core}-${binding}" VERSION "${PROJECT_VERSION}")
 
+set (src      "src/main/com/cufoo/Binding.cpp")
+set (src_test "src/test/com/cufoo/tests/BindingTest.java")
+
+# android-specific options
 if (ANDROID_TOOLCHAIN)
     set (JNI_INCLUDE_DIRS "")
 else ()
     find_package (JNI REQUIRED)
 endif ()
 
-
 find_package (Java REQUIRED)
 include (UseJava)
 
 # a jni library 'binding' and associated .jar
-set (binding "binding-java")
-
-add_library (${binding} SHARED 
-    "src/main/com/cufoo/Binding.cpp"
-)
+add_library (${binding} SHARED ${src})
 set_target_properties (${binding} PROPERTIES 
     OUTPUT_NAME "binding"
 )
@@ -45,10 +43,7 @@ if (cufoo_WITH_TESTS)
     include (CTest)
     set (test ${PROJECT_NAME}_test)
 
-    set (TEST_SRC
-        "src/test/com/cufoo/tests/BindingTest.java"
-    )
-    add_jar (${test} ${TEST_SRC}
+    add_jar (${test} ${src_test}
         INCLUDE_JARS "${core}-java"
     )
     set (cp
