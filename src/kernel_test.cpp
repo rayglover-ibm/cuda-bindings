@@ -12,17 +12,17 @@ namespace
 {
     KERNEL_DECL(foo, compute_mode::CPU)
     {
-        template<compute_mode> static void run();
-        template<compute_mode> static int  run(std::vector<float>&);
+        template<compute_mode> static void op();
+        template<compute_mode> static int  op(std::vector<float>&);
     };
 
     int void_calls = 0;
 
-    template <> void foo::run<compute_mode::CPU>() {
+    template <> void foo::op<compute_mode::CPU>() {
         void_calls++;
     }
 
-    template <> int foo::run<compute_mode::CPU>(std::vector<float>& v) {
+    template <> int foo::op<compute_mode::CPU>(std::vector<float>& v) {
         return (int)v.size();
     }
 }
@@ -65,14 +65,14 @@ TEST(kernel, call_vector)
 namespace
 {
     KERNEL_DECL(foo_2, compute_mode::CPU, compute_mode::CUDA) {
-        template<compute_mode> static void run();
+        template<compute_mode> static void op();
     };
 
     int cuda_calls = 0;
     int cpu_calls = 0;
 
-    template <> void foo_2::run<compute_mode::CPU>()  { cpu_calls++; }
-    template <> void foo_2::run<compute_mode::CUDA>() { cuda_calls++; }
+    template <> void foo_2::op<compute_mode::CPU>()  { cpu_calls++; }
+    template <> void foo_2::op<compute_mode::CUDA>() { cuda_calls++; }
 }
 
 TEST(kernel, call_cuda)

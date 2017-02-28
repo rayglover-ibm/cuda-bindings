@@ -20,11 +20,11 @@ namespace kernels
     KERNEL_DECL(add,
         compute_mode::CPU, compute_mode::CUDA)
     {
-        template <compute_mode> static variant<int, error_code> run(
+        template <compute_mode> static variant<int, error_code> op(
             int a, int b
             );
         
-        template <compute_mode> static error_code run(
+        template <compute_mode> static error_code op(
             const gsl::span<int> a, const gsl::span<int> b, gsl::span<int> result
             );
     };

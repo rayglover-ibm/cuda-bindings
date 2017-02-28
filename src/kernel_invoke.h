@@ -54,7 +54,7 @@ namespace kernel
     template <typename K, typename... Args>
     using op_traits =
         typename detail::op_traits<
-            decltype(K::run<compute_mode::AUTO>(std::declval<Args>()...))
+            decltype(K::op<compute_mode::AUTO>(std::declval<Args>()...))
             >;
 
     template <typename K, typename... Args>
@@ -143,7 +143,7 @@ namespace kernel
                 > = 0
             >
         auto apply(Args&&... args) -> result<K, Args...> {
-            return K::template run<M>(std::forward<Args>(args)...);
+            return K::template op<M>(std::forward<Args>(args)...);
         }
 
         template <
@@ -155,7 +155,7 @@ namespace kernel
             >
         auto apply(Args&&... args) -> result<K, Args...>
         {
-            K::template run<M>(std::forward<Args>(args)...);
+            K::template op<M>(std::forward<Args>(args)...);
             return error_code::NONE;
         }
     };

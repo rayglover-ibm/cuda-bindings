@@ -4,13 +4,13 @@
 namespace cufoo {
 namespace kernels
 {
-    template <> variant<int, error_code> add::run<compute_mode::CPU>(
+    template <> variant<int, error_code> add::op<compute_mode::CPU>(
         int a, int b)
     {
         return a + b;
     }
 
-    template <> error_code add::run<compute_mode::CPU>(
+    template <> error_code add::op<compute_mode::CPU>(
         const gsl::span<int> a, const gsl::span<int> b, gsl::span<int> result)
     {
         const size_t N = a.length();

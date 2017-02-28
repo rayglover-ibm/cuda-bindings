@@ -29,7 +29,7 @@ namespace kernels
 {
     using device_util::device_ptr;
 
-    template <> variant<int, error_code> add::run<compute_mode::CUDA>(
+    template <> variant<int, error_code> add::op<compute_mode::CUDA>(
         int a, int b
         )
     {
@@ -44,7 +44,7 @@ namespace kernels
         return c;
     }
 
-    template <> error_code add::run<compute_mode::CUDA>(
+    template <> error_code add::op<compute_mode::CUDA>(
         const gsl::span<int> a, const gsl::span<int> b, gsl::span<int> result
         )
     {
