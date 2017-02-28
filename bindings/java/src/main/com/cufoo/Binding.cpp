@@ -3,13 +3,14 @@
 
 #include <jni/jni.hpp>
 
-namespace util {
-    struct IntBuffer
-    {
-        static constexpr auto Name() { return "java/nio/IntBuffer"; }
-        using element_type = int32_t;
-    };
+struct IntBuffer
+{
+    static constexpr auto Name() { return "java/nio/IntBuffer"; }
+    using element_type = int32_t;
+};
 
+namespace util
+{
     template<
         typename Buffer,
         typename Elem = typename Buffer::element_type
@@ -49,48 +50,48 @@ namespace util {
     }
 }
 
-namespace
+using namespace jni;
+
+struct Binding
 {
-    struct fascade { static constexpr auto Name() { return "com/cufoo/Binding"; } };
+    static constexpr auto Name() { return "com/cufoo/Binding"; };
+    using _this = jni::Class<Binding>;
 
-    void register_fascade(JavaVM* vm)
+    static Array<jint> version(JNIEnv& env, _this)
     {
-        using namespace cufoo;
-        using namespace ::util;
-
-        auto get_version = [](jni::JNIEnv& env, jni::Class<fascade>) -> jni::Array<jni::jint> {
-            auto vec = std::vector<jni::jint>{
-                cufoo_VERSION_MAJOR, cufoo_VERSION_MINOR, cufoo_VERSION_PATCH
-            };
-            return jni::Make<jni::Array<jni::jint>>(env, vec);
+        auto vec = std::vector<jint>{
+            cufoo_VERSION_MAJOR, cufoo_VERSION_MINOR, cufoo_VERSION_PATCH
         };
-
-        auto add = [] (jni::JNIEnv& env, jni::Class<fascade>,
-                jni::jint a, jni::jint b) -> jni::jint
-        {
-            maybe<int> r = cufoo::add(a, b);
-            return try_throw(env, r) ? 0 : r.get<int>();
-        };
-
-        auto add_all = [](jni::JNIEnv& env, jni::Class<fascade>,
-                jni::Object<IntBuffer> a, jni::Object<IntBuffer> b, jni::Object<IntBuffer> result) -> void
-        {
-            try_throw(env, cufoo::add(
-                to_span<IntBuffer>(env, a),
-                to_span<IntBuffer>(env, b),
-                to_span<IntBuffer>(env, result)));
-        };
-
-        jni::JNIEnv& env { jni::GetEnv(*vm) };
-        jni::RegisterNatives(env, jni::Class<fascade>::Find(env),
-            jni::MakeNativeMethod("add", add),
-            jni::MakeNativeMethod("addAll", add_all),
-            jni::MakeNativeMethod("version", get_version));
+        return Make<Array<jint>>(env, vec);
     }
-}
+
+    static jint add(JNIEnv& env, _this, jint a, jint b)
+    {
+        cufoo::maybe<int> r = cufoo::add(a, b);
+        return util::try_throw(env, r) ? 0 : r.get<int>();
+    }
+
+    static void addAll(JNIEnv& env, _this,
+        Object<IntBuffer> a, Object<IntBuffer> b, Object<IntBuffer> result)
+    {
+        util::try_throw(env, cufoo::add(
+            util::to_span<IntBuffer>(env, a),
+            util::to_span<IntBuffer>(env, b),
+            util::to_span<IntBuffer>(env, result)));
+    }
+
+    static void register_jni(JNIEnv& env)
+    {
+        RegisterNatives(env, _this::Find(env),
+            MakeNativeMethod<decltype(&add), &add>("add"),
+            MakeNativeMethod<decltype(&addAll), &addAll>("addAll"),
+            MakeNativeMethod<decltype(&version), &version>("version"));
+    }
+};
 
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*)
 {
-    register_fascade(vm);
-    return jni::Unwrap(jni::jni_version_1_2);
+    Binding::register_jni(GetEnv(*vm));
+
+    return Unwrap(jni_version_1_2);
 }
