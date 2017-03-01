@@ -1,1 +1,1 @@
-module.exports = require("./binding.node");
+module.exports = require("./binding");
