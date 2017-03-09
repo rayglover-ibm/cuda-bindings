@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <type_traits>
+#include <ostream>
 
 namespace cufoo {
 namespace kernel
@@ -19,8 +20,10 @@ namespace kernel
             using public_type = maybe<R>;
 
             static constexpr bool is_void = false;
-            static error_code get_errc(const output_type& s) {
-                return s.is<error_code>() ? s.get<error_code>() : error_code::NONE;
+            static error_code get_errc(const output_type& s)
+            {
+                return s.template is<error_code>() ?
+                    s.template get<error_code>() : error_code::NONE;
             }
         };
         template <typename R> struct op_traits<variant<R, error_code>>
@@ -29,8 +32,10 @@ namespace kernel
             using public_type = maybe<R>;
 
             static constexpr bool is_void = false;
-            static error_code get_errc(const output_type& s) {
-                return s.is<error_code>() ? s.get<error_code>() : error_code::NONE;
+            static error_code get_errc(const output_type& s)
+            {
+                return s.template is<error_code>() ?
+                    s.template get<error_code>() : error_code::NONE;
             }
         };
         template <> struct op_traits<void>
@@ -54,7 +59,7 @@ namespace kernel
     template <typename K, typename... Args>
     using op_traits =
         typename detail::op_traits<
-            decltype(K::op<compute_mode::AUTO>(std::declval<Args>()...))
+            decltype(K::template op<compute_mode::AUTO>(std::declval<Args>()...))
             >;
 
     template <typename K, typename... Args>
@@ -75,7 +80,10 @@ namespace kernel
             -> result<K, Args...>
         {
             if (!r.begin(M)) { return error_code::CANCELLED; }
-            result<K, Args...> s = r.apply<M, Args...>(std::forward<Args>(args)...);
+
+            result<K, Args...> s = r.template apply<M, Args...>(
+                std::forward<Args>(args)...);
+
             r.end(op_traits<K, Args...>::get_errc(s));
             return s;
         }
@@ -99,7 +107,7 @@ namespace kernel
     auto control<compute_mode::AUTO>::call(Runner& r, Args&&... args)
         -> result<Kernel, Args...>
     {
-        typename result<Kernel, Args...> s = error_code::KERNEL_NOT_DEFINED;
+        result<Kernel, Args...> s = error_code::KERNEL_NOT_DEFINED;
 
         /* Attempt to run cuda kernel */
         if (compute_traits<compute_mode::CUDA>::available())
@@ -163,11 +171,12 @@ namespace kernel
     template <typename K>
     struct log_runner : public runner<K>
     {
+        using typename runner<K>::traits;
         log_runner(std::ostream* out) : m_out(out) {}
 
         bool begin(compute_mode m)
         {
-            *m_out << '[' << traits::name << "] mode="
+            *m_out << "[" << traits::name << "] mode="
                    << to_str(m) << std::endl;
 
             return true;
@@ -175,7 +184,7 @@ namespace kernel
 
         void end(error_code s)
         {
-            *m_out << '[' << traits::name << "] status="
+            *m_out << "[" << traits::name << "] status="
                    << to_str(s) << std::endl;
         }
 
