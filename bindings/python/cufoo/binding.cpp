@@ -4,34 +4,13 @@
  */
 #include "cufoo.h"
 #include "cufoo_config.h"
+#include "binding_util.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 
 namespace py = pybind11;
-
-namespace util
-{
-    template<typename T>
-    gsl::span<T> as_span(const py::buffer_info& info) {
-        return gsl::span<T>{ reinterpret_cast<T*>(info.ptr), info.size };
-    }
-
-    template<typename R>
-    bool try_throw(const cufoo::maybe<R>& r)
-    {
-        if (r.is<cufoo::error>()) throw std::runtime_error(r.get<cufoo::error>().data());
-        return false;
-    }
-
-    inline
-    bool try_throw(const cufoo::status& r)
-    {
-        if (r) throw std::runtime_error(r.get().data());
-        return false;
-    }
-}
 
 namespace
 {
@@ -57,12 +36,6 @@ namespace
 
         return result;
     }
-
-    int add(int a, int b)
-    {
-        cufoo::maybe<int> r = cufoo::add(a, b);
-        return util::try_throw(r) ? 0 : r.get<int>();
-    }
 }
 
 PYBIND11_PLUGIN(binding)
@@ -72,10 +45,10 @@ PYBIND11_PLUGIN(binding)
     m.def("version", &::get_version,
         "Module version");
 
-    m.def("add", &::add,
+    m.def("add", [](int a, int b) { return cufoo::add(a, b); },
         "A function which adds two numbers");
 
-    m.def("add_all", &::add_all,
+    m.def("add", &::add_all,
         "A function which adds two 1d arrays of equal size together");
 
     return m.ptr();
