@@ -16,8 +16,7 @@ namespace util
         typename Elem = typename Buffer::element_type
         >
     gsl::span<Elem> to_span(
-        jni::JNIEnv& env, jni::Object<Buffer>& o
-        )
+        jni::JNIEnv& env, jni::Object<Buffer>& o)
     {
         void* buff = jni::GetDirectBufferAddress(env, *o);
         size_t len = jni::GetDirectBufferCapacity(env, *o);
@@ -92,6 +91,5 @@ struct Binding
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*)
 {
     Binding::register_jni(GetEnv(*vm));
-
     return Unwrap(jni_version_1_2);
 }
