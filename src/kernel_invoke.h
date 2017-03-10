@@ -94,7 +94,7 @@ namespace kernel
     struct control<M, std::enable_if_t< !compute_traits<M>::enabled >>
     {
         template <typename Runner, typename Kernel, typename... Args>
-        static auto call(Runner& r, Args&&... args)
+        static auto call(Runner&, Args&&...)
             -> result<Kernel, Args...>
         {
             return error_code::COMPUTE_MODE_DISABLED;
@@ -132,8 +132,8 @@ namespace kernel
     {
         using traits = typename K::traits;
 
-        bool begin(compute_mode m) { return true; }
-        void end(error_code s) {}
+        bool begin(compute_mode) { return true; }
+        void end(error_code) {}
 
         template <
             compute_mode M, typename... Args,
@@ -207,7 +207,7 @@ namespace kernel
 
         inline status convert(error_code r) {
             return r == error_code::NONE ? status() : status{ to_str(r) };
-        };
+        }
     }
 
     template <
