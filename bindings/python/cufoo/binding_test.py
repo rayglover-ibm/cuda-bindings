@@ -5,10 +5,10 @@ print("[py] version={}".format(cufoo.version()))
 def test_add():
     a = 3
     b = 5
-    
+
     c = cufoo.add(a, b)
     assert(c == 8)
-    
+
     print("[py] {}".format(c))
 
 

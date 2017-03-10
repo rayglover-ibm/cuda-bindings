@@ -22,7 +22,7 @@ TEST(cufoo, add_span)
     array<int, 6> c;
 
     cufoo::add(a, b, c);
-    
+
     array<int, 6> d{ 8, 10, 12, 14, 16, 18 };
     EXPECT_EQ(c, d);
 }
@@ -33,8 +33,8 @@ TEST(cufoo, add_span_multithreaded)
 
     std::vector<int> a(M, 7);
     std::vector<int> b(M, 21);
-    
-    auto fn = [&](int tid)
+
+    auto fn = [&](int)
     {
         std::vector<int> c(M, 0);
         cufoo::add(a, b, c);
