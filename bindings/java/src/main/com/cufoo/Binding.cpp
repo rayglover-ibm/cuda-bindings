@@ -27,10 +27,10 @@ namespace util
     template<typename R>
     bool try_throw(jni::JNIEnv& env, const cufoo::maybe<R>& r)
     {
-        if (r.is<cufoo::error>()) {
+        if (r.template is<cufoo::error>()) {
             jni::ThrowNew(env,
                 jni::FindClass(env, "java/lang/Error"),
-                r.get<cufoo::error>().data());
+                r.template get<cufoo::error>().data());
             return true;
         }
         return false;
