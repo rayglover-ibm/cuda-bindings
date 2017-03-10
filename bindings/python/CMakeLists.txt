@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.1)
 
 # capture the name of the core c++ library
 set (core "${CMAKE_PROJECT_NAME}")
-set (binding "binding-python")
+set (binding "python")
 
 project ("${core}-${binding}" VERSION "${PROJECT_VERSION}")
 add_subdirectory ("thirdparty/pybind11")
