@@ -24,7 +24,7 @@ set (src
     "src/cufoo.cpp"
 )
 
-# language requirements
+# language requirements/compiler opts
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     add_definitions (-std=c++14)
 endif ()
@@ -37,17 +37,17 @@ set_target_properties (${core} PROPERTIES
 )
 
 # config header
-configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/include/${core}_config.h.in"
+configure_file ("include/${core}_config.h.in"
     "include/${core}_config.h"
 )
 
 # project includes
 target_include_directories (${core}
-    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    PUBLIC "include"
     PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/include"
-    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src"
-    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/third_party/gsl_lite/include"
-    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/third_party/variant/include"
+    PUBLIC "src"
+    PUBLIC "third_party/gsl_lite/include"
+    PUBLIC "third_party/variant/include"
 )
 
 # add cuda
@@ -55,9 +55,6 @@ if (${core}_WITH_CUDA)
     include ("cuda.cmake")
     target_link_libraries (${core}
         PUBLIC ${core}_cuda
-    )
-    export (TARGETS ${core}_cuda
-        FILE "${PROJECT_BINARY_DIR}/${core}_cudaTargets.cmake"
     )
 endif ()
 
@@ -74,20 +71,6 @@ endif ()
 if (${core}_WITH_NODEJS)
     add_subdirectory ("bindings/nodejs")
 endif ()
-if (${core}_WITH_JAVA) 
+if (${core}_WITH_JAVA)
     add_subdirectory ("bindings/java")
 endif ()
-
-# Add all targets to the build-tree export set
-export (TARGETS ${core}
-    FILE "${PROJECT_BINARY_DIR}/${core}Targets.cmake"
-)
-
-# Export the package for use from the build-tree
-# (this registers the build-tree with a global CMake-registry)
-export (PACKAGE ${core})
-
-# Create the <pkg>Config.cmake and <pkg>ConfigVersion files
-configure_file ("cmake/${core}Config.cmake.in"
-    "${PROJECT_BINARY_DIR}/${core}Config.cmake" @ONLY
-)

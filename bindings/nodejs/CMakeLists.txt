@@ -22,11 +22,10 @@ configure_file ("${core}/package.json.in" "${core}/package.json" @ONLY)
 # A submodule, 'binding', will contain the nodejs binding itself.
 add_nodejs_module (${binding} ${src})
 
-set_target_properties (${binding} PROPERTIES 
+set_target_properties (${binding} PROPERTIES
     OUTPUT_NAME "binding"
 )
-target_include_directories (${binding} 
-    #PUBLIC "${CMAKE_CURRENT_LIST_DIR}/third_party/nan"
+target_include_directories (${binding}
     PUBLIC "${CMAKE_CURRENT_LIST_DIR}/third_party/v8pp"
 )
 target_link_libraries (${binding}

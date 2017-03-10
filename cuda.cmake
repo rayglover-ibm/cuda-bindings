@@ -8,11 +8,11 @@ set (SRC_CUDA
     "src/device_util.cu"
 )
 cuda_include_directories (
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "include"
     "${CMAKE_CURRENT_BINARY_DIR}/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src"
-    "${CMAKE_CURRENT_SOURCE_DIR}/third_party/gsl_lite/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/third_party/variant/include"
+    "src"
+    "third_party/gsl_lite/include"
+    "third_party/variant/include"
 )
 list (APPEND
     CUDA_NVCC_FLAGS "--expt-relaxed-constexpr --default-stream per-thread"

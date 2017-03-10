@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.2)
 
 include (CTest)
-include ("${CMAKE_MODULE_PATH}/DownloadProject.cmake")
+include ("DownloadProject")
 
 # download GoogleTest targets
 download_project (
