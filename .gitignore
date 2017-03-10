@@ -1,5 +1,4 @@
-build/
-build_*/
+build*/
 .vscode/
 *.sublime-project
 *.sublime-workspace
