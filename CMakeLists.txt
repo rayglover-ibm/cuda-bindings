@@ -29,9 +29,12 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     add_definitions (-std=c++14)
 endif ()
 
-# create the library
+# create the core library
 add_library (${core} STATIC ${src})
-set_target_properties (${core} PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties (${core} PROPERTIES
+    LINKER_LANGUAGE CXX
+    POSITION_INDEPENDENT_CODE ON
+)
 
 # config header
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/include/${core}_config.h.in"
