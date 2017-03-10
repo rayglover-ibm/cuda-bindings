@@ -1,9 +1,9 @@
 # C++/CUDA language bindings
+#### By Raymond Glover - March 2017
 
 _In this tutorial I explain the basics of writing cross-platform CUDA-enabled C++ extensions for Python/Node.js/Java applications, and introduce `kernel.h`, a miniature header-only utility for heterogeneous computing. The accompanying code for this tutorial is available here._
 
 ---
-### _By Raymond Glover - March 2017_
 
 In building data-centric applications and the statistical models that underpin them, the ability to incorporate hardware accelerated algorithms is an [increasingly important](http://www.economist.com/news/business/21717430-success-nvidia-and-its-new-computing-chip-signals-rapid-change-it-architecture) consideration. This is especially true in cloud computing which is democratizing the data center, and with it the availability of dedicated compute appliances like GPUs and FPGAs.
 
@@ -11,7 +11,7 @@ In parallel to this, the use of C++ is becoming a de facto way among application
 
 With C/C++ acting as the enabling glue between data intensive/performance sensitive applications and the underlying hardware, it has become the catalyst for [heterogeneous computing](http://developer.amd.com/resources/heterogeneous-computing/what-is-heterogeneous-computing/) as it becomes mainstream.
 
-### Target Audience
+#### Target Audience
 
 This tutorial is aimed at application/framework developers considering extending their Python/node.js/Java applications with native subroutines, or adopting one of the many pre-existing libraries, but don't know where to start or what the landscape looks like.
 
@@ -19,9 +19,9 @@ In it, we'll construct a minimum working example of a native extension for 3 pop
 
 ## Contents
 
-- __[Part 1 – Native Extensions](#Part1)__
-- __[Part 2 – The Algorithm](#Part2)__
-- __[Part 3 – Language Bindings](#Part3)__
+- [Part 1 – Native Extensions](#Part1)
+- [Part 2 – The Algorithm](#Part2)
+- [Part 3 – Language Bindings](#Part3)
     - [Python](#Part3-1)
     - [Node.js (Javascript)](#Part3-2)
     - [Java](#Part3-3)
@@ -37,7 +37,7 @@ Our aim will be to construct this as a native extension, balancing performance, 
 
 Like many native extensions, there are three components to delivering `cufoo` for a target language:
 
-![img](./fig-5.png)
+![img](./fig-5.PNG)
 
 __1. Loader__ – The language-specific interface to our extension. At a minimum it'll be responsible for finding and loading the extension itself. Whilst we want our extension to have a common API across all target languages, we also want it to feel idiomatic and ergonomic within the context of each. The loader is responsible for this.
 
@@ -140,7 +140,7 @@ These two requirements are particularly useful for real-world cross-platform app
 
 ### Declare the Kernel
 
-![img](./fig-1.png)
+![img](./fig-1.PNG)
 
 With `kernel.h` we declare our kernel with a simple macro, `KERNEL_DECL` in `src/kernels/add.h`:
 
@@ -231,7 +231,7 @@ Depending on your particular problem, it's likely you'll be able to leverage pre
 
 ### Running the kernel
 
-![img](./fig-2.png)
+![img](./fig-2.PNG)
 
 Now that we've fully implemented the operations on our `add` kernel for both CPU and GPU, we can wrap it in a public API which will be exposed through `include/cufoo.h`. Here is the declaration for `add`:
 
@@ -260,7 +260,7 @@ maybe<int> add(int a, int b) {
 
 Implicitly, a special `compute_mode` called `AUTO` is selected, which at runtime invokes an algorithm to determine which `compute_mode` to invoke. For our kernel (that supports both CUDA and CPU) the process like this:
 
-![img](./fig-6.png)
+![img](./fig-6.PNG)
 
 Essentially, the CUDA implementation is used when `compute_mode::CUDA` is _enabled_ at compile time _and_ a valid CUDA context is available at runtime. If the kernel fails during execution for some reason (i.e. it returns an error) then we fallback to the CPU implementation. For kernels that have different combinations of `compute_mode` support, the control-flow is altered to account for this.
 
@@ -310,6 +310,7 @@ With `variant`, our operation changes from `int op(int, int)` to `variant<int, e
 The `variant<T, error_code>` return type is recognized by the kernel runner. Upon encountering an error, the runner will convert this error to our libraries more generic error type, `error`. Altogether, we can tabulate the return types that `kernel.h` recognizes and will automatically convert:
 
 _Return type conversions_
+
 | `op()` type              | `kernel::run()` type   |
 |-------------------------:|:-----------------------|
 | `variant<T, error_code>` | `maybe<T>`             |
@@ -722,6 +723,7 @@ Typically, when working within the confines of a language with AMM, an object's 
 For using our `gsl::span<T>`, we need to ensure the AMM of the target runtime doesn't free, or (in the case of a compacting garbage collector, move) the underlying data. To this end, the IDL-like wrappers we've used in this tutorial provide varying degrees of support in addition to what's provided by the raw API. The source code accompanying this tutorial offers a demonstration, but here is an overview:
 
 _Memory management overview_
+
 | Runtime  | Strategy             | Raw API             | Additional wrapper support   | 
 |----------|:---------------------|---------------------|:------------------|
 | CPython  | [reference counting](https://en.wikipedia.org/wiki/Reference_counting)   | [Py_INCREF, etc.](https://docs.python.org/3.6/c-api/refcounting.html) | [✓](http://pybind11.readthedocs.io/en/master/advanced/smart_ptrs.html) |
