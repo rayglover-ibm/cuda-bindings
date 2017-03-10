@@ -41,20 +41,23 @@ add_jar ("${core}-java"
 # tests
 if (cufoo_WITH_TESTS)
     include (CTest)
+    include (join)
+
     set (test ${PROJECT_NAME}_test)
 
     add_jar (${test} ${src_test}
         INCLUDE_JARS "${core}-java"
     )
-    set (cp
+    set (classpath
         $<TARGET_PROPERTY:${test},JAR_FILE>
         $<TARGET_PROPERTY:${core}-java,JAR_FILE>
     )
+    join_paths ("${classpath}" cp)
     add_test (
         NAME ${PROJECT_NAME}_test_suite
         COMMAND java -enableassertions
                      -Xcheck:jni
-                     -Djava.library.path=$<TARGET_FILE_DIR:binding-java>
+                     -Djava.library.path=$<TARGET_FILE_DIR:${binding}>
                      -cp "${cp}"
                      "com.cufoo.tests.BindingTest"
     )
