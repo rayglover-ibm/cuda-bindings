@@ -17,8 +17,8 @@ def test_add_all():
 
     a = numpy.array([1,2,3,4], dtype=numpy.int32)
     b = numpy.array([5,6,7,8], dtype=numpy.int32)
-    
-    c = cufoo.add_all(a, b)
+
+    c = cufoo.add(a, b)
     assert(numpy.array_equal(c, a + b))
 
     print("[py] {}".format(c))
