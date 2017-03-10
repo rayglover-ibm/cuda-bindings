@@ -14,7 +14,9 @@ namespace util
     template<typename R>
     bool try_throw(const cufoo::maybe<R>& r)
     {
-        if (r.is<cufoo::error>()) throw std::runtime_error(r.get<cufoo::error>().data());
+        if (r.template is<cufoo::error>())
+            throw std::runtime_error(r.template get<cufoo::error>().data());
+
         return false;
     }
 
@@ -45,7 +47,7 @@ namespace detail
             cufoo::maybe<T> &&src, return_value_policy policy, handle parent)
         {
             util::try_throw(src);
-            return type_caster<T>::cast(src.get<T>(), policy, parent);
+            return type_caster<T>::cast(src.template get<T>(), policy, parent);
         }
         static PYBIND11_DESCR name() { return type_caster_base<T>::name(); }
     };
