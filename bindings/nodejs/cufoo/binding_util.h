@@ -1,13 +1,12 @@
 #pragma once
 
+#include "cufoo.h"
+
 #include <v8.h>
 #include <v8pp/convert.hpp>
 
-#include "cufoo.h"
-
 namespace util
 {
-
     /*  Given an v8::ArrayBufferView, produces a span<T>
      *  over the view
      */
@@ -35,9 +34,9 @@ namespace util
     template <typename R>
     bool try_throw(const cufoo::maybe<R>& r)
     {
-        if (r.is<cufoo::error>()) {
-            throw std::invalid_argument(r.get<cufoo::error>().data());
-        }
+        if (r.template is<cufoo::error>())
+            throw std::invalid_argument(r.template get<cufoo::error>().data());
+
         return false;
     }
 
@@ -52,58 +51,60 @@ namespace util
 
 /*  v8pp type converters --------------------------------------------------- */
 
-
-/*
- *  Conversion to span<T> from a v8::ArrayBufferView.
- *  Doesn't permit v8::ArrayBufferView to span<T>.
- */
-template<typename T>
-struct ::v8pp::convert<gsl::span<T>>
+namespace v8pp
 {
-    using from_type = gsl::span<T>;
-    using to_type = v8::Local<v8::ArrayBufferView>;
-
-    static bool is_valid(v8::Isolate*, v8::Local<v8::Value> value) {
-        return value->IsArrayBufferView();
-    }
-
-    static from_type from_v8(v8::Isolate* iso, v8::Local<v8::Value> from)
+    /*
+     *  Conversion to span<T> from a v8::ArrayBufferView.
+     *  Doesn't permit v8::ArrayBufferView to span<T>.
+     */
+    template<typename T>
+    struct convert<gsl::span<T>>
     {
-        if (!is_valid(iso, from)) {
-            throw std::invalid_argument("expected ArrayBufferView");
+        using from_type = gsl::span<T>;
+        using to_type = v8::Local<v8::ArrayBufferView>;
+
+        static bool is_valid(v8::Isolate*, v8::Local<v8::Value> value) {
+            return value->IsArrayBufferView();
         }
-        v8::HandleScope scope(iso);
-        auto view = v8::Local<v8::ArrayBufferView>::Cast(from);
 
-        return util::as_span<T>(iso, view);
-    }
-};
+        static from_type from_v8(v8::Isolate* iso, v8::Local<v8::Value> from)
+        {
+            if (!is_valid(iso, from)) {
+                throw std::invalid_argument("expected ArrayBufferView");
+            }
+            v8::HandleScope scope(iso);
+            auto view = v8::Local<v8::ArrayBufferView>::Cast(from);
 
-template<typename T>
-struct ::v8pp::is_wrapped_class<gsl::span<T>> : std::false_type {};
+            return util::as_span<T>(iso, view);
+        }
+    };
+
+    template<typename T>
+    struct is_wrapped_class<gsl::span<T>> : std::false_type {};
 
 
-/*
- *  Conversion to v8::Value from a cufoo::maybe<T>; will
- *  throw an exception if the incoming cufoo::maybe<T> is
- *  in an error state.
- */
-template<typename T>
-struct ::v8pp::convert<cufoo::maybe<T>>
-{
-    using from_type = cufoo::maybe<T>;
-    using to_type = v8::Local<v8::Value>;
-
-    static to_type to_v8(v8::Isolate* iso, const cufoo::maybe<T>& val)
+    /*
+     *  Conversion to v8::Value from a cufoo::maybe<T>; will
+     *  throw an exception if the incoming cufoo::maybe<T> is
+     *  in an error state.
+     */
+    template<typename T>
+    struct convert<cufoo::maybe<T>>
     {
-        util::try_throw(val);
+        using from_type = cufoo::maybe<T>;
+        using to_type = v8::Local<v8::Value>;
 
-        v8::EscapableHandleScope hatch(iso);
-        to_type to = v8pp::to_v8(iso, val.get<T>());
+        static to_type to_v8(v8::Isolate* iso, const cufoo::maybe<T>& val)
+        {
+            util::try_throw(val);
 
-        return hatch.Escape(to);
-    }
-};
+            v8::EscapableHandleScope hatch(iso);
+            to_type to = v8pp::to_v8(iso, val.template get<T>());
 
-template<typename T>
-struct ::v8pp::is_wrapped_class<cufoo::maybe<T>> : std::false_type {};
+            return hatch.Escape(to);
+        }
+    };
+
+    template<typename T>
+    struct is_wrapped_class<cufoo::maybe<T>> : std::false_type {};
+}
