@@ -1,6 +1,6 @@
-# __CUDA language bindings__ – Minimum working examples
+# *CUDA language bindings* – Minimum working examples
 
-_This is the accompanying code for the tutorial __CUDA language bindings – with modern C++__. This repository contains everything you need to follow that tutorial, and serve as a reference for extending Python, Node.js and Java applications with CUDA._
+_This is the accompanying code for the tutorial **CUDA language bindings – with modern C++**. This repository contains everything you need to follow that tutorial, and serve as a reference for extending Python, Node.js and Java applications with CUDA._
 
 ---
 
@@ -14,15 +14,16 @@ _This is the accompanying code for the tutorial __CUDA language bindings – wit
 
 <br>
 
-## Build Reference
+## Build
 
-At a minimum, you'll need CMake 3.5. If you want to build for Android (see below) 3.7 is required. Refer to the tutorial for concrete examples.
+__Requirements:__ you'll need CMake 3.5. If you want to build for Android (see below) 3.7 is required. Refer to the tutorial for concrete examples.
 
 ```
 mkdir build && cd build
 cmake [-G <generator>] <cmake-options> ..
 cmake --build . [--config Debug]
 ```
+<br>
 
 ### CMake options
 
@@ -34,7 +35,9 @@ cmake --build . [--config Debug]
 | `cufoo_WITH_NODEJS`      | Enable nodejs binding  | OFF     |
 | `cufoo_WITH_JAVA`        | Enable java binding    | OFF     |
 
-### Compilers / runtimes (minimum tested version)
+<br>
+
+### Compilers / Runtimes (minimum tested version)
 
 |               |  Windows 7 |  Linux (Ubuntu 15/16) | Android       |
 |---------------|:----------:|:---------------------:|:-------------:|
@@ -43,7 +46,7 @@ cmake --build . [--config Debug]
 
 <br>
 
-### Building for Android
+### Build & Test for Android
 
 As of version 3.7 of CMake, it's possible to cross-compile for Android out-of-the-box. Here I assume you've installed [Android Studio](https://developer.android.com/studio/index.html#downloads), or at a minimum, the Android command-line tools. I also assume you've installed the NDK.
 
