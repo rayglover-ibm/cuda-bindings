@@ -12,9 +12,6 @@ _This is the accompanying code for the tutorial **CUDA language bindings – wit
 
 <br>
 
----
-
-
 ## Build
 
 __Requirements:__ you'll need CMake 3.5. If you want to build for Android (see below) 3.7 is required. Refer to the tutorial for concrete examples.
@@ -24,26 +21,24 @@ mkdir build && cd build
 cmake [-G <generator>] <cmake-options> ..
 cmake --build . [--config Debug]
 ```
-<br>
 
-### CMake options
+- ### CMake options
 
-| CMake option             | Description            | Default |
-|--------------------------|:-----------------------|:--------|
-| `cufoo_WITH_TESTS`       | Enable unit tests      | ON      |
-| `cufoo_WITH_CUDA`        | Enable cuda support    | OFF     |
-| `cufoo_WITH_PYTHON`      | Enable python binding  | OFF     |
-| `cufoo_WITH_NODEJS`      | Enable nodejs binding  | OFF     |
-| `cufoo_WITH_JAVA`        | Enable java binding    | OFF     |
+    | CMake option             | Description            | Default |
+    |--------------------------|:-----------------------|:--------|
+    | `cufoo_WITH_TESTS`       | Enable unit tests      | ON      |
+    | `cufoo_WITH_CUDA`        | Enable cuda support    | OFF     |
+    | `cufoo_WITH_PYTHON`      | Enable python binding  | OFF     |
+    | `cufoo_WITH_NODEJS`      | Enable nodejs binding  | OFF     |
+    | `cufoo_WITH_JAVA`        | Enable java binding    | OFF     |
 
-<br>
+- ### Compilers / Runtimes 
+    _(Minimum tested versions)_
 
-### Compilers / Runtimes (minimum tested version)
-
-|               |  Windows 7 |  Linux (Ubuntu 15/16) | Android       |
-|---------------|:----------:|:---------------------:|:-------------:|
-| C++ compiler  | VS 2015    | gcc 5.4 / clang 3.6   |  NDK r13      |
-| CUDA version  | 7.5/8.0    | 7.5/8.0               |  ✗           |
+    |               |  Windows 7 |  Linux (Ubuntu 15/16) | Android       |
+    |---------------|:----------:|:---------------------:|:-------------:|
+    | C++ compiler  | VS 2015    | gcc 5.4 / clang 3.6   |  NDK r13      |
+    | CUDA SDK      | 7.5/8.0    | 7.5/8.0               |  ✗           |
 
 <br>
 

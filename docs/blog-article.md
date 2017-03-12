@@ -1,4 +1,4 @@
-# __CUDA language bindings__ – with modern C++
+# <em>CUDA language bindings</em> – with modern C++
 
 #### By Raymond Glover - March 2017
 
@@ -12,11 +12,13 @@ In parallel to this, the use of C++ is becoming a de facto way among application
 
 With C/C++ acting as the enabling glue between data intensive/performance sensitive applications and the underlying hardware, it has become the catalyst for [heterogeneous computing](http://developer.amd.com/resources/heterogeneous-computing/what-is-heterogeneous-computing/) as it becomes mainstream.
 
-#### Target Audience
+### Target Audience
 
 This tutorial is aimed at application/framework developers considering extending their Python/node.js/Java applications with native subroutines, or adopting one of the many pre-existing libraries, but don't know where to start or what the landscape looks like.
 
 In it, we'll construct a minimum working example of a native extension for 3 popular languages and identify some important aspects and principals to keep in mind when building your own bindings. I'll be assuming you have a basic understanding of C++, and at least one of the 3 target languages.
+
+<br>
 
 ## Contents
 
@@ -37,9 +39,7 @@ In it, we'll construct a minimum working example of a native extension for 3 pop
 
 Lets outline what we're going to build. Imagine we have an application, and a crucial part of it is some computationally expensive algorithm. We've benchmarked the application and determined an implementation of this algorithm with a high-performance numerical library such as Eigen, cuBLAS or NPP is likely to be a worthwhile investment.
 
-Our aim will be to construct this as a native extension, balancing performance, portability, and productivity. For lack of a better name, we'll call this extension `cufoo`.
-
-Like many native extensions, there are three components to delivering `cufoo` for a target language:
+Our aim will be to construct this as a native extension, balancing performance, portability, and productivity. For lack of a better name, we'll call this extension `cufoo`. Like most native extensions, there are three major components per target language:
 
 ![img](./fig-5.PNG)
 
@@ -48,6 +48,8 @@ __1. Loader__ – The language-specific interface to our extension. At a minimum
 __2. Extension (cufoo)__ – The core implementation of our algorithm(s), shared across all languages. 
 
 __3. Binding__ – Acts as the interface between the extension and the target language runtime, describing the native extension through the target language's type system. In reality this will be a shared library (e.g. a `.dll` or `.so` file) accessible to the loader.
+
+<br>
 
 ## Possible approaches
 
@@ -59,6 +61,7 @@ __2. IDL bridges and generators__ – Popular examples include [SWIG](http://www
 
 __3. IDL-like C++ wrappers__ – IDL-like wrappers are a middle ground between the first two approaches; by using techniques like [metaprogramming](https://en.wikipedia.org/wiki/Template_metaprogramming) and compile-time introspection (both features of C++) we can aim to build a language-specific wrapping mechanism that avoids the opaque abstractions in 2 and the boilerplate and incidental complexity of 1. Popular examples include [boost.python](http://www.boost.org/doc/libs/1_63_0/libs/python/doc/html/index.html) and [nan](https://github.com/nodejs/nan).
 
+
 For a relatively simple extensions like `cufoo`, we could consider the convenience of method 2. However, it's not unrealistic to expect _real-world_ extensions to eventually encounter shortcomings with this approach, in particular when expressing parts of an API with idioms specific to a language, or idioms that differ slightly between languages; e.g. asynchronous callbacks, exceptions, or in dealing with the nuances of garbage collection.
 
 This seems somewhat unavoidable; if you're using a mechanism that aims to hide the differences between two programming languages, then you also loose the ability to consider either one in isolation. To compensate, higher-level concepts are introduced in the binding itself, such as the [_typemaps_](http://www.swig.org/Doc2.0/Typemaps.html#Typemaps) or [_features_](http://www.swig.org/Doc2.0/Customization.html#Customization) mechanisms in SWIG. However, the added flexibility also introduces a new layer of complexity not readily understood by non-experts.
@@ -69,19 +72,19 @@ Instead, we'll use method 3, which I believe to be the most pragmatic. By exploi
 - [v8pp](https://github.com/pmed/v8pp) (node.js) – *Bind C++ functions and classes into V8 JavaScript engine*
 - [jni.hpp](https://github.com/mapbox/jni.hpp) (Java) – *A modern, type-safe, header-only, C++14 wrapper for JNI*
 
+<br>
+
 ## The build system
 
 In recent years, the tooling to develop complex cross-platform applications has significantly matured. Tools like [Bazel](https://bazel.build/), [Buck](https://buckbuild.com/) and [CMake](https://cmake.org/) orchestrate the building, testing, packaging and deployment for a variety of platforms and toolchains. The oldest and probably most widely used of these is CMake.
 
 CMake is unusual (but not unique) in that it's really a _meta-build_ system used to _generate_ a build environment, rather than target build artifacts (executables and so on.) So for instance, on Windows, CMake can be used to generate a Visual Studio solution (an `.sln` file), whilst on Linux it's usually used to generate a Make based project (a `Makefile` file). CMake has support for many other build tools. Furthermore, the latest version of some IDEs and other productivity tools now have official support for CMake, making it available to a wider set of developers.
 
-I've included a number of steps you can follow to complete this tutorial (although unfortunately they assume you're on Windows):
-
 <br>
 
 ---
 
-### __Step 1 –__ Install tools
+### 🔨&nbsp; Step 1 – Install tools
 
 - Install [CMake](https://cmake.org/download/).
 - You'll also need a recent C++ compiler, for example Visual Studio 2015, gcc 5.4 or clang 3.8.
@@ -91,6 +94,8 @@ I've included a number of steps you can follow to complete this tutorial (althou
 <br>
 
 CMake has first-class support for C, C++, Objective-C and Fortran compilers, and extending CMake is certainly possible (and in some cases, preferable) to support other languages too. That being said, it's not the go-to tool for building and packaging _everything_. Integrations with Apache Maven (a Java build and package manager) and [Gradle](https://developer.android.com/ndk/guides/cmake.html#variables) (Android's integrated build system) can configure and drive CMake builds. This process is preferable when building complex packages for the respective platforms (e.g. `.apk` packages for Android), even if it sounds less convenient at first glance.
+
+<br>
 
 ## Project structure
 
@@ -144,6 +149,8 @@ The `src/kernels` folder contains our algorithm. The term _kernel_ is used to de
 
 For `cufoo` our single kernel will be called `add`, which unsurprisingly just adds integers together. We'll have 2 kernel implementations distinguished by their _compute mode_. The _compute mode_ determines where the kernel is executed i.e. `CPU` or `CUDA`, but you could imagine others, for instance `OpenCL`, `FPGA`, `OpenMP` and so on.
 
+<br>
+
 ## `Add` Kernel
 
 Other than adding numbers, we'd also like our kernel to allow us to:
@@ -152,6 +159,8 @@ Other than adding numbers, we'd also like our kernel to allow us to:
 - permit running `cufoo` with or without a GPU, and be able to control this behavior at runtime.
 
 These two requirements are particularly useful for real-world cross-platform applications, although it's also a missing piece in a typical GPU tutorial. I'll spend some time describing how to accomplish this with a small utility I wrote called `kernel.h`.
+
+<br>
 
 ### Declare the Kernel
 
@@ -178,69 +187,73 @@ KERNEL_DECL(add,
 };
 ```
 
-Now that we've declared an operation, we need to implement it. Since our kernel supports `CPU` and `CUDA`, the kernel runner will expect to be able to find the respective implementation if it's enabled during compilation. For example, if we enable `CUDA` at compile time, the runner will expect to find a specialization of `add::op` for `compute_mode::CUDA`.
+Once the operation is declared, we need to implement it. Since our kernel supports `CPU` and `CUDA`, the kernel runner will expect to be able to find the respective implementation if it's enabled during compilation. For example, if we enable `CUDA` at compile time, the runner will expect to find a specialization of `add::op` for `compute_mode::CUDA`.
+
+<br>
 
 ### Implement the kernel operation(s)
 
 To keep things well structured, the implementations (i.e. definitions) of each operation are grouped by `compute_mode` in to separate files. In our case the definitions reside in `src/kernels/add.cpp` and `src/kernels/add.cu` for `CPU` and `CUDA` respectively.
 
-### Implementation (CPU)
+- ### CPU
 
-```c++
-template <> int add::op<compute_mode::CPU>(
-    int a, int b)
-{
-    return a + b;
-}
-```
-
-The CPU implementation (above) is trivially simple. Note that we're using the `template <>` syntax to denote an [explicit specialization](http://en.cppreference.com/w/cpp/language/template_specialization) of our `add::op` template, in this case for `compute_mode::CPU`.
-
-### Implementation (CUDA)
-
-The CUDA implementation is more substantial. For such a trivial operation like `int add(int, int)` it's highly unlikely that a GPU implementation would be even half as fast as the CPU implementation because of various unavoidable overheads. None the less we can introduce the basic (but fundamental) parts of the CUDA workflow: memory management and kernel launching:
-
-```c++
-namespace
-{
-    __global__ void add(
-        int a, int b, int* result)
+    ```c++
+    template <> int add::op<compute_mode::CPU>(
+        int a, int b)
     {
-        *result = a + b;                       (3)
+        return a + b;
     }
-}
+    ```
 
-template <> int add::op<compute_mode::CUDA>(
-    int a, int b)
-{
-    device_ptr<int> dev_c;                     (1)
+    The CPU implementation (above) is trivially simple. Note that we're using the `template <>` syntax to denote an [explicit specialization](http://en.cppreference.com/w/cpp/language/template_specialization) of our `add::op` template, in this case for `compute_mode::CPU`.
 
-    ::add<<< 1, 1 >>>(a, b, dev_c.get());      (2)
+- ### CUDA
 
-    int c;
-    dev_c.copy_to({ &c, 1 });                  (4)
+    The CUDA implementation is more substantial. For such a trivial operation like `int add(int, int)` it's highly unlikely that a GPU implementation would be even half as fast as the CPU implementation because of various unavoidable overheads. None the less we can introduce the basic (but fundamental) parts of the CUDA workflow: memory management and kernel launching:
+    
+    ```c++
+    namespace
+    {
+        __global__ void add(
+            int a, int b, int* result)
+        {
+            *result = a + b;                       (3)
+        }
+    }
+    
+    template <> int add::op<compute_mode::CUDA>(
+        int a, int b)
+    {
+        device_ptr<int> dev_c;                     (1)
+    
+        ::add<<< 1, 1 >>>(a, b, dev_c.get());      (2)
+    
+        int c;
+        dev_c.copy_to({ &c, 1 });                  (4)
+    
+        return c;                                  (5)
+    }
+    ```
 
-    return c;                                  (5)
-}
-```
+    1. Allocate a single `int` on the GPU (a.k.a. the _device_), where the result of will be written to.
+    2. Launch the CUDA kernel, supplying the 2 input integers and a pointer to the output.
+    3. Our device code, to run on the GPU.
+    4. Copy the output from the device back to main memory.
+    5. Return the result.
+    
+    One initial point of interest in this implementation at (1) is the `device_ptr<T>` type. Similar to `std::unique_ptr<T>`, this is a smart pointer that owns and manages an object of type `T` on the GPU, and disposes of that object when it goes out of scope. We can copy memory to and from the device with `copy_to` and `copy_from` member functions. `device_ptr` also makes it easy to allocate a chunk of memory capable of holding N elements. For example, to allocate 256 `float`'s contiguously in device memory:
+    
+    ```c++
+    device_ptr<float> device_elements(256);
+    ```
+    
+    Once `device_elements` goes out of scope, the device memory is freed.
+    
+    This isn't intended to be a comprehensive tutorial on CUDA itself. If you're interested in knowing more about say, the odd looking `::add<<< G, B >>>` syntax at (2), or what `__global__` means, you can acquaint yourself with the core concepts by reading the introductory tutorial on the NVIDIA Developer blog [here](https://devblogs.nvidia.com/parallelforall/even-easier-introduction-cuda/).
+    
+    Depending on your particular problem, it's likely you'll be able to leverage preexisting CUDA libraries like cuBLAS or _NVIDIA Performance Primitives_ (NPP). There are many open source 3rd party libraries; an incomplete list can be found [here](https://developer.nvidia.com/gpu-accelerated-libraries).
 
-1. Allocate a single `int` on the GPU (a.k.a. the _device_), where the result of will be written to.
-2. Launch the CUDA kernel, supplying the 2 input integers and a pointer to the output.
-3. Our device code, to run on the GPU.
-4. Copy the output from the device back to main memory.
-5. Return the result.
-
-One initial point of interest in this implementation at (1) is the `device_ptr<T>` type. Similar to `std::unique_ptr<T>`, this is a smart pointer that owns and manages an object of type `T` on the GPU, and disposes of that object when it goes out of scope. We can copy memory to and from the device with `copy_to` and `copy_from` member functions. `device_ptr` also makes it easy to allocate a chunk of memory capable of holding N elements. For example, to allocate 256 `float`'s contiguously in device memory:
-
-```c++
-device_ptr<float> device_elements(256);
-```
-
-Once `device_elements` goes out of scope, the device memory is freed.
-
-This isn't intended to be a comprehensive tutorial on CUDA itself. If you're interested in knowing more about say, the odd looking `::add<<< G, B >>>` syntax at (2), or what `__global__` means, you can acquaint yourself with the core concepts by reading the introductory tutorial on the NVIDIA Developer blog [here](https://devblogs.nvidia.com/parallelforall/even-easier-introduction-cuda/).
-
-Depending on your particular problem, it's likely you'll be able to leverage preexisting CUDA libraries like cuBLAS or _NVIDIA Performance Primitives_ (NPP). There are many open source 3rd party libraries; an incomplete list can be found [here](https://developer.nvidia.com/gpu-accelerated-libraries).
+<br>
 
 ### Running the kernel
 
@@ -290,6 +303,8 @@ maybe<int> add(int a, int b)
 
 Here, if `<some condition>` evaluated to true, we'd force the kernel runner to use the CPU.
 
+<br>
+
 ### custom `kernel::runner`'s
 
 Lastly, it's also possible to supply a non-default or custom `kernel::runner`. `kernel.h` comes with the `log_runner<K>` runner which when supplied to `run_with` will log various things during the kernel invocation. For example:
@@ -305,6 +320,8 @@ run_with<kernels::add>(log, a, b);
     [add] status=Success
 
 You could probably imagine other runners which could help you write tests or benchmark your kernels.
+
+<br>
 
 ### Error handling
 
@@ -322,7 +339,7 @@ With `variant`, our operation changes from `int op(int, int)` to `variant<int, e
 
 The `variant<T, error_code>` return type is recognized by the kernel runner. Upon encountering an error, the runner will convert this error to our libraries more generic error type, `error`. Altogether, we can tabulate the return types that `kernel.h` recognizes and will automatically convert:
 
-_Return type conversions_
+#### Return type conversions
 
 | `op()` type              | `kernel::run()` type   |
 |-------------------------:|:-----------------------|
@@ -331,7 +348,9 @@ _Return type conversions_
 | `void`                   | `option<error>`        |
 | `T`                      | `maybe<T>`             |
 
-_Note:_ `maybe<T>` type, which is an alias for `variant<T, error>`.
+_Note:_ `maybe<T>` is an alias for `variant<T, error>`.
+
+<br>
 
 ## Unit Tests
 
@@ -354,7 +373,7 @@ TEST(cufoo, add)
 
 ---
 
-### __Step 2 –__ Build and run the unit tests
+### 🔨&nbsp; Step 2 – Build and run the unit tests
 
 ```
 mkdir build && cd build                              (1)
@@ -387,21 +406,11 @@ The default build configuration will produce a CPU-only version of cufoo (see th
 
 ## Build Options
 
-By default the build wont enable CUDA, even if you have CUDA installed. To enable CUDA, supply the option `cufoo_WITH_CUDA` to CMake at the configuration stage, like so:
+By default the build wont enable CUDA, even if you have CUDA installed. To enable CUDA, supply the option `cufoo_WITH_CUDA` to CMake at the configuration stage, (see below). A complete list of options is maintained on the cufoo README.
 
 ```
 cmake -G "Visual Studio 14 2015 Win64" -Dcufoo_WITH_CUDA=ON ..
 ```
-
-A complete list of options is maintained on the cufoo README, but the relevant ones for this tutorial are as follows:
-
-| CMake option             | Description            | Default |
-|--------------------------|:-----------------------|:--------|
-| `cufoo_WITH_TESTS`       | Enable unit tests      | ON      |
-| `cufoo_WITH_CUDA`        | Enable cuda support    | OFF     |
-| `cufoo_WITH_PYTHON`      | Enable python binding  | OFF     |
-| `cufoo_WITH_NODEJS`      | Enable nodejs binding  | OFF     |
-| `cufoo_WITH_JAVA`        | Enable java binding    | OFF     |
 
 <br>
 
@@ -419,7 +428,7 @@ Now that our library is complete, we'll make it consumable by other languages. A
 
 3. With CMake we can configure, build and test the bindings in an automated way that fits a single workflow. Each build configuration is defined in `bindings/<lang>/CMakeLists.txt`.
 
-
+<br>
 
 ## <a name="Part3-1"></a> Python
 
@@ -462,7 +471,7 @@ That's all there is to it. we can build and test our binding with CMake:
 
 ---
 
-### __Step 3 –__ Build and test the python binding
+### 🔨&nbsp; Step 3 – Build and test the python binding
 
 To work You'll need Python 3 installed on your system. If on Linux, you may already have Python installed, but you will also need the python development package, typically called `python-devel` or `python-dev`. On Windows or osx, I recommend [Miniconda](https://conda.io/miniconda.html) for 64-bit Python 3.x.
 
@@ -572,7 +581,7 @@ You may notice the similarities with the Python binding; line 2 is almost identi
 
 ---
 
-### __Step 4 –__ Build and test the nodejs binding
+### 🔨&nbsp; Step 4 – Build and test the nodejs binding
 To work You'll need node.js installed on your system from [here](https://nodejs.org/en/download/). The build will also automatically download the headers and libraries to build against your version of node.js.
 
 ```bash
@@ -693,9 +702,9 @@ public class BindingTest {
 
 ---
 
-### __Step 5 –__ Build and test the Java binding
+### 🔨&nbsp; Step 5 – Build and test the Java binding
 
-_To work, you'll need a JDK installed on your system. You should also make sure the `JAVA_HOME` environment variable is set to the location of your JDK installation._
+To work, you'll need a JDK installed on your system. You should also make sure the `JAVA_HOME` environment variable is set to the location of your JDK installation.
 
 ```bash
 mkdir build_java && cd build_java
@@ -737,11 +746,15 @@ template <compute_mode> static error_code op(
 
 Here we're declaring an operation taking three _views_ of 1-dimensional vectors, implemented by adding the first two together into the third. In the last part of this tutorial, I'll single out 1 aspect of this operation worthy of further explanation: `gsl::span<T>`, and it's implications for memory management.
 
+<br>
+
 ### The `gsl::span<T>`
 
 A `gsl::span<T>` is a view over contiguous memory, intended as an alternative to the error-prone `(pointer, length)` idiom. It also supports describing the shape and span of n-dimensional data. It forms a part of the _Guidelines Support Library_ (GSL) library. GSL is a support library for the [C++ core guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines), a attempt by the C++ standards committee to produce a set of rules and best practice for writing modern C++.
 
 Passing views and sub-views of n-dimensional vectors, rather than the data itself, forms an important part of writing language bindings that pass large amounts of data through the layers of a binding. By passing views, we can aim to avoid unnecessary memory allocation and copying. When incorporating other hardware (e.g. GPUs) this topic becomes especially important, and can make or break application performance since copying (back and forth between various bits of hardware) becomes unavoidable. This will impact the way your library is designed.
+
+<br>
 
 ### Ownership and Garbage Collection
 
@@ -753,7 +766,8 @@ Typically, when working within the confines of a language with AMM, an object's 
 
 For using our `gsl::span<T>`, we need to ensure the AMM of the target runtime doesn't free, or (in the case of a compacting garbage collector, move) the underlying data. To this end, the IDL-like wrappers we've used in this tutorial provide varying degrees of support in addition to what's provided by the raw API. The source code accompanying this tutorial offers a demonstration, but here is an overview:
 
-### Memory management overview
+
+#### Memory management overview
 
 | Runtime  | Strategy             | Raw API             | Additional wrapper support   | 
 |----------|:---------------------|---------------------|:------------------|
@@ -769,7 +783,7 @@ For using our `gsl::span<T>`, we need to ensure the AMM of the target runtime do
 I hope you found this tutorial interesting and insightful. The main aim was to show how, with the features of modern C++, it's becoming far easier to extend applications with natively without resorting to complex language bridges, or writing esoteric binding code that requires you to be several domain experts rolled in to one. For heterogeneous computing, we've shown that the modern features of C++ also make it productive to write kernels for a variety of hardware configurations, without having to resort to complex frameworks, or unifying approaches that fail to achieve performance portability.
 
 
-## Further Reading / Presentations
+### Further Reading / Presentations
 
 - [Writing Good C++14](https://www.youtube.com/watch?v=1OEu9C51K2A) – An introduction to the C++ core guidelines initiative (B. Stroustrup)
 - [Evolving array_view and string_view for safe C++ code](https://www.youtube.com/watch?v=C4Z3c4Sv52U) – A presentation on the GSL support library (Neil Macintosh)
