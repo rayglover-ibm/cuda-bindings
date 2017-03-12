@@ -1,4 +1,5 @@
-# C++/CUDA language bindings
+# __CUDA language bindings__ – with modern C++
+
 #### By Raymond Glover - March 2017
 
 _In this tutorial I explain the basics of writing cross-platform CUDA-enabled C++ extensions for Python/Node.js/Java applications, and introduce `kernel.h`, a miniature header-only utility for heterogeneous computing. The accompanying code for this tutorial is available here._
@@ -26,8 +27,11 @@ In it, we'll construct a minimum working example of a native extension for 3 pop
     - [Node.js (Javascript)](#Part3-2)
     - [Java](#Part3-3)
     - [Memory Management (in brief)](#Part3-4)
+- [Summary](#summary)
 
----
+
+
+<br>
 
 # <a name="Part1"></a> Part 1 – Native Extensions
 
@@ -71,9 +75,20 @@ In recent years, the tooling to develop complex cross-platform applications has 
 
 CMake is unusual (but not unique) in that it's really a _meta-build_ system used to _generate_ a build environment, rather than target build artifacts (executables and so on.) So for instance, on Windows, CMake can be used to generate a Visual Studio solution (an `.sln` file), whilst on Linux it's usually used to generate a Make based project (a `Makefile` file). CMake has support for many other build tools. Furthermore, the latest version of some IDEs and other productivity tools now have official support for CMake, making it available to a wider set of developers.
 
-I've included a number of steps you can follow to complete this tutorial (although unfortunately they generally assume you're on Windows):
+I've included a number of steps you can follow to complete this tutorial (although unfortunately they assume you're on Windows):
 
-> ### __Step 1:__ Install [CMake](https://cmake.org/download/). You'll also need a recent C++ compiler, for example Visual Studio 2015.
+<br>
+
+---
+
+### __Step 1 –__ Install tools
+
+- Install [CMake](https://cmake.org/download/).
+- You'll also need a recent C++ compiler, for example Visual Studio 2015, gcc 5.4 or clang 3.8.
+
+---
+
+<br>
 
 CMake has first-class support for C, C++, Objective-C and Fortran compilers, and extending CMake is certainly possible (and in some cases, preferable) to support other languages too. That being said, it's not the go-to tool for building and packaging _everything_. Integrations with Apache Maven (a Java build and package manager) and [Gradle](https://developer.android.com/ndk/guides/cmake.html#variables) (Android's integrated build system) can configure and drive CMake builds. This process is preferable when building complex packages for the respective platforms (e.g. `.apk` packages for Android), even if it sounds less convenient at first glance.
 
@@ -119,7 +134,7 @@ The core implementation resides in `src`, and each individual binding resides wi
 
 Each binding is structured in a way considered idiomatic in the respective language. This is relevant for languages that require packages, modules, or source files to be arranged in a certain way in the file system.
 
-
+<br>
 
 # <a name="Part2"></a> Part 2. The algorithm
 
@@ -171,8 +186,6 @@ To keep things well structured, the implementations (i.e. definitions) of each o
 
 ### Implementation (CPU)
 
-The CPU implementation is trivially simple:
-
 ```c++
 template <> int add::op<compute_mode::CPU>(
     int a, int b)
@@ -181,7 +194,7 @@ template <> int add::op<compute_mode::CPU>(
 }
 ```
 
-Note that we're using the `template <>` syntax to denote an [explicit specialization](http://en.cppreference.com/w/cpp/language/template_specialization) of our `add::op` template, in this case for `compute_mode::CPU`.
+The CPU implementation (above) is trivially simple. Note that we're using the `template <>` syntax to denote an [explicit specialization](http://en.cppreference.com/w/cpp/language/template_specialization) of our `add::op` template, in this case for `compute_mode::CPU`.
 
 ### Implementation (CUDA)
 
@@ -286,7 +299,7 @@ log_runner<kernels::add> log(&std::cout);
 run_with<kernels::add>(log, a, b);
 ```
 
-_Sample Output:_
+#### Sample Output:
 
     [add] mode=CPU
     [add] status=Success
@@ -337,22 +350,22 @@ TEST(cufoo, add)
 }
 ```
 
-Next we run this test from the repository root directory:
+<br>
 
-> ### __Step 2:__ Build and run the unit tests
->
-> ```
-> mkdir build && cd build                              (1)
->
-> cmake -G "Visual Studio 14 2015 Win64" ..            (2)
-> cmake --build . --config Debug                       (3)
-> ctest . -VV -C Debug                                 (4)
-> ```
->
-> 1. Create the build directory
-> 2. (Windows only) Generate the 64-bit build for Visual Studio
-> 3. Build the cufoo tests in debug mode
-> 4. Run the cufoo test suite with `ctest` (a tool distributed as a part of CMake)
+---
+
+### __Step 2 –__ Build and run the unit tests
+
+```
+mkdir build && cd build                              (1)
+cmake -G "Visual Studio 14 2015 Win64" ..            (2)
+cmake --build . --config Debug                       (3)
+ctest . -VV -C Debug                                 (4)
+```
+1. Create the build directory
+2. (Windows only) Generate the 64-bit build for Visual Studio
+3. Build the cufoo tests in debug mode
+4. Run the cufoo test suite with `ctest` (a tool distributed as a part of CMake)
 
 The default build configuration will produce a CPU-only version of cufoo (see the next section for details.) A successful test run should produce output similar to:
 
@@ -367,6 +380,10 @@ The default build configuration will produce a CPU-only version of cufoo (see th
 1: [==========] 1 tests from 1 test cases ran. (575 ms total)
 1: [  PASSED  ] 1 tests.
 ```
+
+---
+
+<br>
 
 ## Build Options
 
@@ -386,10 +403,9 @@ A complete list of options is maintained on the cufoo README, but the relevant o
 | `cufoo_WITH_NODEJS`      | Enable nodejs binding  | OFF     |
 | `cufoo_WITH_JAVA`        | Enable java binding    | OFF     |
 
-
+<br>
 
 # <a name="Part3"></a> Part 3: Language Bindings
-
 
 
 Now that our library is complete, we'll make it consumable by other languages. As I mentioned earlier, each binding resides in a `bindings/<lang>` directory, and the structure within each is specific to the target language's canonical representation of a package or module. Each binding follows a common template:
@@ -442,17 +458,20 @@ When the above `import` statement is run, our initializer function is invoked, w
 
 That's all there is to it. we can build and test our binding with CMake:
 
-> ### __Step 3:__ Build and test the python binding
->
-> To work You'll need Python 3 installed on your system. If on Linux, you may already have Python installed, but you will also need the python development package, typically called `python-devel` or `python-dev`. On Windows or osx, I recommend [Miniconda](https://conda.io/miniconda.html) for 64-bit Python 3.x.
->
-> ```bash
-> mkdir build_py && cd build_py
->
-> cmake -G "Visual Studio 14 2015 Win64" -Dcufoo_WITH_PYTHON=ON ..  (1)
-> cmake --build . --config Debug
-> ctest . -VV -C Debug                                              (2)
-> ```
+<br>
+
+---
+
+### __Step 3 –__ Build and test the python binding
+
+To work You'll need Python 3 installed on your system. If on Linux, you may already have Python installed, but you will also need the python development package, typically called `python-devel` or `python-dev`. On Windows or osx, I recommend [Miniconda](https://conda.io/miniconda.html) for 64-bit Python 3.x.
+
+```bash
+mkdir build_py && cd build_py
+cmake -G "Visual Studio 14 2015 Win64" -Dcufoo_WITH_PYTHON=ON ..  (1)
+cmake --build . --config Debug
+ctest . -VV -C Debug                                              (2)
+```
 
 Note that at (1) we using the CMake `-Dcufoo_WITH_PYTHON=ON` option which enables the Python binding and its associated test suite. When we run the tests at (2) CMake will configure python to execute these tests.
 
@@ -494,7 +513,9 @@ FUNCTIONS
 >>> cufoo.add(1, 2)
 3
 ```
+---
 
+<br>
 
 ## <a name="Part3-2"></a> Node.js (Javascript)
 
@@ -547,19 +568,21 @@ void init(v8::Local<v8::Object> exports)
 
 You may notice the similarities with the Python binding; line 2 is almost identical. Again, since `coofoo::add` actually returns `maybe<int>` rather than `int`, we write a v8pp converter for the generic `maybe<T>` template which will throw a Javascript exception if an incoming `maybe<T>` holds an error, _or_ recursively convert `T` to a `v8::Value` (which in our case is a one step conversion from `int` to a `v8::Number`.) For v8pp, these conversion specializations are fairly easy to write, although you should become familiar with some core V8 concepts like _isolates_, _scopes_ and _handles_, which are described in the V8 [embedder's guide](https://github.com/v8/v8/wiki/Embedder's%20Guide#handles-and-garbage-collection) before you write your own.
 
-> ### __Step 4:__ Build and test the nodejs binding
->
-> To work You'll need node.js installed on your system from [here](https://nodejs.org/en/download/).
->
-> ```bash
-> mkdir build_js && cd build_js
->
-> cmake -G "Visual Studio 14 2015 Win64" -Dcufoo_WITH_NODEJS=ON ..
-> cmake --build . --config Debug
-> ctest . -VV -C Debug
-> ```
+<br>
 
-Once built (by supplying the `-Dcufoo_WITH_NODEJS=ON` option to CMake) we should have the following folder structure in the build directory:
+---
+
+### __Step 4 –__ Build and test the nodejs binding
+To work You'll need node.js installed on your system from [here](https://nodejs.org/en/download/). The build will also automatically download the headers and libraries to build against your version of node.js.
+
+```bash
+mkdir build_js && cd build_js
+cmake -G "Visual Studio 14 2015 Win64" -Dcufoo_WITH_NODEJS=ON ..
+cmake --build . --config Debug
+ctest . -VV -C Debug
+```
+
+Once built, we should have the following folder structure in the build directory:
 
 ```
 .
@@ -577,7 +600,9 @@ Once built (by supplying the `-Dcufoo_WITH_NODEJS=ON` option to CMake) we should
 3. The package entrypoint.
 4. The native module.
 
+---
 
+<br>
 
 ## <a name="Part3-3"></a> Java
 
@@ -664,17 +689,20 @@ public class BindingTest {
 }
 ```
 
-> ### __Step 5:__ Build and test the Java binding
->
-> To work, you'll need a JDK installed on your system. You should also make sure the `JAVA_HOME` environment variable is set to the location of your JDK installation.
->
-> ```bash
-> mkdir build_java && cd build_java
->
-> cmake -G "Visual Studio 14 2015 Win64" -Dcufoo_WITH_JAVA=ON ..
-> cmake --build . --config Debug
-> ctest . -VV -C Debug
-> ```
+<br>
+
+---
+
+### __Step 5 –__ Build and test the Java binding
+
+_To work, you'll need a JDK installed on your system. You should also make sure the `JAVA_HOME` environment variable is set to the location of your JDK installation._
+
+```bash
+mkdir build_java && cd build_java
+cmake -G "Visual Studio 14 2015 Win64" -Dcufoo_WITH_JAVA=ON ..
+cmake --build . --config Debug
+ctest . -VV -C Debug
+```
 
 Once built (by supplying the `-Dcufoo_WITH_JAVA=ON` option to CMake) we should have the following folder structure in the build directory:
 
@@ -690,6 +718,9 @@ Once built (by supplying the `-Dcufoo_WITH_JAVA=ON` option to CMake) we should h
 1. The cufoo Java package
 2. The native library
 
+---
+
+<br>
 
 ## <a name="Part3-4"></a> Memory management (in brief)
 
@@ -722,7 +753,7 @@ Typically, when working within the confines of a language with AMM, an object's 
 
 For using our `gsl::span<T>`, we need to ensure the AMM of the target runtime doesn't free, or (in the case of a compacting garbage collector, move) the underlying data. To this end, the IDL-like wrappers we've used in this tutorial provide varying degrees of support in addition to what's provided by the raw API. The source code accompanying this tutorial offers a demonstration, but here is an overview:
 
-_Memory management overview_
+### Memory management overview
 
 | Runtime  | Strategy             | Raw API             | Additional wrapper support   | 
 |----------|:---------------------|---------------------|:------------------|
@@ -730,16 +761,16 @@ _Memory management overview_
 | V8       | Tracing and compacting GC | [Local/Persistent handles](https://github.com/v8/v8/wiki/Embedder's-Guide#handles-and-garbage-collection) and Scopes | Some 
 | JVM      | Implementation defined | [Local/global references]( http://docs.oracle.com/javase/1.5.0/docs/guide/jni/spec/design.html#wp16785) | Limited
 
+<br>
 
-# Summary
+# <a name="summary"></a> Summary
 
 
-I hope you found this tutorial interesting and illuminating. The main aim was to show how, with the features of modern C++, it's becoming far easier to extend applications with natively without resorting to complex language bridges, or writing esoteric binding code that requires you to be several domain experts rolled in to one. For heterogeneous computing, we've shown that the modern features of C++ also make it productive to write kernels for a variety of hardware configurations, without having to resort to complex frameworks, or unifying approaches that fail to achieve performance portability.
+I hope you found this tutorial interesting and insightful. The main aim was to show how, with the features of modern C++, it's becoming far easier to extend applications with natively without resorting to complex language bridges, or writing esoteric binding code that requires you to be several domain experts rolled in to one. For heterogeneous computing, we've shown that the modern features of C++ also make it productive to write kernels for a variety of hardware configurations, without having to resort to complex frameworks, or unifying approaches that fail to achieve performance portability.
 
 
 ## Further Reading / Presentations
 
-- [Standards, APIs, Interfaces and Bindings](http://oldwww.acm.org/tsc/apis.html) - 
 - [Writing Good C++14](https://www.youtube.com/watch?v=1OEu9C51K2A) – An introduction to the C++ core guidelines initiative (B. Stroustrup)
 - [Evolving array_view and string_view for safe C++ code](https://www.youtube.com/watch?v=C4Z3c4Sv52U) – A presentation on the GSL support library (Neil Macintosh)
-- [How to Optimize Data Transfers in CUDA C/C++](https://devblogs.nvidia.com/parallelforall/how-optimize-data-transfers-cuda-cc/#disqus_thread)
+- [How to Optimize Data Transfers in CUDA C/C++](https://devblogs.nvidia.com/parallelforall/how-optimize-data-transfers-cuda-cc) – A useful summary of the data transfer mechanisms in CUDA
