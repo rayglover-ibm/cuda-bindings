@@ -2,9 +2,7 @@
 
 _This is the accompanying code for the tutorial **CUDA language bindings – with modern C++**. This repository contains everything you need to follow that tutorial, and serve as a reference for extending Python, Node.js and Java applications with CUDA._
 
----
-
-## Binding support
+### Example Bindings
 
 |               |  Windows 7 |  Linux (Ubuntu 15/16) | Android       |
 |---------------|:----------:|:---------------------:|:-------------:|
@@ -13,6 +11,9 @@ _This is the accompanying code for the tutorial **CUDA language bindings – wit
 | Java          |    1.7     | 1.7                   |  ✓           |
 
 <br>
+
+---
+
 
 ## Build
 
