@@ -78,10 +78,14 @@ CMake is unusual (but not unique) in that it's really a _meta-build_ system used
 
 ---
 
-### 🔨&nbsp; Step 1 – Install tools
+### 🔨&nbsp; Step 1 – Tools & Code
 
-- Install [CMake](https://cmake.org/download/).
-- You'll also need a recent C++ compiler, for example Visual Studio 2015, gcc 5.4 or clang 3.8.
+1. Install [CMake](https://cmake.org/download/).
+2. You'll also need a recent C++ compiler compatible with CUDA 8, for example Visual Studio 2015, gcc 5.3 or Xcode 7 for Windows, Linux and Mac respectively.
+3. Using Git, clone the repository with submodules:
+    ```
+    git clone <url> --recursive
+    ```
 
 ---
 

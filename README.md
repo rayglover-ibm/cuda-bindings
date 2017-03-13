@@ -35,10 +35,10 @@ cmake --build . [--config Debug]
 - ### Compilers / Runtimes 
     _(Minimum tested versions)_
 
-    |               |  Windows 7 |  Linux (Ubuntu 15/16) | Android       |
-    |---------------|:----------:|:---------------------:|:-------------:|
-    | C++ compiler  | VS 2015    | gcc 5.4 / clang 3.6   |  NDK r13      |
-    | CUDA SDK      | 7.5/8.0    | 7.5/8.0               |  ✗           |
+    |                | Windows 7  | Linux (Ubuntu 15/16)  | Android         | Mac OSX |
+    |----------------|:----------:|:---------------------:|:---------------:|:-------:|
+    | *C++ compiler* | VS 2015    | gcc 5.3 / clang 3.6   | NDK r13 (clang) | XCode 7 |
+    | *CUDA SDK*     | 8          | 8                     | ✗               | 8       |
 
 <br>
 
