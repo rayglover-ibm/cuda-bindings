@@ -1,11 +1,5 @@
 # <em>CUDA language bindings</em> – Part 3: Language Bindings
 
-_Now that our microlibrary is complete, we'll make it consumable by other languages._
-
-<br>
-
-## Contents
-
 - [Python](#Part3-1)
 - [Node.js (Javascript)](#Part3-2)
 - [Java](#Part3-3)
@@ -376,11 +370,11 @@ For using our `gsl::span<T>`, we need to ensure the AMM of the target runtime do
 # <a name="summary"></a> Summary
 
 
-I hope you found this tutorial interesting and insightful. The main aim was to show how, with the features of modern C++, it's becoming far easier to extend applications with natively without resorting to complex language bridges, or writing esoteric binding code that requires you to be several domain experts rolled in to one. For heterogeneous computing, we've shown that the modern features of C++ also make it productive to write kernels for a variety of hardware configurations, without having to resort to complex frameworks, or unifying approaches that fail to achieve performance portability.
+I hope you found this tutorial interesting and insightful. The main aim was to show how, with the features of modern C++, it's becoming far easier to extend applications without resorting to complex language bridges, or writing esoteric binding code that requires you're several domain experts rolled in to one. For heterogeneous computing, we've shown that the modern features of C++ also make it productive to write kernels for a variety of hardware configurations, without having to resort to complex frameworks, or unifying approaches that fail to achieve performance portability.
 
 
 ### Further Reading / Presentations
 
 - [Writing Good C++14](https://www.youtube.com/watch?v=1OEu9C51K2A) – An introduction to the C++ core guidelines initiative (B. Stroustrup)
-- [Evolving array_view and string_view for safe C++ code](https://www.youtube.com/watch?v=C4Z3c4Sv52U) – A presentation on the GSL support library (Neil Macintosh)
+- [Evolving array_view and string_view for safe C++ code](https://www.youtube.com/watch?v=C4Z3c4Sv52U) – A presentation on the GSL support library (N. Macintosh)
 - [How to Optimize Data Transfers in CUDA C/C++](https://devblogs.nvidia.com/parallelforall/how-optimize-data-transfers-cuda-cc) – A useful summary of the data transfer mechanisms in CUDA

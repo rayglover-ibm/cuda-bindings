@@ -1,13 +1,10 @@
-# <em>CUDA language bindings</em> – Part 2. Microlibrary implementation
-
-<br>
-
-## Contents
+# <em>CUDA language bindings</em> – Part 2: Microlibrary
 
 - [`Add` Kernel](#Part2-1)
 - [Running Kernels](#Part2-2)
-- [Unit Tests](#Part2-3)
-- [Build Options](#Part2-4)
+- [Error Handling](#Part2-3)
+- [Unit Tests](#Part2-4)
+- [Build Options](#Part2-5)
 
 ---
 
@@ -121,11 +118,11 @@ To keep things well structured, the implementations (i.e. definitions) of each o
 
 <br>
 
-## <a name="Part2-2"></a> Running the kernel
+## <a name="Part2-2"></a> Running kernels
 
 ![img](./fig-2.PNG)
 
-Now that we've fully implemented the operations on our `add` kernel for both CPU and GPU, we can wrap it in a public API which will be exposed through `include/cufoo.h`. Here is the declaration for `add`:
+Now that we've fully implemented the operations on our `add` kernel for both CPU and GPU, we can wrap it in a public API to be exposed through `include/cufoo.h`. Here is the declaration for `add`:
 
 ```c++
 maybe<int> add(int a, int b);
@@ -270,7 +267,7 @@ ctest . -VV -C Debug                                 (4)
 
 <br>
 
-## Build Options
+## <a name="Part2-5"></a> Build Options
 
 By default the build wont enable (or require) CUDA. If you have CUDA installed, enable CUDA by supplying the option `cufoo_WITH_CUDA` to CMake at the configuration stage (below). A complete list of build options is maintained on the cufoo README.
 
@@ -278,6 +275,6 @@ By default the build wont enable (or require) CUDA. If you have CUDA installed, 
 cmake -G "Visual Studio 14 2015 Win64" -Dcufoo_WITH_CUDA=ON ..
 ```
 
-<br>
+---
 
-_In the [final part](./blog-article-pt2.md) we implement our language bindings to cufoo._
+_In the [final part](./blog-article-pt3.md) we implement our language bindings to cufoo._

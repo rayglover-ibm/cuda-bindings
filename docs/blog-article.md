@@ -23,13 +23,13 @@ In it, we'll construct a minimum working example of a native extension for 3 pop
 ## Contents
 
 - [Part 1 – Native Extensions](#Part1)
-- [Part 2 – Microlibrary implementation](./blog-article-pt2.md)
+- [Part 2 – Microlibrary](./blog-article-pt2.md)
 - [Part 3 – Language Bindings](./blog-article-pt3.md)
 
 
 <br>
 
-# <a name="Part1"></a> Part 1 – Native Extensions
+# <a name="Part1"></a> Part 1: Native Extensions
 
 Lets outline what we're going to build. Imagine we have an application, and a crucial part of it is some computationally expensive algorithm. We've benchmarked the application and determined an implementation of this algorithm with a high-performance numerical library such as Eigen, cuBLAS or NPP is likely to be a worthwhile investment.
 
@@ -132,6 +132,6 @@ The core implementation resides in `src`, and each individual binding resides wi
 
 Each binding is structured in a way considered idiomatic in the respective language. This is relevant for languages that require packages, modules, or source files to be arranged in a certain way in the file system.
 
-<br>
+---
 
 _In [part 2](./blog-article-pt2.md), we implement our `cufoo` microlibrary._
