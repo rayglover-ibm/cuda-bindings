@@ -53,9 +53,7 @@ target_include_directories (${core}
 # add cuda
 if (${core}_WITH_CUDA)
     include ("cuda.cmake")
-    target_link_libraries (${core}
-        PUBLIC ${core}_cuda
-    )
+    target_link_libraries (${core} PUBLIC ${core}_cuda)
 endif ()
 
 # core library unit tests

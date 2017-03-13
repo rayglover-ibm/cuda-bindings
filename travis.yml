@@ -1,0 +1,33 @@
+language: cpp
+dist: trusty
+sudo: true
+
+matrix:
+  include:
+    - env: COMPILER=g++-5 BUILD_TYPE=Debug
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - kubuntu-backports
+            - ubuntu-toolchain-r-test
+          packages:
+            - cmake
+            - g++-5
+
+before_script:
+  - which $COMPILER
+  - mkdir build && cd build
+  - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+  - cmake --build .
+  
+script:
+  - cd test
+  - ctest . -VV -C Debug
+
+branches:
+  only:
+    - master
+
+notifications:
+  email: false
