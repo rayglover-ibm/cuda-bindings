@@ -1,6 +1,6 @@
 /*
  *   For more nan examples, see:
- *   https://github.com/nodejs/nan/tree/master/test/cpp
+ *   https://github.com/pmed/v8pp/tree/master/examples
  */
 #include "cufoo.h"
 #include "cufoo_config.h"
