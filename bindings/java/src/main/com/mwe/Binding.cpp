@@ -1,5 +1,5 @@
-#include "cufoo.h"
-#include "cufoo_config.h"
+#include "mwe.h"
+#include "mwe_config.h"
 
 #include <jni/jni.hpp>
 
@@ -25,19 +25,19 @@ namespace util
     }
 
     template<typename R>
-    bool try_throw(jni::JNIEnv& env, const cufoo::maybe<R>& r)
+    bool try_throw(jni::JNIEnv& env, const mwe::maybe<R>& r)
     {
-        if (r.template is<cufoo::error>()) {
+        if (r.template is<mwe::error>()) {
             jni::ThrowNew(env,
                 jni::FindClass(env, "java/lang/Error"),
-                r.template get<cufoo::error>().data());
+                r.template get<mwe::error>().data());
             return true;
         }
         return false;
     }
 
     inline
-    bool try_throw(jni::JNIEnv& env, const cufoo::status& r)
+    bool try_throw(jni::JNIEnv& env, const mwe::status& r)
     {
         if (r) {
             jni::ThrowNew(env,
@@ -53,27 +53,27 @@ using namespace jni;
 
 struct Binding
 {
-    static constexpr auto Name() { return "com/cufoo/Binding"; };
+    static constexpr auto Name() { return "com/mwe/Binding"; };
     using _this = jni::Class<Binding>;
 
     static Array<jint> version(JNIEnv& env, _this)
     {
         auto vec = std::vector<jint>{
-            cufoo_VERSION_MAJOR, cufoo_VERSION_MINOR, cufoo_VERSION_PATCH
+            mwe_VERSION_MAJOR, mwe_VERSION_MINOR, mwe_VERSION_PATCH
         };
         return Make<Array<jint>>(env, vec);
     }
 
     static jint add(JNIEnv& env, _this, jint a, jint b)
     {
-        cufoo::maybe<int> r = cufoo::add(a, b);
+        mwe::maybe<int> r = mwe::add(a, b);
         return util::try_throw(env, r) ? 0 : r.get<int>();
     }
 
     static void addAll(JNIEnv& env, _this,
         Object<IntBuffer> a, Object<IntBuffer> b, Object<IntBuffer> result)
     {
-        util::try_throw(env, cufoo::add(
+        util::try_throw(env, mwe::add(
             util::to_span<IntBuffer>(env, a),
             util::to_span<IntBuffer>(env, b),
             util::to_span<IntBuffer>(env, result)));

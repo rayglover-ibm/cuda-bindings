@@ -10,7 +10,7 @@
 
 The `src/kernels` folder contains our algorithm. The term _kernel_ is used to describe a low-level building block which facilitates some higher-level algorithm or subroutine. A kernel may be invoked directly by a consumer of your library or rather via some higher-level public API. There can be several kernel implementations for the same logical operation; it's the job of our library to select one based on the inputs to the operation and the capabilities of the underlying hardware.
 
-For `cufoo` our single kernel will be called `add`, which unsurprisingly just adds integers together. We'll have 2 kernel implementations distinguished by their _compute mode_. The _compute mode_ determines where the kernel is executed i.e. `CPU` or `CUDA`, but you could imagine others, for instance `OpenCL`, `FPGA`, `OpenMP` and so on.
+For `mwe` our single kernel will be called `add`, which unsurprisingly just adds integers together. We'll have 2 kernel implementations distinguished by their _compute mode_. The _compute mode_ determines where the kernel is executed i.e. `CPU` or `CUDA`, but you could imagine others, for instance `OpenCL`, `FPGA`, `OpenMP` and so on.
 
 <br>
 
@@ -18,8 +18,8 @@ For `cufoo` our single kernel will be called `add`, which unsurprisingly just ad
 
 Other than adding numbers, we'd also like our kernel to allow us to:
 
-- permit building `cufoo` with or without a GPU present.
-- permit running `cufoo` with or without a GPU, and be able to control this behavior at runtime.
+- permit building `mwe` with or without a GPU present.
+- permit running `mwe` with or without a GPU, and be able to control this behavior at runtime.
 
 These two requirements are particularly useful for real-world cross-platform applications, although it's also a missing piece in a typical GPU tutorial. I'll spend some time describing how to accomplish this with a small utility I wrote called `kernel.h`.
 
@@ -122,7 +122,7 @@ To keep things well structured, the implementations (i.e. definitions) of each o
 
 ![img](./fig-2.PNG)
 
-Now that we've fully implemented the operations on our `add` kernel for both CPU and GPU, we can wrap it in a public API to be exposed through `include/cufoo.h`. Here is the declaration for `add`:
+Now that we've fully implemented the operations on our `add` kernel for both CPU and GPU, we can wrap it in a public API to be exposed through `include/mwe.h`. Here is the declaration for `add`:
 
 ```c++
 maybe<int> add(int a, int b);
@@ -130,7 +130,7 @@ maybe<int> add(int a, int b);
 
 Note the introduction of the `maybe<T>` type, which is how we will propagate potential errors back to the caller. We'll discuss error handling in more detail in a moment.
 
-In `src/cufoo.cpp`, the implementation looks like:
+In `src/mwe.cpp`, the implementation looks like:
 
 ```c++
 #include "kernels/add.h"            (1)
@@ -217,17 +217,17 @@ _Note:_ `maybe<T>` is an alias for `variant<T, error>`.
 
 ## <a name="Part2-4"></a> Unit Tests
 
-We now have a complete `cufoo` module ready for binding to our application. Before we do so, we should write a simple unit test which can be later used to isolate bugs that appear within either the module or a particular language binding. To do this we'll use the popular [google test](https://github.com/google/googletest) C++ test framework. The [documentation](https://github.com/google/googletest/blob/master/googletest/docs/Primer.md) for Google Test is comprehensive and easy to follow.
+We now have a complete `mwe` module ready for binding to our application. Before we do so, we should write a simple unit test which can be later used to isolate bugs that appear within either the module or a particular language binding. To do this we'll use the popular [google test](https://github.com/google/googletest) C++ test framework. The [documentation](https://github.com/google/googletest/blob/master/googletest/docs/Primer.md) for Google Test is comprehensive and easy to follow.
 
 Within `src/kernels/add_test.cpp` we declare a _test case_ like so:
 
 ```c++
 #include "gtest/gtest.h"
-#include "cufoo.h"
+#include "mwe.h"
 
-TEST(cufoo, add)
+TEST(mwe, add)
 {
-    auto c = cufoo::add(5, 4);
+    auto c = mwe::add(5, 4);
     EXPECT_EQ(c, 9);
 }
 ```
@@ -246,18 +246,18 @@ ctest . -VV -C Debug                                 (4)
 ```
 1. Create the build directory
 2. (Windows only) Generate the 64-bit build for Visual Studio
-3. Build the cufoo tests in debug mode
-4. Run the cufoo test suite with `ctest` (a tool distributed as a part of CMake)
+3. Build the mwe tests in debug mode
+4. Run the mwe test suite with `ctest` (a tool distributed as a part of CMake)
 
  A successful test run should produce output similar to:
 
 ```
-1: Test command: build\Debug\cufoo_test.exe
+1: Test command: build\Debug\mwe_test.exe
 1: Test timeout computed to be: 1500
 1: Running main() from gmock_main.cc
-1: [----------] 1 tests from cufoo
-1: [ RUN      ] cufoo.add
-1: [       OK ] cufoo.add (0 ms)
+1: [----------] 1 tests from mwe
+1: [ RUN      ] mwe.add
+1: [       OK ] mwe.add (0 ms)
 1: [----------] Global test environment tear-down
 1: [==========] 1 tests from 1 test cases ran. (575 ms total)
 1: [  PASSED  ] 1 tests.
@@ -269,12 +269,12 @@ ctest . -VV -C Debug                                 (4)
 
 ## <a name="Part2-5"></a> Build Options
 
-By default the build wont enable (or require) CUDA. If you have CUDA installed, enable CUDA by supplying the option `cufoo_WITH_CUDA` to CMake at the configuration stage (below). A complete list of build options is maintained on the cufoo README.
+By default the build wont enable (or require) CUDA. If you have CUDA installed, enable CUDA by supplying the option `mwe_WITH_CUDA` to CMake at the configuration stage (below). A complete list of build options is maintained on the mwe README.
 
 ```
-cmake -G "Visual Studio 14 2015 Win64" -Dcufoo_WITH_CUDA=ON ..
+cmake -G "Visual Studio 14 2015 Win64" -Dmwe_WITH_CUDA=ON ..
 ```
 
 ---
 
-_In the [final part](./blog-article-pt3.md) we implement our language bindings to cufoo._
+_In the [final part](./blog-article-pt3.md) we implement our language bindings to mwe._

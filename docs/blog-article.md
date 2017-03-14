@@ -33,13 +33,13 @@ In it, we'll construct a minimum working example of a native extension for 3 pop
 
 Lets outline what we're going to build. Imagine we have an application, and a crucial part of it is some computationally expensive algorithm. We've benchmarked the application and determined an implementation of this algorithm with a high-performance numerical library such as Eigen, cuBLAS or NPP is likely to be a worthwhile investment.
 
-Our aim will be to construct this as a native extension, balancing performance, portability, and productivity. For lack of a better name, we'll call this extension `cufoo`. Like most native extensions, there are three major components per target language:
+Our aim will be to construct this as a native extension, balancing performance, portability, and productivity. For lack of a better name, we'll call it `mwe` (_minimum working examples_). Like most native extensions, there are three major components to consider:
 
 ![img](./fig-5.PNG)
 
 __1. Loader__ – The language-specific interface to our extension. At a minimum it'll be responsible for finding and loading the extension itself. Whilst we want our extension to have a common API across all target languages, we also want it to feel idiomatic and ergonomic within the context of each. The loader is responsible for this.
 
-__2. Extension (cufoo)__ – The core implementation of our algorithm(s), shared across all languages. 
+__2. Extension (mwe)__ – The core implementation of our algorithm(s), shared across all languages. 
 
 __3. Binding__ – Acts as the interface between the extension and the target language runtime, describing the native extension through the target language's type system. In reality this will be a shared library (e.g. a `.dll` or `.so` file) accessible to the loader.
 
@@ -56,11 +56,11 @@ __2. IDL bridges and generators__ – Popular examples include [SWIG](http://www
 __3. IDL-like C++ wrappers__ – IDL-like wrappers are a middle ground between the first two approaches; by using techniques like [metaprogramming](https://en.wikipedia.org/wiki/Template_metaprogramming) and compile-time introspection (both features of C++) we can aim to build a language-specific wrapping mechanism that avoids the opaque abstractions in 2 and the boilerplate and incidental complexity of 1. Popular examples include [boost.python](http://www.boost.org/doc/libs/1_63_0/libs/python/doc/html/index.html) and [nan](https://github.com/nodejs/nan).
 
 
-For a relatively simple extensions like `cufoo`, we could consider the convenience of method 2. However, it's not unrealistic to expect _real-world_ extensions to eventually encounter shortcomings with this approach, in particular when expressing parts of an API with idioms specific to a language, or idioms that differ slightly between languages; e.g. asynchronous callbacks, exceptions, or in dealing with the nuances of garbage collection.
+For a relatively simple extensions like `mwe`, we could consider the convenience of method 2. However, it's not unrealistic to expect _real-world_ extensions to eventually encounter shortcomings with this approach, in particular when expressing parts of an API with idioms specific to a language, or idioms that differ slightly between languages; e.g. asynchronous callbacks, exceptions, or in dealing with the nuances of garbage collection.
 
 This seems somewhat unavoidable; if you're using a mechanism that aims to hide the differences between two programming languages, then you also loose the ability to consider either one in isolation. To compensate, higher-level concepts are introduced in the binding itself, such as the [_typemaps_](http://www.swig.org/Doc2.0/Typemaps.html#Typemaps) or [_features_](http://www.swig.org/Doc2.0/Customization.html#Customization) mechanisms in SWIG. However, the added flexibility also introduces a new layer of complexity not readily understood by non-experts.
 
-Instead, we'll use method 3, which I believe to be the most pragmatic. By exploiting the features of C++11/14, we'll build 3 lightweight wrappers to `cufoo` (one per language) in an IDL-like abstraction. In this way we can also enforce a strict separation of concerns between bindings, and so hope to keep our bindings simpler. We'll use three binding libraries that align with these aims:
+Instead, we'll use method 3, which I believe to be the most pragmatic. By exploiting the features of C++11/14, we'll build 3 lightweight wrappers to `mwe` (one per language) in an IDL-like abstraction. In this way we can also enforce a strict separation of concerns between bindings, and so hope to keep our bindings simpler. We'll use three binding libraries that align with these aims:
 
 - [pybind11](https://github.com/pybind/pybind11) (Python) – *Seamless operability between C++11 and Python*
 - [v8pp](https://github.com/pmed/v8pp) (node.js) – *Bind C++ functions and classes into V8 JavaScript engine*
@@ -97,7 +97,7 @@ CMake has first-class support for C, C++, Objective-C and Fortran compilers, and
 
 ## Project structure
 
-Here is what the complete directory structure for `cufoo` looks like:
+Here is what the complete directory structure for `mwe` looks like:
 
 ```
 .
@@ -109,12 +109,12 @@ Here is what the complete directory structure for `cufoo` looks like:
 └───bindings
     ├───nodejs   . . . . . . . . . . . . . .  (5)
     │   ├───cmake  . . . . . . . . . . . . .  (4)
-    │   ├───cufoo
+    │   ├───mwe
     │   └───third_party
     │       └───v8pp . . . . . . . . . . . .  (3)
     │
     ├───python   . . . . . . . . . . . . . .  (5)
-    │   ├───cufoo
+    │   ├───mwe
     │   └───thirdparty
     │       └───pybind11 . . . . . . . . . .  (3)
     │
@@ -126,8 +126,8 @@ Here is what the complete directory structure for `cufoo` looks like:
             └───jni.hpp  . . . . . . . . . .  (3)
 ```
 
-1. Contains the public interface for `cufoo`
-2. Core implementation of `cufoo`
+1. Contains the public interface for `mwe`
+2. Core implementation of `mwe`
 3. Third party header-only libraries
 4. Build helpers
 5. Binding implementations
@@ -138,4 +138,4 @@ Each binding is structured in a way considered idiomatic in the respective langu
 
 ---
 
-_In [part 2](./blog-article-pt2.md), we implement our `cufoo` microlibrary._
+_In [part 2](./blog-article-pt2.md), we implement our `mwe` microlibrary._

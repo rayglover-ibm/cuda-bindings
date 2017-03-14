@@ -20,7 +20,7 @@ limitations under the License.  */
 #include <array>
 #include <vector>
 
-using namespace cufoo::kernel;
+using namespace mwe::kernel;
 
 namespace
 {
@@ -44,7 +44,7 @@ namespace
 TEST(kernel, call_void)
 {
     ::void_calls = 0;
-    cufoo::status err = run<foo>();
+    mwe::status err = run<foo>();
 
     EXPECT_FALSE(err);
     EXPECT_EQ(::void_calls, 1);
@@ -58,7 +58,7 @@ TEST(kernel, call_void)
 TEST(kernel, call_undefined)
 {
     ::void_calls = 0;
-    cufoo::status err = run<foo, compute_mode::CUDA>();
+    mwe::status err = run<foo, compute_mode::CUDA>();
 
     EXPECT_TRUE(err);
     EXPECT_EQ(::void_calls, 0);
@@ -69,9 +69,9 @@ TEST(kernel, call_vector)
     ::void_calls = 0;
 
     std::vector<float> vec(5, 0);
-    cufoo::maybe<int> result = run<foo>(vec);
+    mwe::maybe<int> result = run<foo>(vec);
 
-    EXPECT_FALSE(result.is<cufoo::error>());
+    EXPECT_FALSE(result.is<mwe::error>());
     EXPECT_EQ(result.get<int>(), 5);
 }
 

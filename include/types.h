@@ -17,11 +17,11 @@ limitations under the License.  */
 #include <mapbox/variant.hpp>
 #include <mapbox/optional.hpp>
 
-namespace cufoo
+namespace mwe
 {
     /* Types  -------------------------------------------------------------- */
 
-    /* standard cufoo error type */
+    /* standard mwe error type */
     using error = std::string;
 
     /* introduce a variant type */

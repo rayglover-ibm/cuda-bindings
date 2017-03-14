@@ -10,7 +10,7 @@
 
 As I mentioned earlier, each binding resides in a `bindings/<lang>` directory, and the structure within each is specific to the target language's canonical representation of a package or module. Each binding follows a common template:
 
-1. From the target language's perspective, each native module is a file named `binding` and is subsequently consumed by a loader called `cufoo`. This encapsulation allows us to:
+1. From the target language's perspective, each native module is a file named `binding` and is subsequently consumed by a loader called `mwe`. This encapsulation allows us to:
     -   Hide the incidental complexity of searching for the binding on the file system, and loading it into the runtime.
     -   Make it convenient (and more productive) to write language-specific utilities in the target language itself.
     -   Make it easier to refine the public interface to the binding on a per target language basis. This could, for example, make it easier for users to integrate your native library in to 3rd party libraries (e.g. Numpy in python).
@@ -32,7 +32,7 @@ Instead, because exceptions and the `try ..catch` block is the generally accepte
 
 Our python binding implementation, using pybind11, is similar to the one in the pybind11 documentation [here](http://pybind11.readthedocs.io/en/master/basics.html#creating-bindings-for-a-simple-function); The difference being that we transparently convert the `maybe<T>` to `T` or throw an exception that will bubble up to Python.
 
-So, In `bindings/python/cufoo/binding.cpp`, we declare a module initializer with the `PYBIND11_PLUGIN` macro:
+So, In `bindings/python/mwe/binding.cpp`, we declare a module initializer with the `PYBIND11_PLUGIN` macro:
 
 ```c++
 #include <pybind11/pybind11.h>
@@ -40,7 +40,7 @@ So, In `bindings/python/cufoo/binding.cpp`, we declare a module initializer with
 PYBIND11_PLUGIN(binding)
 {
     pybind11::module m("binding", "python binding example");         (1)
-    m.def("add", &cufoo::add, "A function which adds two numbers");  (2)
+    m.def("add", &mwe::add, "A function which adds two numbers");  (2)
     return m.ptr();                                                  (3)
 }
 ```
@@ -48,10 +48,10 @@ PYBIND11_PLUGIN(binding)
 2. Declare a function, `add`
 3. Return the internal representation of `binding` back to the python interpreter
 
-The python loader, in `bindings/python/cufoo/__init__.py`, is trivially simple, and just exposes the contents of the binding at the package level.
+The python loader, in `bindings/python/mwe/__init__.py`, is trivially simple, and just exposes the contents of the binding at the package level.
 
 ```python
-from cufoo.binding import *
+from mwe.binding import *
 ```
 When the above `import` statement is run, our initializer function is invoked, which ultimately instantiates our binding in the Python interpreter. Pybind11 handles the rest.
 
@@ -67,12 +67,12 @@ To work You'll need Python 3 installed on your system. If on Linux, you may alre
 
 ```bash
 mkdir build_py && cd build_py
-cmake -G "Visual Studio 14 2015 Win64" -Dcufoo_WITH_PYTHON=ON ..  (1)
+cmake -G "Visual Studio 14 2015 Win64" -Dmwe_WITH_PYTHON=ON ..  (1)
 cmake --build . --config Debug
 ctest . -VV -C Debug                                              (2)
 ```
 
-Note that at (1) we using the CMake `-Dcufoo_WITH_PYTHON=ON` option which enables the Python binding and its associated test suite. When we run the tests at (2) CMake will configure python to execute these tests.
+Note that at (1) we using the CMake `-Dmwe_WITH_PYTHON=ON` option which enables the Python binding and its associated test suite. When we run the tests at (2) CMake will configure python to execute these tests.
 
 After the build completes, the files of interest to us are arranged as a canonical Python package in the build directory:
 
@@ -80,25 +80,25 @@ After the build completes, the files of interest to us are arranged as a canonic
 .
 └───bindings
     └───python
-        └───cufoo  . . . . . . . . . . . . . . . . . .   (1)
+        └───mwe  . . . . . . . . . . . . . . . . . .   (1)
                 __init__.py  . . . . . . . . . . . . .   (2)
                 binding.cp35-win_amd64.pyd . . . . . .   (3)
 ```
 
-1. The cufoo package root, as described [here](https://docs.python.org/3/tutorial/modules.html).
+1. The mwe package root, as described [here](https://docs.python.org/3/tutorial/modules.html).
 2. The package entry point.
 3. The compiled extension module, named according to the platform, architecture and python version the module was compiled for.
 
-We can also inspect the the module interactively, making sure to set the `PYTHONPATH` environment variable to point at the location of the `cufoo` package:
+We can also inspect the the module interactively, making sure to set the `PYTHONPATH` environment variable to point at the location of the `mwe` package:
 
 ```bash
 $ PYTHONPATH=./bindings/python python -i
->>> import cufoo as cufoo
->>> help(cufoo)
-Help on package cufoo:
+>>> import mwe as mwe
+>>> help(mwe)
+Help on package mwe:
 
 NAME
-    cufoo
+    mwe
 
 PACKAGE CONTENTS
     binding
@@ -109,7 +109,7 @@ FUNCTIONS
 
         A function which adds two numbers
 
->>> cufoo.add(1, 2)
+>>> mwe.add(1, 2)
 3
 ```
 ---
@@ -119,7 +119,7 @@ FUNCTIONS
 ## <a name="Part3-2"></a> Node.js (Javascript)
 
 
-Within the node.js environment the Javascript engine, [V8](https://en.wikipedia.org/wiki/V8_(JavaScript_engine)), is exposed to various native modules. Many of these come packaged with node.js itself, and form part of the node.js ecosystem. Alongside, we'll be introducing our own `cufoo` module written with v8pp. In this setting, v8pp acts as the metaprogramming layer over V8 to help us with many of the incidental details of this process.
+Within the node.js environment the Javascript engine, [V8](https://en.wikipedia.org/wiki/V8_(JavaScript_engine)), is exposed to various native modules. Many of these come packaged with node.js itself, and form part of the node.js ecosystem. Alongside, we'll be introducing our own `mwe` module written with v8pp. In this setting, v8pp acts as the metaprogramming layer over V8 to help us with many of the incidental details of this process.
 
 Javascript is a peculiar language in that it doesn't have classes per-se, and so doesn't fundamentally distinguish between a class and its instances. Instead we have _object_, a fundamental data type which in essence is a collection of properties. Furthermore, in Javascript all functions are objects too, and so there exists a kind of duality between functions and objects. People familiar with Javascript will also know about the prototypal object model, and how these concepts can be used together to create something akin to class hierarchies and inheritance.
 
@@ -137,7 +137,7 @@ Object.setPrototypeOf(module.exports, m);               (2)
 
 Subsequently, a user can consume the module and call `add()` in an external script in the usual way: `require("./binding").add(...);`.
 
-The difference between this Javascript and the equivalent C++ we'll write is that in C++ we instead instantiate `m` from an _object template_. To achieve this, in `bindings/nodejs/cufoo/binding.cpp`, we first create a standard node.js addon with the macro `NODE_MODULE` (imported from `node.h`) taking a name and a single module initializer function where the template is defined and instantiated:
+The difference between this Javascript and the equivalent C++ we'll write is that in C++ we instead instantiate `m` from an _object template_. To achieve this, in `bindings/nodejs/mwe/binding.cpp`, we first create a standard node.js addon with the macro `NODE_MODULE` (imported from `node.h`) taking a name and a single module initializer function where the template is defined and instantiated:
 
 ```c++
 #include <node.h>
@@ -156,13 +156,13 @@ Within `init` we define the object template, `m`:
 void init(v8::Local<v8::Object> exports)
 {
     v8pp::module m(v8::Isolate::GetCurrent());          (1)
-    m.set("add", &cufoo::add);                          (2)
+    m.set("add", &mwe::add);                          (2)
     exports->SetPrototype(m.new_instance());            (3)
 }
 ```
 
 1. Declare `m`, a `v8pp::module` that wraps a `v8::ObjectTemplate`.
-2. Set `add` on the object template to pointe to `cufoo::add`
+2. Set `add` on the object template to pointe to `mwe::add`
 3. Create and instance of `m`, and assign it to the module prototype.
 
 You may notice the similarities with the Python binding; line 2 is almost identical. Again, since `coofoo::add` actually returns `maybe<int>` rather than `int`, we write a v8pp converter for the generic `maybe<T>` template which will throw a Javascript exception if an incoming `maybe<T>` holds an error, _or_ recursively convert `T` to a `v8::Value` (which in our case is a one step conversion from `int` to a `v8::Number`.) For v8pp, these conversion specializations are fairly easy to write, although you should become familiar with some core V8 concepts like _isolates_, _scopes_ and _handles_, which are described in the V8 [embedder's guide](https://github.com/v8/v8/wiki/Embedder's%20Guide#handles-and-garbage-collection) before you write your own.
@@ -176,7 +176,7 @@ To work You'll need node.js installed on your system from [here](https://nodejs.
 
 ```bash
 mkdir build_js && cd build_js
-cmake -G "Visual Studio 14 2015 Win64" -Dcufoo_WITH_NODEJS=ON ..
+cmake -G "Visual Studio 14 2015 Win64" -Dmwe_WITH_NODEJS=ON ..
 cmake --build . --config Debug
 ctest . -VV -C Debug
 ```
@@ -187,7 +187,7 @@ Once built, we should have the following folder structure in the build directory
 .
 └───bindings
     └───nodejs
-        └───cufoo  . . . . . . . . . . . . . . . . . .  (1)
+        └───mwe  . . . . . . . . . . . . . . . . . .  (1)
                 package.json . . . . . . . . . . . . .  (2)
                 index.js . . . . . . . . . . . . . . .  (3)
                 binding.node . . . . . . . . . . . . .  (4)
@@ -211,10 +211,10 @@ Lastly, the Java binding. Most Java developers may be familiar with the term _Ja
 
 There are two distinct parts to a JNI extension. Owing to Java being a statically typed language, we first need to declare the interface we wish to expose in Java at compilation time. To do this, we use the `native` keyword to mark out which methods will be implemented by the binding.
 
-All functions in Java are defined at class scope, and this has implications for how we declare and subsequently use our binding. The natural approach is to define the API as a facade of `static native` methods on a class called `com.cufoo.Binding`, and to use its static constructor to initialize the binding by loading the native `cufoo` library:
+All functions in Java are defined at class scope, and this has implications for how we declare and subsequently use our binding. The natural approach is to define the API as a facade of `static native` methods on a class called `com.mwe.Binding`, and to use its static constructor to initialize the binding by loading the native `mwe` library:
 
 ```java
-package com.cufoo;
+package com.mwe;
 
 public class Binding
 {
@@ -235,7 +235,7 @@ JNI bindings will usually export a function called `JNI_OnLoad`, and at runtime 
 
 struct Binding
 {
-    static constexpr auto Name() { return "com/cufoo/Binding"; };
+    static constexpr auto Name() { return "com/mwe/Binding"; };
     static void register_jni(jni::JNIEnv& env) { ... }
 };
 
@@ -246,22 +246,22 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*)
 }
 ```
 
-Each bindable C++ struct has a static function, `Name()`, which returns the fully qualified name of the associated Java class. In our case the name is `"com/cufoo/Binding"`. For each `native` method on this class we defined in Java, we register the associated native implementation using `jni::MakeNativeMethod(...)`. A complete implementation of `Binding` looks like:
+Each bindable C++ struct has a static function, `Name()`, which returns the fully qualified name of the associated Java class. In our case the name is `"com/mwe/Binding"`. For each `native` method on this class we defined in Java, we register the associated native implementation using `jni::MakeNativeMethod(...)`. A complete implementation of `Binding` looks like:
 
 ```c++
 #include <jni/jni.hpp>
-#include "cufoo.h"
+#include "mwe.h"
 
 using namespace jni;
 
 struct Binding
 {
-    static constexpr auto Name() { return "com/cufoo/Binding"; };
+    static constexpr auto Name() { return "com/mwe/Binding"; };
     using _this = jni::Class<Binding>;
 
     static jint add(JNIEnv& env, _this, jint a, jint b)
     {
-        cufoo::maybe<int> r = cufoo::add(a, b);
+        mwe::maybe<int> r = mwe::add(a, b);
         return util::try_throw(env, r) ? 0 : r.get<int>();
     }
 
@@ -273,12 +273,12 @@ struct Binding
 };
 ```
 
-The binding is now complete. Notice that in this case `cufoo::add` is not called directly by the metatemplate library, but instead called by a helper which performs the relevant type conversions and error handling. Writing custom converters doesn't seem to be feature of jni.hpp, but this is only mildly inconvenient in our case.
+The binding is now complete. Notice that in this case `mwe::add` is not called directly by the metatemplate library, but instead called by a helper which performs the relevant type conversions and error handling. Writing custom converters doesn't seem to be feature of jni.hpp, but this is only mildly inconvenient in our case.
 
-We build `Binding.cpp` as a shared library (a `.so`, `.dll` or `.dylib` file, depending on the platform), and `Binding.java` as an archive (a `.jar`). To consume it within a Java application we import the java class like any other. Here is complete example that imports all the static methods of `Binding` with `import static com.cufoo.Binding.*`:
+We build `Binding.cpp` as a shared library (a `.so`, `.dll` or `.dylib` file, depending on the platform), and `Binding.java` as an archive (a `.jar`). To consume it within a Java application we import the java class like any other. Here is complete example that imports all the static methods of `Binding` with `import static com.mwe.Binding.*`:
 
 ```java
-import static com.cufoo.Binding.*;
+import static com.mwe.Binding.*;
 
 public class BindingTest {
     public static void main(String[] args) {
@@ -298,23 +298,23 @@ To work, you'll need a JDK installed on your system. You should also make sure t
 
 ```bash
 mkdir build_java && cd build_java
-cmake -G "Visual Studio 14 2015 Win64" -Dcufoo_WITH_JAVA=ON ..
+cmake -G "Visual Studio 14 2015 Win64" -Dmwe_WITH_JAVA=ON ..
 cmake --build . --config Debug
 ctest . -VV -C Debug
 ```
 
-Once built (by supplying the `-Dcufoo_WITH_JAVA=ON` option to CMake) we should have the following folder structure in the build directory:
+Once built (by supplying the `-Dmwe_WITH_JAVA=ON` option to CMake) we should have the following folder structure in the build directory:
 
 ```
 .
 └───bindings
     ├───java
-    │       cufoo.jar . . . . . . . . . . . . . . . . . (1)
+    │       mwe.jar . . . . . . . . . . . . . . . . . (1)
     └───Debug
             binding.dll . . . . . . . . . . . . . . . . (2)
 ```
 
-1. The cufoo Java package
+1. The mwe Java package
 2. The native library
 
 ---
@@ -325,7 +325,7 @@ Once built (by supplying the `-Dcufoo_WITH_JAVA=ON` option to CMake) we should h
 
 Many numerical libraries have interfaces that describe a set of data structures like matrices and n-dimensional vectors of data. This is also the _lingua franca_ of other domains like image processing and machine learning. To leverage the data-parallel capabilities of heterogeneous hardware (especially GPUs), or the libraries that do so, you should become familiar with some of the pre-exiting mechanisms for dealing with this kind of data.
 
-The cufoo repository contains an extra minimum working example of vector addition, introduced by overloading our `add` kernel (in `src/kernels/add.h`) with an additional operation:
+The mwe repository contains an extra minimum working example of vector addition, introduced by overloading our `add` kernel (in `src/kernels/add.h`) with an additional operation:
 
 ```c++
 template <compute_mode> static error_code op(

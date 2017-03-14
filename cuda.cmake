@@ -7,16 +7,14 @@ set (SRC_CUDA
     "src/kernels/add.cu"
     "src/device_util.cu"
 )
-cuda_include_directories (
-    "include"
-    "${CMAKE_CURRENT_BINARY_DIR}/include"
-    "src"
-    "third_party/gsl_lite/include"
-    "third_party/variant/include"
+get_property (incdirs
+    TARGET ${core}
+    PROPERTY INCLUDE_DIRECTORIES
 )
 list (APPEND
     CUDA_NVCC_FLAGS "--expt-relaxed-constexpr --default-stream per-thread"
 )
+cuda_include_directories (${incdirs})
 cuda_add_library (${core}_cuda
     STATIC ${SRC_CUDA}
     OPTIONS "-gencode arch=compute_30,code=compute_30 -cudart static"

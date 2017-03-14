@@ -14,7 +14,7 @@ limitations under the License.  */
 
 #pragma once
 
-#include "cufoo.h"
+#include "mwe.h"
 
 #include <v8.h>
 #include <v8pp/convert.hpp>
@@ -46,16 +46,16 @@ namespace util
     }
 
     template <typename R>
-    bool try_throw(const cufoo::maybe<R>& r)
+    bool try_throw(const mwe::maybe<R>& r)
     {
-        if (r.template is<cufoo::error>())
-            throw std::invalid_argument(r.template get<cufoo::error>().data());
+        if (r.template is<mwe::error>())
+            throw std::invalid_argument(r.template get<mwe::error>().data());
 
         return false;
     }
 
     inline
-    bool try_throw(const cufoo::status& r)
+    bool try_throw(const mwe::status& r)
     {
         if (r) { throw std::invalid_argument(r.get().data()); }
         return false;
@@ -98,17 +98,17 @@ namespace v8pp
 
 
     /*
-     *  Conversion to v8::Value from a cufoo::maybe<T>; will
-     *  throw an exception if the incoming cufoo::maybe<T> is
+     *  Conversion to v8::Value from a mwe::maybe<T>; will
+     *  throw an exception if the incoming mwe::maybe<T> is
      *  in an error state.
      */
     template<typename T>
-    struct convert<cufoo::maybe<T>>
+    struct convert<mwe::maybe<T>>
     {
-        using from_type = cufoo::maybe<T>;
+        using from_type = mwe::maybe<T>;
         using to_type = v8::Local<v8::Value>;
 
-        static to_type to_v8(v8::Isolate* iso, const cufoo::maybe<T>& val)
+        static to_type to_v8(v8::Isolate* iso, const mwe::maybe<T>& val)
         {
             util::try_throw(val);
 
@@ -120,5 +120,5 @@ namespace v8pp
     };
 
     template<typename T>
-    struct is_wrapped_class<cufoo::maybe<T>> : std::false_type {};
+    struct is_wrapped_class<mwe::maybe<T>> : std::false_type {};
 }

@@ -5,7 +5,7 @@ cmake_policy (SET CMP0048 NEW) # project versioning
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 # Name of the core c++ library
-set (core cufoo)
+set (core mwe)
 
 project (${core}
     LANGUAGES C CXX
@@ -21,7 +21,7 @@ option (${core}_WITH_JAVA   "Enable Java binding"   OFF)
 
 set (src
     "src/kernels/add.cpp"
-    "src/cufoo.cpp"
+    "src/mwe.cpp"
 )
 
 # language requirements/compiler opts

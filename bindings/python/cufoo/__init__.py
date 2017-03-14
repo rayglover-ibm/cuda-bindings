@@ -1,1 +1,0 @@
-from cufoo.binding import *

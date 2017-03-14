@@ -15,7 +15,7 @@ limitations under the License.  */
 #include "types.h"
 #include "kernels/add.h"
 
-namespace cufoo {
+namespace mwe {
 namespace kernels
 {
     template <> variant<int, error_code> add::op<compute_mode::CPU>(

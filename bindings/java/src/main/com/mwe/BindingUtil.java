@@ -1,4 +1,4 @@
-package com.cufoo;
+package com.mwe;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;

@@ -36,7 +36,7 @@ add_custom_command (TARGET ${binding} POST_BUILD
 )
 
 # unit tests
-if (cufoo_WITH_TESTS)
+if (mwe_WITH_TESTS)
     include (CTest)
     add_test (
         NAME ${PROJECT_NAME}_test_suite

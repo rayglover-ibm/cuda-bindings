@@ -6,8 +6,8 @@ set (binding "java")
 
 project ("${core}-${binding}" VERSION "${PROJECT_VERSION}")
 
-set (src      "src/main/com/cufoo/Binding.cpp")
-set (src_test "src/test/com/cufoo/tests/BindingTest.java")
+set (src      "src/main/com/mwe/Binding.cpp")
+set (src_test "src/test/com/mwe/tests/BindingTest.java")
 
 # android-specific options
 if (ANDROID_TOOLCHAIN)
@@ -32,14 +32,14 @@ target_link_libraries (${binding}
     ${core}
 )
 add_jar ("${core}-java"
-    "src/main/com/cufoo/BindingUtil.java"
-    "src/main/com/cufoo/Binding.java"
+    "src/main/com/mwe/BindingUtil.java"
+    "src/main/com/mwe/Binding.java"
 
     OUTPUT_NAME "${core}"
 )
 
 # tests
-if (cufoo_WITH_TESTS)
+if (mwe_WITH_TESTS)
     include (CTest)
     include (join)
 
@@ -59,6 +59,6 @@ if (cufoo_WITH_TESTS)
                      -Xcheck:jni
                      -Djava.library.path=$<TARGET_FILE_DIR:${binding}>
                      -cp "${cp}"
-                     "com.cufoo.tests.BindingTest"
+                     "com.mwe.tests.BindingTest"
     )
 endif ()

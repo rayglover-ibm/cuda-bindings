@@ -26,11 +26,11 @@ cmake --build . [--config Debug]
 
     | CMake option             | Description            | Default |
     |--------------------------|:-----------------------|:--------|
-    | `cufoo_WITH_TESTS`       | Enable unit tests      | ON      |
-    | `cufoo_WITH_CUDA`        | Enable cuda support    | OFF     |
-    | `cufoo_WITH_PYTHON`      | Enable python binding  | OFF     |
-    | `cufoo_WITH_NODEJS`      | Enable nodejs binding  | OFF     |
-    | `cufoo_WITH_JAVA`        | Enable java binding    | OFF     |
+    | `mwe_WITH_TESTS`         | Enable unit tests      | ON      |
+    | `mwe_WITH_CUDA`          | Enable cuda support    | OFF     |
+    | `mwe_WITH_PYTHON`        | Enable python binding  | OFF     |
+    | `mwe_WITH_NODEJS`        | Enable nodejs binding  | OFF     |
+    | `mwe_WITH_JAVA`          | Enable java binding    | OFF     |
 
 - ### Compilers / Runtimes 
     _(Minimum tested versions)_
@@ -48,7 +48,7 @@ As of version 3.7 of CMake, it's possible to cross-compile for Android out-of-th
 
 1. Install the [Ninja](https://ninja-build.org/) build system. We'll use Ninja in place of Visual Studio because VS doesn't support the various NDK toolchains.
 
-2. From the cufoo repository root:
+2. From the mwe repository root:
     ```bash
     $ mkdir build-android && cd build-android
     $ cmake -G "Ninja"                      \
@@ -68,10 +68,10 @@ As of version 3.7 of CMake, it's possible to cross-compile for Android out-of-th
 
 4. With the Android Debug Bridge (adb) tool (usually located in the `platform-tools` directory) upload the unit-test binary to the device, make it executable, and run:
     ```
-    adb push cufoo_test /data/local/tmp/cufoo_test
+    adb push mwe_test /data/local/tmp/mwe_test
     adb shell
-    chmod 755 /data/local/tmp/cufoo_test
-    /data/local/tmp/cufoo_test
+    chmod 755 /data/local/tmp/mwe_test
+    /data/local/tmp/mwe_test
     ```
 
 <br>

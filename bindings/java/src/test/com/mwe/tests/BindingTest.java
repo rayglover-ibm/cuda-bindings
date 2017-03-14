@@ -1,10 +1,10 @@
-package com.cufoo.tests;
+package com.mwe.tests;
 
 import java.nio.IntBuffer;
 import java.util.Arrays;
 
-import static com.cufoo.Binding.*;
-import static com.cufoo.BindingUtil.*;
+import static com.mwe.Binding.*;
+import static com.mwe.BindingUtil.*;
 
 public class BindingTest
 {

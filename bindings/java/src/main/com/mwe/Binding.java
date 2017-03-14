@@ -1,9 +1,9 @@
-package com.cufoo;
+package com.mwe;
 
 import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
 
-import com.cufoo.BindingUtil;
+import com.mwe.BindingUtil;
 
 public class Binding {
     static { System.loadLibrary("binding"); }

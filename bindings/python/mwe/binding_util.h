@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.  */
 
 #pragma once
-#include "cufoo.h"
+#include "mwe.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -26,16 +26,16 @@ namespace util
     }
 
     template<typename R>
-    bool try_throw(const cufoo::maybe<R>& r)
+    bool try_throw(const mwe::maybe<R>& r)
     {
-        if (r.template is<cufoo::error>())
-            throw std::runtime_error(r.template get<cufoo::error>().data());
+        if (r.template is<mwe::error>())
+            throw std::runtime_error(r.template get<mwe::error>().data());
 
         return false;
     }
 
     inline
-    bool try_throw(const cufoo::status& r)
+    bool try_throw(const mwe::status& r)
     {
         if (r) throw std::runtime_error(r.get().data());
         return false;
@@ -50,15 +50,15 @@ namespace pybind11 {
 namespace detail
 {
     /*
-     *  Conversion to handle from a cufoo::maybe<T>; will
-     *  throw an exception if the incoming cufoo::maybe<T> is
+     *  Conversion to handle from a mwe::maybe<T>; will
+     *  throw an exception if the incoming mwe::maybe<T> is
      *  in an error state.
      */
     template <typename T>
-    class type_caster<cufoo::maybe<T>> {
+    class type_caster<mwe::maybe<T>> {
     public:
         static handle cast(
-            cufoo::maybe<T> &&src, return_value_policy policy, handle parent)
+            mwe::maybe<T> &&src, return_value_policy policy, handle parent)
         {
             util::try_throw(src);
             return type_caster<T>::cast(src.template get<T>(), policy, parent);

@@ -21,7 +21,7 @@ limitations under the License.  */
 #include <type_traits>
 #include <ostream>
 
-namespace cufoo {
+namespace mwe {
 namespace kernel
 {
     /* Kernel output traits ------------------------------------------------ */

@@ -38,7 +38,7 @@ namespace
     }
 }
 
-namespace cufoo {
+namespace mwe {
 namespace kernels
 {
     using device_util::device_ptr;

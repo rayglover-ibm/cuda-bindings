@@ -2,8 +2,8 @@
  *   For more pybind11 examples, see:
  *   https://github.com/pybind/pybind11/tree/master/tests
  */
-#include "cufoo.h"
-#include "cufoo_config.h"
+#include "mwe.h"
+#include "mwe_config.h"
 #include "binding_util.h"
 
 #include <pybind11/pybind11.h>
@@ -16,7 +16,7 @@ namespace
 {
     std::valarray<int> get_version() {
         return std::valarray<int>({
-            cufoo_VERSION_MAJOR, cufoo_VERSION_MINOR, cufoo_VERSION_PATCH
+            mwe_VERSION_MAJOR, mwe_VERSION_MINOR, mwe_VERSION_PATCH
         });
     }
 
@@ -29,7 +29,7 @@ namespace
 
         auto result = py::array_t<int>(buf1.size);
 
-        util::try_throw(cufoo::add(
+        util::try_throw(mwe::add(
             util::as_span<int>(buf1),
             util::as_span<int>(buf2),
             util::as_span<int>(result.request())));
@@ -45,7 +45,7 @@ PYBIND11_PLUGIN(binding)
     m.def("version", &::get_version,
         "Module version");
 
-    m.def("add", [](int a, int b) { return cufoo::add(a, b); },
+    m.def("add", [](int a, int b) { return mwe::add(a, b); },
         "A function which adds two numbers");
 
     m.def("add", &::add_all,

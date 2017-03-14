@@ -63,7 +63,7 @@ inline bool __checkLastCudaError(const char *file, const int line) {
 
 
 
-namespace cufoo {
+namespace mwe {
 namespace device_util
 {
     template<typename T> class device_ptr final
@@ -131,7 +131,7 @@ namespace device_util
 
 #endif
 
-namespace cufoo {
+namespace mwe {
 namespace device_util
 {
     bool init_cudart();

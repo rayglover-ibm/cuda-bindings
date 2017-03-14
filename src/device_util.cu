@@ -16,7 +16,7 @@ limitations under the License.  */
 
 #include <mutex>
 
-namespace cufoo {
+namespace mwe {
 namespace device_util
 {
     bool init_cudart(void)

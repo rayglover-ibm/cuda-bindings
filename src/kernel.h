@@ -14,13 +14,13 @@ limitations under the License.  */
 
 #pragma once
 
-#include "cufoo_config.h"
+#include "mwe_config.h"
 #include "device_util.h"
 
 #include <memory>
 #include <type_traits>
 
-namespace cufoo {
+namespace mwe {
 namespace kernel
 {
     /* the suppported compute modes */
@@ -56,7 +56,7 @@ namespace kernel
         static bool available() { return true; }
     };
 
-#if !defined(cufoo_WITH_CUDA)
+#if !defined(mwe_WITH_CUDA)
     template <>
     struct compute_traits<compute_mode::CUDA> {
         static constexpr bool enabled = false;
@@ -99,7 +99,7 @@ namespace kernel
         struct Name ## _traits_ {                        \
             static constexpr const char* name = #Name;   \
         };                                               \
-        struct Name : ::cufoo::kernel::impl<Name ## _traits_, __VA_ARGS__ >
+        struct Name : ::mwe::kernel::impl<Name ## _traits_, __VA_ARGS__ >
 
 
     /*  Implementation detail ---------------------------------------------- */

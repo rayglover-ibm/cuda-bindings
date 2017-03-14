@@ -19,7 +19,7 @@ limitations under the License.  */
 
 #include <gsl.h>
 
-namespace cufoo {
+namespace mwe {
 namespace kernels
 {
     using kernel::compute_mode;
