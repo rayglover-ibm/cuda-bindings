@@ -14,7 +14,7 @@ matrix:
       env: COMPILER=g++-5 BUILD_TYPE=Debug CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON" 
       addons:
         apt:
-          sources: [kubuntu-backports, ubuntu-toolchain-r-test]
+          sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports, deadsnakes]
           packages: [cmake, g++-5, python3.5-dev]
 
 before_script:
