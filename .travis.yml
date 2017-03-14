@@ -9,7 +9,7 @@ matrix:
         apt:
           sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports]
           packages: [cmake, g++-5]
-    # python
+    # -- python
     - os: linux
       env: COMPILER=g++-5 BUILD_TYPE=Debug CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON"
       addons:
@@ -19,6 +19,18 @@ matrix:
       install:
         - pip install --user --upgrade pip
         - pip install --user numpy
+    # -- nodejs
+    - os: linux
+      env: COMPILER=g++-5 BUILD_TYPE=Debug CMAKE_EXTRA_ARGS="-Dmwe_WITH_NODEJS=ON"
+      addons:
+        apt:
+          sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports]
+          packages: [cmake, g++-5]
+      install:
+         - rm -rf ~/.nvm && git clone --depth 1 --branch v0.33.1 https://github.com/creationix/nvm.git ~/.nvm
+         - source ~/.nvm/nvm.sh && nvm install 5
+         - node --version
+         - npm --version
 
 before_script:
   - which $COMPILER
