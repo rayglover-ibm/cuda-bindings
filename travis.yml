@@ -20,7 +20,7 @@ before_script:
   - mkdir build && cd build
   - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE
   - cmake --build .
-  
+
 script:
   - cd test
   - ctest . -VV -C Debug
