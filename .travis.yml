@@ -17,7 +17,9 @@ matrix:
         apt:
           sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports, deadsnakes]
           packages: [cmake, g++-5, python3.5-dev]
-      install: pip install numpy
+      install:
+        - pip3 install --user --upgrade pip
+        - pip3 install --user numpy
 
 before_script:
   - which $COMPILER
