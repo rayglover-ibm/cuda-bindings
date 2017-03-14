@@ -227,6 +227,7 @@ function(nodejs_init)
 
     # Create a temporary download directory
     set(TEMP ${CMAKE_CURRENT_BINARY_DIR}/temp)
+    message(STATUS "creating temp directory '${TEMP}'")
     if(EXISTS ${TEMP})
         file(REMOVE_RECURSE ${TEMP})
     endif()
