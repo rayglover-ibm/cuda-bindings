@@ -34,8 +34,10 @@ function(download_file URL)
     message(STATUS "Downloading: ${URL}")
     file(DOWNLOAD
         ${URL}
+        LOG DLLOG
         ${ARGN}
     )
+    message(STATUS ${DLLOG})
 endfunction()
 
 # Embedded win_delay_load_hook file so that this file can be copied
