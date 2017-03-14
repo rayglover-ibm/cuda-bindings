@@ -1,33 +1,43 @@
 language: cpp
-dist: trusty
-sudo: true
+sudo: false
 
 matrix:
   include:
-    - env: COMPILER=g++-5 BUILD_TYPE=Debug
-      compiler: gcc
+    - os: linux
+      env: COMPILER=g++-5 BUILD_TYPE=Debug
       addons:
         apt:
-          sources:
-            - kubuntu-backports
-            - ubuntu-toolchain-r-test
-          packages:
-            - cmake
-            - g++-5
+          sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports]
+          packages: [cmake, g++-5]
+    # python
+    - os: linux
+      env: COMPILER=g++-5 BUILD_TYPE=Debug CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON"
+      addons:
+        apt:
+          sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports, deadsnakes]
+          packages: [cmake, g++-5, python3.5-dev]
+      install:
+        - pip install --user --upgrade pip
+        - pip install --user numpy
 
 before_script:
   - which $COMPILER
   - mkdir build && cd build
-  - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+  - cmake ${CMAKE_EXTRA_ARGS} .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE
   - cmake --build .
+  
+cache:
+  directories:
+  - $HOME/.cache/pip
+  - $HOME/Library/Caches/pip
 
 script:
-  - cd test
   - ctest . -VV -C Debug
 
 branches:
   only:
     - master
+    - dev
 
 notifications:
   email: false
