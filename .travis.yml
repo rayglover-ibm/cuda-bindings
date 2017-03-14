@@ -21,6 +21,7 @@ matrix:
         - pip install --user numpy
     # -- nodejs
     - os: linux
+      dist: trusty
       env: COMPILER=g++-5 BUILD_TYPE=Debug CMAKE_EXTRA_ARGS="-Dmwe_WITH_NODEJS=ON"
       addons:
         apt:
