@@ -34,8 +34,8 @@ function(download_file URL)
     message(STATUS "Downloading: ${URL}")
     file(DOWNLOAD
         ${URL}
-        LOG DLLOG
         ${ARGN}
+        LOG DLLOG
     )
     message(STATUS ${DLLOG})
 endfunction()
@@ -229,7 +229,7 @@ function(nodejs_init)
 
     # Create a temporary download directory
     set(TEMP ${CMAKE_CURRENT_BINARY_DIR}/temp)
-    message(STATUS "creating temp directory '${TEMP}'")
+    message(STATUS "creating temp dir: ${TEMP}")
     if(EXISTS ${TEMP})
         file(REMOVE_RECURSE ${TEMP})
     endif()
