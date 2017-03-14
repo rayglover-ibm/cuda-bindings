@@ -10,8 +10,7 @@ set (src      "${core}/binding.cpp")
 set (src_test "${core}/binding_test.js")
 
 # import nodejs modules
-list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-include (NodeJS)
+include ("${CMAKE_CURRENT_LIST_DIR}/third_party/node-cmake/NodeJS.cmake")
 
 nodejs_init ()
 
