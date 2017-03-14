@@ -16,12 +16,18 @@ matrix:
         apt:
           sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports, deadsnakes]
           packages: [cmake, g++-5, python3.5-dev]
+      install: pip install numpy
 
 before_script:
   - which $COMPILER
   - mkdir build && cd build
   - cmake ${CMAKE_EXTRA_ARGS} .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE
   - cmake --build .
+  
+cache:
+  directories:
+  - $HOME/.cache/pip
+  - $HOME/Library/Caches/pip
 
 script:
   - ctest . -VV -C Debug
