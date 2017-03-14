@@ -12,14 +12,13 @@ matrix:
     # python
     - os: linux
       env: COMPILER=g++-5 BUILD_TYPE=Debug CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON"
-      sudo: true
       addons:
         apt:
           sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports, deadsnakes]
           packages: [cmake, g++-5, python3.5-dev]
       install:
-        - pip3 install --user --upgrade pip
-        - pip3 install --user numpy
+        - pip install --user --upgrade pip
+        - pip install --user numpy
 
 before_script:
   - which $COMPILER
