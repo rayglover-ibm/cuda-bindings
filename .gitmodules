@@ -13,3 +13,6 @@
 [submodule "bindings/nodejs/third_party/v8pp"]
 	path = bindings/nodejs/third_party/v8pp
 	url = https://github.com/pmed/v8pp
+[submodule "bindings/nodejs/third_party/node-cmake"]
+	path = bindings/nodejs/third_party/node-cmake
+	url = https://github.com/cjntaylor/node-cmake
