@@ -38,12 +38,11 @@ matrix:
       env: COMPILER=g++-5 BUILD_TYPE=Debug CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
       jdk:
          - oraclejdk7
+         - openjdk7
       addons:
         apt:
           sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports]
           packages: [cmake, g++-5]
-      install:
-         - which javac
 
 before_script:
   - which $COMPILER
