@@ -24,6 +24,7 @@ matrix:
       osx_image: xcode7.3
       env: COMPILER=clang++ CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON"
       install:
+        - pyenv install 3.5.0
         - pyenv global 3.5.0
         - pip install --user --upgrade pip
         - pip install --user numpy
