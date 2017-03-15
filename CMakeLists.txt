@@ -25,7 +25,7 @@ set (src
 )
 
 # language requirements/compiler opts
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     add_definitions (-std=c++14)
 endif ()
 

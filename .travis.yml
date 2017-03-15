@@ -8,6 +8,7 @@ env:
 
 matrix:
   include:
+    # -- core library tests
     - os: linux
       addons:
         apt:
@@ -60,6 +61,10 @@ matrix:
           packages: [cmake, g++-5]
       install:
         - jdk_switcher use openjdk7
+
+    - os: osx
+      osx_image: xcode7.3
+      env: COMPILER=clang++
 
 before_script:
   - which $COMPILER
