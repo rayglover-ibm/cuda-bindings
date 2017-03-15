@@ -9,6 +9,10 @@ env:
 matrix:
   include:
     # -- core library tests
+    - os: osx
+      osx_image: xcode7.3
+      env: COMPILER=clang++
+
     - os: linux
       addons:
         apt:
@@ -16,6 +20,14 @@ matrix:
           packages: [cmake, g++-5]
     
     # -- python
+    - os: osx
+      osx_image: xcode7.3
+      env: COMPILER=clang++ CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON"
+      install:
+        - pyenv global 3.5.0
+        - pip install --user --upgrade pip
+        - pip install --user numpy
+
     - os: linux
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON"
       addons:
@@ -62,9 +74,7 @@ matrix:
       install:
         - jdk_switcher use openjdk7
 
-    - os: osx
-      osx_image: xcode7.3
-      env: COMPILER=clang++
+    
 
 before_script:
   - which $COMPILER
