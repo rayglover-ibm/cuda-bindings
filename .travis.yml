@@ -1,17 +1,22 @@
 language: cpp
 sudo: false
 
+env:
+  global:
+    - COMPILER=g++-5
+    - BUILD_TYPE=Debug
+
 matrix:
   include:
     - os: linux
-      env: COMPILER=g++-5 BUILD_TYPE=Debug
       addons:
         apt:
           sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports]
           packages: [cmake, g++-5]
+    
     # -- python
     - os: linux
-      env: COMPILER=g++-5 BUILD_TYPE=Debug CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON"
+      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON"
       addons:
         apt:
           sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports, deadsnakes]
@@ -19,10 +24,11 @@ matrix:
       install:
         - pip install --user --upgrade pip
         - pip install --user numpy
+    
     # -- nodejs
     - os: linux
       dist: trusty
-      env: COMPILER=g++-5 BUILD_TYPE=Debug CMAKE_EXTRA_ARGS="-Dmwe_WITH_NODEJS=ON"
+      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_NODEJS=ON"
       addons:
         apt:
           sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports]
@@ -32,6 +38,28 @@ matrix:
          - source ~/.nvm/nvm.sh && nvm install 5
          - node --version
          - npm --version
+    
+    # -- java (oraclejdk7)
+    - os: linux
+      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
+      jdk: oraclejdk7
+      addons:
+        apt:
+          sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports]
+          packages: [cmake, g++-5]
+      install:
+        - jdk_switcher use oraclejdk7
+    
+    # -- java (openjdk7)
+    - os: linux
+      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
+      jdk: openjdk7
+      addons:
+        apt:
+          sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports]
+          packages: [cmake, g++-5]
+      install:
+        - jdk_switcher use openjdk7
 
 before_script:
   - which $COMPILER
