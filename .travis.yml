@@ -20,15 +20,6 @@ matrix:
           packages: [cmake, g++-5]
     
     # -- python
-    - os: osx
-      osx_image: xcode7.3
-      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON" COMPILER=clang++ 
-      install:
-        - pyenv install 3.5.0
-        - pyenv global 3.5.0
-        - pip install --user --upgrade pip
-        - pip install --user numpy
-
     - os: linux
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON"
       addons:
@@ -36,6 +27,15 @@ matrix:
           sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports, deadsnakes]
           packages: [cmake, g++-5, python3.5-dev]
       install:
+        - pip install --user --upgrade pip
+        - pip install --user numpy
+    
+    - os: osx
+      osx_image: xcode7.3
+      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON" COMPILER=clang++ 
+      install:
+        - pyenv install 3.5.0
+        - pyenv global 3.5.0
         - pip install --user --upgrade pip
         - pip install --user numpy
     
@@ -60,7 +60,7 @@ matrix:
          - source ~/.nvm/nvm.sh && nvm install 5
          - node --version
     
-    # -- java (oraclejdk7)
+    # -- java (oraclejdk7, linux)
     - os: linux
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
       jdk: oraclejdk7
@@ -71,7 +71,7 @@ matrix:
       install:
         - jdk_switcher use oraclejdk7
     
-    # -- java (openjdk7)
+    # -- java (openjdk7, linux)
     - os: linux
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
       jdk: openjdk7
@@ -81,6 +81,13 @@ matrix:
           packages: [cmake, g++-5]
       install:
         - jdk_switcher use openjdk7
+    
+    # -- java (oraclejdk8, osx)
+    - os: osx
+      osx_image: xcode7.3
+      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON" COMPILER=clang++ 
+      install:
+         - java --version
 
     
 
