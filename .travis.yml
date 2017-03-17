@@ -89,8 +89,6 @@ matrix:
       install:
          - java -version
 
-    
-
 before_script:
   - which $COMPILER
   - mkdir build && cd build
@@ -99,8 +97,8 @@ before_script:
   
 cache:
   directories:
-  - $HOME/.cache/pip
-  - $HOME/Library/Caches/pip
+    - $HOME/.cache/pip
+    - $HOME/Library/Caches/pip
 
 script:
   - ctest . -VV -C Debug
