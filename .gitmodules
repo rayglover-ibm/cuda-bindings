@@ -1,15 +1,31 @@
-[submodule "pybind11"]
-	path = bindings/python/thirdparty/pybind11
-	url = https://github.com/pybind/pybind11
-[submodule "bindings/java/third_party/jni.hpp"]
-	path = bindings/java/third_party/jni.hpp
-	url = https://github.com/rayglover-ibm/jni.hpp.git
+# CMake helper for downloading repositories
+[submodule "third_party/DownloadProject"]
+	path = third_party/DownloadProject
+	url = https://github.com/Crascit/DownloadProject.git
+
+
+# core libs
 [submodule "third_party/gsl_lite"]
 	path = third_party/gsl_lite
 	url = https://github.com/martinmoene/gsl-lite
 [submodule "third_party/variant"]
 	path = third_party/variant
 	url = https://github.com/mapbox/variant
+
+
+# python binding
+[submodule "pybind11"]
+	path = bindings/python/thirdparty/pybind11
+	url = https://github.com/pybind/pybind11
+
+
+# Java binding
+[submodule "bindings/java/third_party/jni.hpp"]
+	path = bindings/java/third_party/jni.hpp
+	url = https://github.com/rayglover-ibm/jni.hpp.git
+
+
+# Javascript binding
 [submodule "bindings/nodejs/third_party/v8pp"]
 	path = bindings/nodejs/third_party/v8pp
 	url = https://github.com/pmed/v8pp
