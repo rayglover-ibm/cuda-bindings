@@ -8,6 +8,11 @@ env:
 
 matrix:
   include:
+    # -- core library tests
+    - os: osx
+      osx_image: xcode7.3
+      env: COMPILER=clang++
+
     - os: linux
       addons:
         apt:
@@ -25,6 +30,15 @@ matrix:
         - pip install --user --upgrade pip
         - pip install --user numpy
     
+    - os: osx
+      osx_image: xcode7.3
+      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON" COMPILER=clang++ 
+      install:
+        - pyenv install 3.5.0
+        - pyenv global 3.5.0
+        - pip install --user --upgrade pip
+        - pip install --user numpy
+    
     # -- nodejs
     - os: linux
       dist: trusty
@@ -37,9 +51,16 @@ matrix:
          - rm -rf ~/.nvm && git clone --depth 1 --branch v0.33.1 https://github.com/creationix/nvm.git ~/.nvm
          - source ~/.nvm/nvm.sh && nvm install 5
          - node --version
-         - npm --version
     
-    # -- java (oraclejdk7)
+    - os: osx
+      osx_image: xcode7.3
+      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_NODEJS=ON" COMPILER=clang++ 
+      install:
+         - rm -rf ~/.nvm && git clone --depth 1 --branch v0.33.1 https://github.com/creationix/nvm.git ~/.nvm
+         - source ~/.nvm/nvm.sh && nvm install 5
+         - node --version
+    
+    # -- java (oraclejdk7, linux)
     - os: linux
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
       jdk: oraclejdk7
@@ -50,7 +71,7 @@ matrix:
       install:
         - jdk_switcher use oraclejdk7
     
-    # -- java (openjdk7)
+    # -- java (openjdk7, linux)
     - os: linux
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
       jdk: openjdk7
@@ -60,6 +81,13 @@ matrix:
           packages: [cmake, g++-5]
       install:
         - jdk_switcher use openjdk7
+    
+    # -- java (oraclejdk8, osx)
+    - os: osx
+      osx_image: xcode7.3
+      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON" COMPILER=clang++ 
+      install:
+         - java -version
 
 before_script:
   - which $COMPILER
@@ -69,8 +97,8 @@ before_script:
   
 cache:
   directories:
-  - $HOME/.cache/pip
-  - $HOME/Library/Caches/pip
+    - $HOME/.cache/pip
+    - $HOME/Library/Caches/pip
 
 script:
   - ctest . -VV -C Debug
