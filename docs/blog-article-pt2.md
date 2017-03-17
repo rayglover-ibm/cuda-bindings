@@ -8,9 +8,9 @@
 
 ---
 
-The `src/kernels` folder contains our algorithm. The term _kernel_ is used to describe a low-level building block which facilitates some higher-level algorithm or subroutine. A kernel may be invoked directly by a consumer of your library or rather via some higher-level public API. There can be several kernel implementations for the same logical operation; it's the job of our library to select one based on the inputs to the operation and the capabilities of the underlying hardware.
+The `src/kernels` folder will contain our algorithm. The term _kernel_ is used to describe a low-level building block which facilitates some higher-level algorithm. A kernel may be invoked directly by a consumer of your library, but more typically kernels are encapsulated via some higher-level public API defined by the library. There can be several kernel implementations for the same logical operation; it's the job of the library to select one based on the inputs to the operation and the capabilities of the underlying hardware.
 
-For `mwe` our single kernel will be called `add`, which unsurprisingly just adds integers together. We'll have 2 kernel implementations distinguished by their _compute mode_. The _compute mode_ determines where the kernel is executed i.e. `CPU` or `CUDA`, but you could imagine others, for instance `OpenCL`, `FPGA`, `OpenMP` and so on.
+For `mwe` our single kernel will be called `add`, which unsurprisingly just adds integers together. We'll have 2 kernel implementations, distinguished by their _compute mode_. The _compute mode_ determines where the kernel is executed, i.e. `CPU` or `CUDA`, but you could imagine others, for instance `OpenCL`, `FPGA`, `OpenMP` and so on.
 
 <br>
 
@@ -21,7 +21,7 @@ Other than adding numbers, we'd also like our kernel to allow us to:
 - permit building `mwe` with or without a GPU present.
 - permit running `mwe` with or without a GPU, and be able to control this behavior at runtime.
 
-These two requirements are particularly useful for real-world cross-platform applications, although it's also a missing piece in a typical GPU tutorial. I'll spend some time describing how to accomplish this with a small utility I wrote called `kernel.h`.
+These two requirements are particularly useful for real-world cross-platform applications, although it's also a missing piece in a typical GPGPU tutorial. I'll spend some time describing how to accomplish this with a small utility I wrote called `kernel.h`.
 
 <br>
 
@@ -68,11 +68,11 @@ To keep things well structured, the implementations (i.e. definitions) of each o
     }
     ```
 
-    The CPU implementation (above) is trivially simple. Note that we're using the `template <>` syntax to denote an [explicit specialization](http://en.cppreference.com/w/cpp/language/template_specialization) of our `add::op` template, in this case for `compute_mode::CPU`.
+    The CPU implementation (above) is trivially simple. Note we're using the `template <>` syntax to denote an [explicit specialization](http://en.cppreference.com/w/cpp/language/template_specialization) of our `add::op` template, in this case for `compute_mode::CPU`.
 
 - ### CUDA
 
-    The CUDA implementation is more substantial. For such a trivial operation like `int add(int, int)` it's highly unlikely that a GPU implementation would be even half as fast as the CPU implementation because of various unavoidable overheads. None the less we can introduce the basic (but fundamental) parts of the CUDA workflow: memory management and kernel launching:
+    The CUDA implementation is more substantial. For such a trivial operation like `int add(int, int)`, it's highly unlikely that a GPU implementation would be even half as fast as the CPU implementation because of various unavoidable overheads. None the less we can introduce the basic (but fundamental) parts of the CUDA workflow here: memory management and kernel launching:
     
     ```c++
     namespace
@@ -151,7 +151,7 @@ Implicitly, a special `compute_mode` called `AUTO` is selected, which at runtime
 
 ![img](./fig-6.PNG)
 
-Essentially, the CUDA implementation is used when `compute_mode::CUDA` is _enabled_ at compile time _and_ a valid CUDA context is available at runtime. If the kernel fails during execution for some reason (i.e. it returns an error) then we fallback to the CPU implementation. For kernels that have different combinations of `compute_mode` support, the control-flow is altered to account for this.
+Essentially, the CUDA implementation is used when `compute_mode::CUDA` is _enabled_ at compile time _and_ a valid CUDA context is available at runtime. If the kernel fails during execution for some reason (i.e. it returns an error) then we fall back to the CPU implementation. For kernels that have different combinations of `compute_mode` support, the control-flow is altered to account for this.
 
 It's possible to override this behavior by explicitly specifying which `compute_mode` to use. For example, if we knew that the inputs to an operation were insufficiently large to benefit from the GPU, we can easily alter the behavior to include such a condition:
 
@@ -164,7 +164,7 @@ maybe<int> add(int a, int b)
 }
 ```
 
-Here, if `<some condition>` evaluated to true, we'd force the kernel runner to use the CPU.
+Here, if `<some condition>` evaluated to true, we'd _force_ the kernel runner to use the CPU, or otherwise proceed as normal.
 
 <br>
 
@@ -190,17 +190,15 @@ You could probably imagine other runners which could help you write tests or ben
 
 So far we've only touched on handling the return values of operations, and as part of this how we deal with errors.
 
-Firstly, `kernel.h` doesn't throw C++ exceptions, and doesn't catch any; if your operation can throw one, then it's your users responsibility to catch it. Instead `kernel.h` internally uses the `kernel::error_code` enum to communicate various possible error states. All calls to `kernel::run()`, will either return successfully or with an error.
+Firstly, `kernel.h` doesn't throw C++ exceptions, and doesn't catch any; if your operation can throw one, then it's your users responsibility to catch it. Instead `kernel.h` internally uses the `kernel::error_code` enum to communicate various possible error states.
 
-A kernel operation (specifically, an `op` method) can return any value, or `void`. However, `kernel.h` also recognizes several special return types, designed to make error handling more ergonomic.
+A kernel operation (specifically, an `op` method) is just a normal method, and so it can return any value, or `void`. However, `kernel.h` also recognizes several special return types, designed to make error handling more ergonomic.
 
-So, lets take our `add` operation. We really want to be able to return an `int` _or_ an error. Errors can occur in CUDA, for instance, when we allocate memory. To do this we can use the `variant` type, which is being [introduced in C++17](http://en.cppreference.com/w/cpp/utility/variant).
-
-`variant` is capable of holding a value that can be one of a number of possible types, and do so in a type safe way. If you want to become more familiar with variant, I suggest watching [this](https://www.youtube.com/watch?v=k3O4EKX4z1c) presentation by D. Sankel.
+So, lets take our `add` operation. We really want to be able to return an `int` _or_ an error. Errors can occur in CUDA, for instance, when we allocate memory. To accommodate these two possible outcomes, we can use the `variant` type, which is being [introduced in C++17](http://en.cppreference.com/w/cpp/utility/variant). `variant` is capable of holding a value that can be one of a number of possible types, and do so in a type safe way. If you want to become more familiar with variant, I suggest watching [this](https://www.youtube.com/watch?v=k3O4EKX4z1c) presentation by D. Sankel.
 
 With `variant`, our operation changes from `int op(int, int)` to `variant<int, error_code> op(int, int)`.
 
-The `variant<T, error_code>` return type is recognized by the kernel runner. Upon encountering an error, the runner will convert this error to our libraries more generic error type, `error`. Altogether, we can tabulate the return types that `kernel.h` recognizes and will automatically convert:
+The `variant<T, error_code>` return type pattern is recognized by the kernel runner. Upon encountering an error, the runner will convert this error to our library's more generic error type, `error`. Altogether, we can tabulate the return type patterns that `kernel.h` recognizes and will automatically convert:
 
 #### Return type conversions
 
@@ -217,7 +215,7 @@ _Note:_ `maybe<T>` is an alias for `variant<T, error>`.
 
 ## <a name="Part2-4"></a> Unit Tests
 
-We now have a complete `mwe` module ready for binding to our application. Before we do so, we should write a simple unit test which can be later used to isolate bugs that appear within either the module or a particular language binding. To do this we'll use the popular [google test](https://github.com/google/googletest) C++ test framework. The [documentation](https://github.com/google/googletest/blob/master/googletest/docs/Primer.md) for Google Test is comprehensive and easy to follow.
+We now have a complete `mwe` module ready for binding to our application. Before we do so, we should write a simple unit test for the `add` kernel. Kernels are typically good candidates for testing because as the name suggests, they tend to be cohesive and mostly independent units of functionality. To do this we'll use the popular [google test](https://github.com/google/googletest) C++ test framework. 
 
 Within `src/kernels/add_test.cpp` we declare a _test case_ like so:
 
@@ -267,9 +265,13 @@ ctest . -VV -C Debug                                 (4)
 
 <br>
 
+If you wish to find out more on the Google Test framework, the [documentation](https://github.com/google/googletest/blob/master/googletest/docs/Primer.md) is comprehensive and easy to follow.
+
+<br>
+
 ## <a name="Part2-5"></a> Build Options
 
-By default the build wont enable (or require) CUDA. If you have CUDA installed, enable CUDA by supplying the option `mwe_WITH_CUDA` to CMake at the configuration stage (below). A complete list of build options is maintained on the mwe README.
+By default the build wont enable (or require) CUDA. If you have CUDA installed, enable it by supplying the option `mwe_WITH_CUDA` to CMake at the configuration stage (below). A complete list of CMake options is maintained on the `mwe` README.
 
 ```
 cmake -G "Visual Studio 14 2015 Win64" -Dmwe_WITH_CUDA=ON ..

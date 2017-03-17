@@ -6,17 +6,17 @@ _In this tutorial I explain the basics of writing cross-platform CUDA-enabled C+
 
 ---
 
-In building data-centric applications and the statistical models that underpin them, the ability to incorporate hardware accelerated algorithms is an [increasingly important](http://www.economist.com/news/business/21717430-success-nvidia-and-its-new-computing-chip-signals-rapid-change-it-architecture) consideration. This is especially true in cloud computing which is democratizing the data center, and with it the availability of dedicated compute appliances like GPUs and FPGAs.
+At the intersection of data and optimization, the ability to leverage hardware acceleration is a  consideration of [increasing importance](http://www.economist.com/news/business/21717430-success-nvidia-and-its-new-computing-chip-signals-rapid-change-it-architecture). This is especially true in cloud computing, which is democratizing the data center, and with it the availability of dedicated compute appliances such as GPUs and FPGAs.
 
-In parallel to this, the use of C++ is becoming a de facto way among application developers to deliver core components targeting multiple underlying platforms. Whether it be for the desktop, mobile, embedded or cloud; C++ is a common denominator that can run practically anywhere without compromising on performance or flexibility.
+In parallel to this, C++ is becoming a de facto way among application developers to deliver core components targeting multiple underlying platforms. Whether it be for the desktop, mobile, embedded or cloud; C++ is a common denominator that can run practically anywhere without compromising on performance or flexibility.
 
-With C/C++ acting as the enabling glue between data intensive/performance sensitive applications and the underlying hardware, it has become the catalyst for [heterogeneous computing](http://developer.amd.com/resources/heterogeneous-computing/what-is-heterogeneous-computing/) as it becomes mainstream.
+With C/C++ acting as the glue between data intensive/performance sensitive applications and the underlying hardware, it's become a catalyst for [heterogeneous computing](http://developer.amd.com/resources/heterogeneous-computing/what-is-heterogeneous-computing/).
 
 ### Target Audience
 
-This tutorial is aimed at application/framework developers considering extending their Python/node.js/Java applications with native subroutines, or adopting one of the many pre-existing libraries, but don't know where to start or what the landscape looks like.
+This tutorial is aimed at those considering extending their Python/Node.js/Java applications with native and hardware accelerated components, or adopting one of the many pre-existing libraries, but don't know where to start or what the landscape for such things looks like.
 
-In it, we'll construct a minimum working example of a native extension for 3 popular languages and identify some important aspects and principals to keep in mind when building your own bindings. I'll be assuming you have a basic understanding of C++, and at least one of the 3 target languages.
+In it, we'll construct a minimum working example of a native extension for 3 popular languages, and identify important aspects and principals to keep in mind when building your own bindings. I'll be assuming you have a basic understanding of C++, and at least one of the 3 target languages.
 
 <br>
 
@@ -31,15 +31,15 @@ In it, we'll construct a minimum working example of a native extension for 3 pop
 
 # <a name="Part1"></a> Part 1: Native Extensions
 
-Lets outline what we're going to build. Imagine we have an application, and a crucial part of it is some computationally expensive algorithm. We've benchmarked the application and determined an implementation of this algorithm with a high-performance numerical library such as Eigen, cuBLAS or NPP is likely to be a worthwhile investment.
+Lets outline what we're going to build. Imagine we have an application, and a crucial part of it is some computationally expensive algorithm. We've benchmarked the application and determined an implementation of this algorithm with a high-performance numerical library such as Eigen, cuBLAS or NPP would likely be a worthwhile investment.
 
-Our aim will be to construct this as a native extension, balancing performance, portability, and productivity. For lack of a better name, we'll call it `mwe` (_minimum working examples_). Like most native extensions, there are three major components to consider:
+Our aim will be to construct this as a native extension, balancing performance, portability, and productivity. For lack of a better name, we'll call it `mwe` (_minimum working examples_). Like most native extensions, there are three components of it to consider:
 
 ![img](./fig-5.PNG)
 
-__1. Loader__ – The language-specific interface to our extension. At a minimum it'll be responsible for finding and loading the extension itself. Whilst we want our extension to have a common API across all target languages, we also want it to feel idiomatic and ergonomic within the context of each. The loader is responsible for this.
+__1. Loader__ – The language-specific interface to our extension. At a minimum, it'll be responsible for finding and loading the extension itself. Whilst we want our extension to have a common API across all target languages, we also want it to feel idiomatic and ergonomic within the context of each. The loader is responsible for this.
 
-__2. Extension (mwe)__ – The core implementation of our algorithm(s), shared across all languages. 
+__2. Extension (mwe)__ – The core implementation of our algorithm(s), shared across target languages. 
 
 __3. Binding__ – Acts as the interface between the extension and the target language runtime, describing the native extension through the target language's type system. In reality this will be a shared library (e.g. a `.dll` or `.so` file) accessible to the loader.
 
@@ -47,13 +47,13 @@ __3. Binding__ – Acts as the interface between the extension and the target la
 
 ## Possible approaches
 
-Before we get started, I'll skim over some common methods of integrating native libraries to other languages. I think you can  group each in to one of three categories:
+Before we get started, I'll skim over some common methods native libraries can be integrated to other languages. I think you can group each in to one of three categories:
 
-__1. Raw C__ – Most modern languages provide a C interoperability layer or _foreign function interface_ (FFI). For all but the most trivial APIs, a C based integration would be both verbose and error prone. Even if we wrote a raw C integration, we'd find it hard to resist reinventing one of the other two approaches as we did so. The additional complexity of supporting multiple versions of the same language can also be (depending on the language) extremely burdensome, we'd want to avoid this.
+__1. Raw C__ – Most modern languages provide a C interoperability layer or _foreign function interface_ (FFI). For all but the most trivial APIs, a C based integration would be both verbose and error prone. Even if we wrote a raw C integration, we'd find it hard to resist reinventing one of the other two approaches as we did so. The additional complexity of supporting multiple versions of the same language can also be extremely burdensome; we'd want to avoid, or at least isolate, such complexities.
 
 __2. IDL bridges and generators__ – Popular examples include [SWIG](http://www.swig.org/) and the more nascent [djinni](https://github.com/dropbox/djinni). These bindings aim to abstract away the idiosyncrasies of individual languages by providing an _interface definition language_ (IDL) with which to define data structures and operations at the language boundary. The binding will try to figure out the rest, including how to [marshall](https://en.wikipedia.org/wiki/Marshalling_(computer_science)) data across this boundary, during an automated generation phase. As you'd imagine, the tradeoff in ease of use is the flexibility and internal complexity of such generators.
 
-__3. IDL-like C++ wrappers__ – IDL-like wrappers are a middle ground between the first two approaches; by using techniques like [metaprogramming](https://en.wikipedia.org/wiki/Template_metaprogramming) and compile-time introspection (both features of C++) we can aim to build a language-specific wrapping mechanism that avoids the opaque abstractions in 2 and the boilerplate and incidental complexity of 1. Popular examples include [boost.python](http://www.boost.org/doc/libs/1_63_0/libs/python/doc/html/index.html) and [nan](https://github.com/nodejs/nan).
+__3. IDL-like C++ wrappers__ – IDL-like wrappers are a middle ground between the first two approaches; by using techniques like [metaprogramming](https://en.wikipedia.org/wiki/Template_metaprogramming) and compile-time introspection (both prominent features of C++), we can aim to build a language-specific wrapping mechanism that avoids the opaque abstractions in 2 and the boilerplate and incidental complexity of 1. Popular examples include [boost.python](http://www.boost.org/doc/libs/1_63_0/libs/python/doc/html/index.html) and [nan](https://github.com/nodejs/nan).
 
 
 For a relatively simple extensions like `mwe`, we could consider the convenience of method 2. However, it's not unrealistic to expect _real-world_ extensions to eventually encounter shortcomings with this approach, in particular when expressing parts of an API with idioms specific to a language, or idioms that differ slightly between languages; e.g. asynchronous callbacks, exceptions, or in dealing with the nuances of garbage collection.
@@ -72,7 +72,7 @@ Instead, we'll use method 3, which I believe to be the most pragmatic. By exploi
 
 In recent years, the tooling to develop complex cross-platform applications has significantly matured. Tools like [Bazel](https://bazel.build/), [Buck](https://buckbuild.com/) and [CMake](https://cmake.org/) orchestrate the building, testing, packaging and deployment for a variety of platforms and toolchains. The oldest and probably most widely used of these is CMake.
 
-CMake is unusual (but not unique) in that it's really a _meta-build_ system used to _generate_ a build environment, rather than target build artifacts (executables and so on.) So for instance, on Windows, CMake can be used to generate a Visual Studio solution (an `.sln` file), whilst on Linux it's usually used to generate a Make based project (a `Makefile` file). CMake has support for many other build tools. Furthermore, the latest version of some IDEs and other productivity tools now have official support for CMake, making it available to a wider set of developers.
+CMake is unusual (but not unique) in that it's really a _meta-build_ system used to _generate_ a build environment, rather than target build artifacts (executables and so on.) So for instance, on Windows, CMake can be used to generate a Visual Studio solution (an `.sln` file), whilst on Linux it's usually used to generate a Make based project (a `Makefile` file). CMake has support for many other build systems. Furthermore, the latest version of some IDEs and other productivity tools now have official support for CMake, making it available to a wider set of developers.
 
 <br>
 
@@ -84,14 +84,14 @@ CMake is unusual (but not unique) in that it's really a _meta-build_ system used
 2. You'll also need a recent C++ compiler compatible with CUDA 8, for example Visual Studio 2015, gcc 5.3 or Xcode 7 for Windows, Linux and Mac respectively.
 3. Using Git, clone the repository with submodules:
     ```
-    git clone <url> --recursive
+    git clone https://github.com/rayglover-ibm/cuda-bindings.git --recursive
     ```
 
 ---
 
 <br>
 
-CMake has first-class support for C, C++, Objective-C and Fortran compilers, and extending CMake is certainly possible (and in some cases, preferable) to support other languages too. That being said, it's not the go-to tool for building and packaging _everything_. Integrations with Apache Maven (a Java build and package manager) and [Gradle](https://developer.android.com/ndk/guides/cmake.html#variables) (Android's integrated build system) can configure and drive CMake builds. This process is preferable when building complex packages for the respective platforms (e.g. `.apk` packages for Android), even if it sounds less convenient at first glance.
+CMake has first-class support for C, C++, Objective-C and Fortran compilers. Furthermore, extending CMake is certainly possible (and in some cases, preferable) to support other languages. That being said, it's not the go-to tool for building and packaging _everything_. Integrations with Apache Maven (a Java build and package manager) and [Gradle](https://developer.android.com/ndk/guides/cmake.html#variables) (Android's integrated build system) can configure and drive CMake builds; this process is preferable when building complex packages for their respective platforms (e.g. `.apk` packages for Android), even if it sounds less convenient at first glance.
 
 <br>
 
@@ -107,10 +107,10 @@ Here is what the complete directory structure for `mwe` looks like:
 │    └───gsl_lite  . . . . . . . . . . . . .  (3)
 ├───cmake  . . . . . . . . . . . . . . . . .  (4)
 └───bindings
-    ├───nodejs   . . . . . . . . . . . . . .  (5)
-    │   ├───cmake  . . . . . . . . . . . . .  (4)
+    ├───nodejs . . . . . . . . . . . . . . .  (5)
     │   ├───mwe
     │   └───third_party
+    │       ├───node-cmake   . . . . . . . .  (3)
     │       └───v8pp . . . . . . . . . . . .  (3)
     │
     ├───python   . . . . . . . . . . . . . .  (5)
@@ -134,7 +134,7 @@ Here is what the complete directory structure for `mwe` looks like:
 
 The core implementation resides in `src`, and each individual binding resides within `bindings`. Third-party libraries are placed as descendants to their dependant component(s).
 
-Each binding is structured in a way considered idiomatic in the respective language. This is relevant for languages that require packages, modules, or source files to be arranged in a certain way in the file system.
+Each binding is structured in a way considered idiomatic in the respective language. This is relevant for languages that require packages, modules, or source files to be arranged in a certain way in the file system. We'll discus this in more detail in part 3.
 
 ---
 

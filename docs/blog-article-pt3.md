@@ -8,16 +8,16 @@
 
 ---
 
-As I mentioned earlier, each binding resides in a `bindings/<lang>` directory, and the structure within each is specific to the target language's canonical representation of a package or module. Each binding follows a common template:
+As I mentioned earlier, bindings reside in `bindings/<lang>` directories, and the structure within each is specific to the target language's canonical representation of a package or module. The implementation of the bindings, however, follow a common template:
 
-1. From the target language's perspective, each native module is a file named `binding` and is subsequently consumed by a loader called `mwe`. This encapsulation allows us to:
+1. From the target language's perspective, each native module is named `binding` and is subsequently consumed by a loader called `mwe`. This encapsulation allows us to:
     -   Hide the incidental complexity of searching for the binding on the file system, and loading it into the runtime.
     -   Make it convenient (and more productive) to write language-specific utilities in the target language itself.
     -   Make it easier to refine the public interface to the binding on a per target language basis. This could, for example, make it easier for users to integrate your native library in to 3rd party libraries (e.g. Numpy in python).
 
-2. When you have multiple target languages, it can become a substantial burden to maintain high-quality documentation for each as your module evolves. To make this easier, each binding has a collection of integration tests, some of which should be simple enough to be understood by users of the binding and serve as minimal working examples.
+2. When you have multiple target languages, it can become burdensome to maintain high quality documentation for each as your module evolves. To make this easier, each binding has a collection of integration tests, some of which should be simple enough to be understood by users of the binding and serve as minimal working examples.
 
-3. With CMake we can configure, build and test the bindings in an automated way that fits a single workflow. Each build configuration is defined in `bindings/<lang>/CMakeLists.txt`.
+3. With CMake we can configure, build and test the bindings in an automated way that fits a single workflow. In our case, each build configuration is defined in `bindings/<lang>/CMakeLists.txt`.
 
 <br>
 
@@ -26,11 +26,11 @@ As I mentioned earlier, each binding resides in a `bindings/<lang>` directory, a
 
 Since our single operation so far is only dealing with `int` primitives (and no _objects_ per-se) and a 32-bit integer type is a natively supported type in most languages, the bindings should be relatively trivial. This is the case for Python.
 
-However, since our kernel operation returns `maybe<int>` instead of `int`, we need to either implement `maybe<T>` or find a substitute in each language. If our target language was say F# (which supports discriminated unions) or Haskell (where Maybe and Either are built-in types) or Go (which doesn't support exceptions) then it would feel natural (occasionally preferable) to use these analogous types or mechanisms (e.g. pattern matching or destructuring) to complement `maybe<T>`.
+However, since our kernel operation returns `maybe<int>` instead of `int`, we need to either implement `maybe<T>` or find a substitute in each language. If our target language was say F# (which supports discriminated unions), Haskell (where Maybe and Either are built-in types) or Go (which doesn't support exceptions) then it would feel natural (occasionally preferable) to use these analogous types and mechanisms (e.g. pattern matching, destructuring or multiple return values) to complement `maybe<T>`.
 
-Instead, because exceptions and the `try ..catch` block is the generally accepted way to deal with exceptional behavior in Python, Javascript and Java, we'll use this idiom. To facilitate this, we introduce custom type converters to handle this behavior transparently in each language.
+Instead, because exceptions and the `try ..catch` statement is the generally accepted way to deal with exceptional behavior in Python, Javascript and Java, we'll use this idiom. To facilitate this, we'll introduce custom type converters to handle this behavior transparently in each language.
 
-Our python binding implementation, using pybind11, is similar to the one in the pybind11 documentation [here](http://pybind11.readthedocs.io/en/master/basics.html#creating-bindings-for-a-simple-function); The difference being that we transparently convert the `maybe<T>` to `T` or throw an exception that will bubble up to Python.
+Our python binding implementation, using `pybind11`, is similar to the one in the `pybind11` documentation [here](http://pybind11.readthedocs.io/en/master/basics.html#creating-bindings-for-a-simple-function); The difference being that we transparently convert the `maybe<T>` to `T` or throw an exception that will bubble up to Python.
 
 So, In `bindings/python/mwe/binding.cpp`, we declare a module initializer with the `PYBIND11_PLUGIN` macro:
 
@@ -53,9 +53,9 @@ The python loader, in `bindings/python/mwe/__init__.py`, is trivially simple, an
 ```python
 from mwe.binding import *
 ```
-When the above `import` statement is run, our initializer function is invoked, which ultimately instantiates our binding in the Python interpreter. Pybind11 handles the rest.
+When the above `import` statement is run, our initializer function is invoked, which ultimately instantiates our binding in the Python interpreter. `Pybind11` handles the rest.
 
-That's all there is to it. we can build and test our binding with CMake:
+That's all there is to it. We can build and test our binding with CMake:
 
 <br>
 
@@ -63,13 +63,13 @@ That's all there is to it. we can build and test our binding with CMake:
 
 ### 🔨&nbsp; Step 3 – Build and test the python binding
 
-To work You'll need Python 3 installed on your system. If on Linux, you may already have Python installed, but you will also need the python development package, typically called `python-devel` or `python-dev`. On Windows or osx, I recommend [Miniconda](https://conda.io/miniconda.html) for 64-bit Python 3.x.
+To work You'll need Python 3 installed on your system. On Linux, you may already have Python installed, but you will also need the python development package, typically called `python-devel` or `python-dev`. On Windows or Mac, I recommend [Miniconda](https://conda.io/miniconda.html) for 64-bit Python 3.x.
 
 ```bash
 mkdir build_py && cd build_py
 cmake -G "Visual Studio 14 2015 Win64" -Dmwe_WITH_PYTHON=ON ..  (1)
 cmake --build . --config Debug
-ctest . -VV -C Debug                                              (2)
+ctest . -VV -C Debug                                            (2)
 ```
 
 Note that at (1) we using the CMake `-Dmwe_WITH_PYTHON=ON` option which enables the Python binding and its associated test suite. When we run the tests at (2) CMake will configure python to execute these tests.
@@ -80,9 +80,9 @@ After the build completes, the files of interest to us are arranged as a canonic
 .
 └───bindings
     └───python
-        └───mwe  . . . . . . . . . . . . . . . . . .   (1)
-                __init__.py  . . . . . . . . . . . . .   (2)
-                binding.cp35-win_amd64.pyd . . . . . .   (3)
+        └───mwe  . . . . . . . . . . . . . . . . . . .  (1)
+                __init__.py  . . . . . . . . . . . . .  (2)
+                binding.cp35-win_amd64.pyd . . . . . .  (3)
 ```
 
 1. The mwe package root, as described [here](https://docs.python.org/3/tutorial/modules.html).
@@ -156,7 +156,7 @@ Within `init` we define the object template, `m`:
 void init(v8::Local<v8::Object> exports)
 {
     v8pp::module m(v8::Isolate::GetCurrent());          (1)
-    m.set("add", &mwe::add);                          (2)
+    m.set("add", &mwe::add);                            (2)
     exports->SetPrototype(m.new_instance());            (3)
 }
 ```
@@ -165,7 +165,7 @@ void init(v8::Local<v8::Object> exports)
 2. Set `add` on the object template to pointe to `mwe::add`
 3. Create and instance of `m`, and assign it to the module prototype.
 
-You may notice the similarities with the Python binding; line 2 is almost identical. Again, since `coofoo::add` actually returns `maybe<int>` rather than `int`, we write a v8pp converter for the generic `maybe<T>` template which will throw a Javascript exception if an incoming `maybe<T>` holds an error, _or_ recursively convert `T` to a `v8::Value` (which in our case is a one step conversion from `int` to a `v8::Number`.) For v8pp, these conversion specializations are fairly easy to write, although you should become familiar with some core V8 concepts like _isolates_, _scopes_ and _handles_, which are described in the V8 [embedder's guide](https://github.com/v8/v8/wiki/Embedder's%20Guide#handles-and-garbage-collection) before you write your own.
+You may notice the similarities with the Python binding; `(2)` is almost identical. Again, since `coofoo::add` actually returns `maybe<int>` rather than `int`, we write a v8pp converter for the generic `maybe<T>` template which will throw a Javascript exception if an incoming `maybe<T>` holds an error, _or_ recursively convert `T` to a `v8::Value` (which in our case is a one step conversion from `int` to a `v8::Number`.) For v8pp, these conversion specializations are fairly easy to write, although you should become familiar with some core V8 concepts like _isolates_, _scopes_ and _handles_, which are described in the V8 [embedder's guide](https://github.com/v8/v8/wiki/Embedder's%20Guide#handles-and-garbage-collection) before you write your own.
 
 <br>
 
@@ -187,7 +187,7 @@ Once built, we should have the following folder structure in the build directory
 .
 └───bindings
     └───nodejs
-        └───mwe  . . . . . . . . . . . . . . . . . .  (1)
+        └───mwe  . . . . . . . . . . . . . . . . . . .  (1)
                 package.json . . . . . . . . . . . . .  (2)
                 index.js . . . . . . . . . . . . . . .  (3)
                 binding.node . . . . . . . . . . . . .  (4)
@@ -309,7 +309,7 @@ Once built (by supplying the `-Dmwe_WITH_JAVA=ON` option to CMake) we should hav
 .
 └───bindings
     ├───java
-    │       mwe.jar . . . . . . . . . . . . . . . . . (1)
+    │       mwe.jar . . . . . . . . . . . . . . . . . . (1)
     └───Debug
             binding.dll . . . . . . . . . . . . . . . . (2)
 ```
@@ -334,27 +334,27 @@ template <compute_mode> static error_code op(
           gsl::span<int> result);
 ```
 
-Here we're declaring an operation taking three _views_ of 1-dimensional vectors, implemented by adding the first two together into the third. In the last part of this tutorial, I'll single out 1 aspect of this operation worthy of further explanation: `gsl::span<T>`, and it's implications for memory management.
+Here we're declaring an operation taking three _views_ of 1-dimensional vectors, implemented by adding the first two together into `result`. In the last part of this tutorial, I'll single out 1 aspect of this operation worthy of further explanation: `gsl::span<T>`, and it's implications for memory management.
 
 <br>
 
 ### The `gsl::span<T>`
 
-A `gsl::span<T>` is a view over contiguous memory, intended as an alternative to the error-prone `(pointer, length)` idiom. It also supports describing the shape and span of n-dimensional data. It forms a part of the _Guidelines Support Library_ (GSL) library. GSL is a support library for the [C++ core guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines), a attempt by the C++ standards committee to produce a set of rules and best practice for writing modern C++.
+A `gsl::span<T>` is a view over contiguous memory, intended as an alternative to the error-prone `(pointer, length)` idiom. It also supports describing the shape and span of n-dimensional data. It forms a part of the _Guidelines Support Library_ (GSL) library, which is a support library for the [C++ core guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines), an ambitious attempt by the C++ standards committee to produce a set of rules and best practice for writing modern C++.
 
-Passing views and sub-views of n-dimensional vectors, rather than the data itself, forms an important part of writing language bindings that pass large amounts of data through the layers of a binding. By passing views, we can aim to avoid unnecessary memory allocation and copying. When incorporating other hardware (e.g. GPUs) this topic becomes especially important, and can make or break application performance since copying (back and forth between various bits of hardware) becomes unavoidable. This will impact the way your library is designed.
+Passing views and sub-views of n-dimensional vectors around, rather than the data itself, forms an important part of writing language bindings that manipulate large amounts of data through the layers of a binding. By passing views, we can aim to avoid unnecessary memory allocation and copying. When incorporating other hardware (e.g. GPUs) this topic becomes especially important, and can make or break application performance since some copying (back and forth between various bits of hardware) becomes unavoidable. This should impact the way your library is designed, and indeed, some languages have special mechanisms to support this in a standardized way (e.g. the Python [Buffer Protocol](https://docs.python.org/3/c-api/buffer.html)).
 
 <br>
 
 ### Ownership and Garbage Collection
 
-Let's be more concrete about what a `gsl::span<T>` _is_ in memory management terms. When a view goes out of scope, the data being viewed remains valid because it's owned by something else – it's a _non-owning_ reference to some data. In more technical terms, the _lifetime_ of this data is not bounded by the lifetime of the view. This is in contrast to, say, a `std::vector<T>` and the data it owns; in this case the data contained within a `vector` is bounded by its lifetime. 
+Let's be more concrete about what a view-like type such as `gsl::span<T>` actually _is_ in memory management terms. When a view goes out of scope, the data being viewed remains valid because it's owned by something else – it's a _non-owning_ reference to some data. In more technical terms, the _lifetime_ of this data is not bounded by the lifetime of the view. This is in contrast to, say, a `std::vector<T>` and the data it owns; in this case the data contained within a `vector` is bounded by its lifetime. 
 
 The concepts of lifetime and ownership are a pervasive part of binding to languages that have automatic memory management (AMM) schemes. In our case, the data being referenced by the `gsl::span<T>`'s are owned by the target language runtime. For our kernel operation to work correctly, we may need to interact with this memory management scheme to ensure the referenced data (and by implication, the `gsl::span<T>`'s) remains valid for the duration of the operation.
 
 Typically, when working within the confines of a language with AMM, an object's lifetime is determined, transparently, by a garbage collector. As soon as these objects are referenced from outside the runtime (say by a native extension) you will occasionally need to make the AMM scheme aware about your intentions more explicitly. The specific mechanism(s) used to do this vary across languages, but the basic principles about lifetimes and ownership are the same.
 
-For using our `gsl::span<T>`, we need to ensure the AMM of the target runtime doesn't free, or (in the case of a compacting garbage collector, move) the underlying data. To this end, the IDL-like wrappers we've used in this tutorial provide varying degrees of support in addition to what's provided by the raw API. The source code accompanying this tutorial offers a demonstration, but here is an overview:
+For using our `gsl::span<T>`, we need to ensure the AMM of the target runtime doesn't free, or (in the case of a compacting garbage collector, move) the underlying data. To this end, the IDL-like wrappers we've used in this tutorial provide varying degrees of support in addition to what's provided by the raw API. The source code accompanying this tutorial offers a demonstration in each language, but here is an overview:
 
 
 #### Memory management overview
@@ -370,7 +370,7 @@ For using our `gsl::span<T>`, we need to ensure the AMM of the target runtime do
 # <a name="summary"></a> Summary
 
 
-I hope you found this tutorial interesting and insightful. The main aim was to show how, with the features of modern C++, it's becoming far easier to extend applications without resorting to complex language bridges, or writing esoteric binding code that requires you're several domain experts rolled in to one. For heterogeneous computing, we've shown that the modern features of C++ also make it productive to write kernels for a variety of hardware configurations, without having to resort to complex frameworks, or unifying approaches that fail to achieve performance portability.
+I hope you found this tutorial interesting and insightful. The main aim was to show how, with the features of modern C++, it's becoming far easier to extend applications without resorting to complex language bridges, or writing esoteric binding code, often requiring you to be several domain experts simultaneously. For heterogeneous computing, we've shown that the modern features of C++ also make it productive to write kernels for a variety of hardware configurations, without necessarily having to resort to complex frameworks, or unifying approaches that historically fail to achieve performance portability.
 
 
 ### Further Reading / Presentations
