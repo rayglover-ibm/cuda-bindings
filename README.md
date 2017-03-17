@@ -4,11 +4,11 @@ _This is the accompanying code for the tutorial **CUDA language bindings – wit
 
 ### Example Bindings
 
-|                | Linux <br> [![Build Status](https://travis-ci.org/rayglover-ibm/cuda-bindings.svg?branch=master)](https://travis-ci.org/rayglover-ibm/cuda-bindings) |       Windows 7 |  Android      |
-|----------------|:----------:|:---------------------:|:-------------:|
-| _Python_       |    3.5     | 3.5                   |  ✗           |
-| _Node.js (v8)_ |    4/5     | 4/5                   |  ✗           |
-| _Java_         |    1.7     | 1.7                   |  ✓           |
+|                | Linux <br> [![Build Status](https://travis-ci.org/rayglover-ibm/cuda-bindings.svg?branch=master)](https://travis-ci.org/rayglover-ibm/cuda-bindings) | Mac <br> [![Build Status](https://travis-ci.org/rayglover-ibm/cuda-bindings.svg?branch=master)](https://travis-ci.org/rayglover-ibm/cuda-bindings)   | Windows 7 <br> &nbsp; |  Android  <br> &nbsp;    |
+|----------------|:----------:|:--------:|:---------------------:|:-------------:|
+| _Python_       |    3       |  3       | 3                     |  ✗           |
+| _Node.js (v8)_ |    4/5     |  4/5     | 4/5                   |  ✗           |
+| _Java_         |    1.7     |  1.7     | 1.7                   |  ✓           |
 
 <br>
 
@@ -36,7 +36,7 @@ cmake --build . [--config Debug]
     
     _(Minimum tested versions)_
 
-    |                | Windows 7  | Linux (Ubuntu 15/16)  | Android         | Mac OSX |
+    |                | Windows 7  | Linux (Ubuntu 15/16)  | Android         | Mac     |
     |----------------|:----------:|:---------------------:|:---------------:|:-------:|
     | *C++ compiler* | VS 2015    | gcc 5.3 / clang 3.6   | NDK r13 (clang) | XCode 7 |
     | *CUDA SDK*     | 8          | 8                     | ✗               | 8       |
