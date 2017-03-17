@@ -1,14 +1,14 @@
 # *CUDA language bindings* – Minimum working examples
 
-_This is the accompanying code for the tutorial **CUDA language bindings – with modern C++**. This repository contains everything you need to follow that tutorial, and serve as a reference for extending Python, Node.js and Java applications with CUDA._
+_This is the accompanying code for the tutorial **CUDA language bindings – with modern C++** (available [here](./docs/blog-article.md).) This repository contains everything you need to follow that tutorial, and serve as a reference for extending Python, Node.js and Java applications with CUDA._
 
 ### Example Bindings
 
-|               |  Windows 7 |  Linux (Ubuntu 15/16) | Android       |
-|---------------|:----------:|:---------------------:|:-------------:|
-| Python        |    3.5     | 3.5                   |  ✗           |
-| Node.js (v8)  |    4.3     | 5.2                   |  ✗           |
-| Java          |    1.7     | 1.7                   |  ✓           |
+|                | Linux <br> [![Build Status](https://travis-ci.org/rayglover-ibm/cuda-bindings.svg?branch=master)](https://travis-ci.org/rayglover-ibm/cuda-bindings) |       Windows 7 |  Android      |
+|----------------|:----------:|:---------------------:|:-------------:|
+| _Python_       |    3.5     | 3.5                   |  ✗           |
+| _Node.js (v8)_ |    4/5     | 4/5                   |  ✗           |
+| _Java_         |    1.7     | 1.7                   |  ✓           |
 
 <br>
 
@@ -33,6 +33,7 @@ cmake --build . [--config Debug]
     | `mwe_WITH_JAVA`          | Enable java binding    | OFF     |
 
 - ### Compilers / Runtimes 
+    
     _(Minimum tested versions)_
 
     |                | Windows 7  | Linux (Ubuntu 15/16)  | Android         | Mac OSX |
