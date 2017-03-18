@@ -3,22 +3,22 @@ sudo: false
 
 env:
   global:
-    - COMPILER=g++-5
     - BUILD_TYPE=Debug
+
+dist: trusty
+osx_image: xcode7.3
+
+addons:
+  apt:
+    sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports]
+    packages: [cmake, g++-5]
 
 matrix:
   include:
     # -- core library tests
     - os: osx
-      osx_image: xcode7.3
-      env: COMPILER=clang++
-
     - os: linux
-      addons:
-        apt:
-          sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports]
-          packages: [cmake, g++-5]
-    
+
     # -- python
     - os: linux
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON"
@@ -29,72 +29,61 @@ matrix:
       install:
         - pip install --user --upgrade pip
         - pip install --user numpy
-    
+
     - os: osx
-      osx_image: xcode7.3
-      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON" COMPILER=clang++ 
+      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_PYTHON=ON"
       install:
         - pyenv install 3.5.0
         - pyenv global 3.5.0
         - pip install --user --upgrade pip
         - pip install --user numpy
-    
+
     # -- nodejs
     - os: linux
       dist: trusty
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_NODEJS=ON"
-      addons:
-        apt:
-          sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports]
-          packages: [cmake, g++-5]
+
       install:
          - rm -rf ~/.nvm && git clone --depth 1 --branch v0.33.1 https://github.com/creationix/nvm.git ~/.nvm
          - source ~/.nvm/nvm.sh && nvm install 5
          - node --version
-    
+
     - os: osx
-      osx_image: xcode7.3
-      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_NODEJS=ON" COMPILER=clang++ 
+      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_NODEJS=ON"
       install:
          - rm -rf ~/.nvm && git clone --depth 1 --branch v0.33.1 https://github.com/creationix/nvm.git ~/.nvm
          - source ~/.nvm/nvm.sh && nvm install 5
          - node --version
-    
+
     # -- java (oraclejdk7, linux)
     - os: linux
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
       jdk: oraclejdk7
-      addons:
-        apt:
-          sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports]
-          packages: [cmake, g++-5]
+
       install:
         - jdk_switcher use oraclejdk7
-    
+
     # -- java (openjdk7, linux)
     - os: linux
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
       jdk: openjdk7
-      addons:
-        apt:
-          sources: [kubuntu-backports, ubuntu-toolchain-r-test, george-edison55-precise-backports]
-          packages: [cmake, g++-5]
+
       install:
         - jdk_switcher use openjdk7
-    
+
     # -- java (oraclejdk8, osx)
     - os: osx
-      osx_image: xcode7.3
-      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON" COMPILER=clang++ 
+      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
       install:
          - java -version
 
 before_script:
-  - which $COMPILER
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then export COMPILER=clang++ ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export COMPILER=g++-5   ; fi
   - mkdir build && cd build
   - cmake ${CMAKE_EXTRA_ARGS} .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE
   - cmake --build .
-  
+
 cache:
   directories:
     - $HOME/.cache/pip
