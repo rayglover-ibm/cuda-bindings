@@ -40,7 +40,6 @@ matrix:
 
     # -- nodejs
     - os: linux
-      dist: trusty
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_NODEJS=ON"
 
       install:
@@ -58,16 +57,9 @@ matrix:
     # -- java (oraclejdk7, linux)
     - os: linux
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
-      jdk: oraclejdk7
-      install:
-        - jdk_switcher use oraclejdk7
-
-    # -- java (openjdk7, linux)
-    - os: linux
-      env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
-      jdk: openjdk7
-      install:
-        - jdk_switcher use openjdk7
+      jdk:
+        - oraclejdk7
+        - openjdk7
 
     # -- java (oraclejdk8, osx)
     - os: osx
