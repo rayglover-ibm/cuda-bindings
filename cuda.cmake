@@ -5,7 +5,6 @@ find_package (CUDA REQUIRED)
 
 set (SRC_CUDA
     "src/kernels/add.cu"
-    "src/device_util.cu"
 )
 get_property (incdirs
     TARGET ${core}
