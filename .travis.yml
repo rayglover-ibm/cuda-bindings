@@ -59,7 +59,6 @@ matrix:
     - os: linux
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
       jdk: oraclejdk7
-
       install:
         - jdk_switcher use oraclejdk7
 
@@ -67,7 +66,6 @@ matrix:
     - os: linux
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_JAVA=ON"
       jdk: openjdk7
-
       install:
         - jdk_switcher use openjdk7
 
