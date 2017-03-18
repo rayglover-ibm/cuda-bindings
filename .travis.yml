@@ -16,8 +16,8 @@ addons:
 matrix:
   include:
     # -- core library tests
-    - os: osx
     - os: linux
+    - os: osx
 
     # -- python
     - os: linux
@@ -45,14 +45,12 @@ matrix:
       install:
          - rm -rf ~/.nvm && git clone --depth 1 --branch v0.33.1 https://github.com/creationix/nvm.git ~/.nvm
          - source ~/.nvm/nvm.sh && nvm install 5
-         - node --version
 
     - os: osx
       env: CMAKE_EXTRA_ARGS="-Dmwe_WITH_NODEJS=ON"
       install:
          - rm -rf ~/.nvm && git clone --depth 1 --branch v0.33.1 https://github.com/creationix/nvm.git ~/.nvm
          - source ~/.nvm/nvm.sh && nvm install 5
-         - node --version
 
     # -- java (oraclejdk7, linux)
     - os: linux
