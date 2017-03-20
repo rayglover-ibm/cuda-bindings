@@ -1,6 +1,6 @@
 # *CUDA language bindings* – Minimum working examples
 
-_This is the accompanying code for the tutorial **CUDA language bindings – with modern C++** (available [here](./docs/blog-article.md).) This repository contains everything you need to follow that tutorial, and serve as a reference for extending Python, Node.js and Java applications with CUDA._
+_This is the accompanying code for the tutorial **CUDA language bindings – with modern C++** (available [here](./docs/blog-article.md).) This repository contains everything you need to follow that tutorial, and serves as a reference for your own projects._
 
 ### Example Bindings
 
@@ -26,8 +26,8 @@ cmake --build . [--config Debug]
 
     | CMake option             | Description            | Default |
     |--------------------------|:-----------------------|:--------|
+    | `kernelpp_WITH_CUDA`     | Enable cuda support    | OFF     |
     | `mwe_WITH_TESTS`         | Enable unit tests      | ON      |
-    | `mwe_WITH_CUDA`          | Enable cuda support    | OFF     |
     | `mwe_WITH_PYTHON`        | Enable python binding  | OFF     |
     | `mwe_WITH_NODEJS`        | Enable nodejs binding  | OFF     |
     | `mwe_WITH_JAVA`          | Enable java binding    | OFF     |
