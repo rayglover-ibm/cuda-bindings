@@ -40,7 +40,7 @@ So, In `bindings/python/mwe/binding.cpp`, we declare a module initializer with t
 PYBIND11_PLUGIN(binding)
 {
     pybind11::module m("binding", "python binding example");         (1)
-    m.def("add", &mwe::add, "A function which adds two numbers");  (2)
+    m.def("add", &mwe::add, "A function which adds two numbers");    (2)
     return m.ptr();                                                  (3)
 }
 ```
