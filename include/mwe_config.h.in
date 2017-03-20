@@ -9,4 +9,3 @@
 #define mwe_VERSION_MINOR @mwe_VERSION_MINOR@
 #define mwe_VERSION_PATCH @mwe_VERSION_PATCH@
 
-#cmakedefine mwe_WITH_CUDA

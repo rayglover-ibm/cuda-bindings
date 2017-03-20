@@ -1,20 +1,21 @@
-cmake_minimum_required (VERSION 2.8.12)
+cmake_minimum_required (VERSION 3.0)
 
 set (CUDA_VERBOSE_BUILD ON)
 find_package (CUDA REQUIRED)
 
-set (SRC_CUDA
+set (src_kernels
     "src/kernels/add.cu"
 )
-get_property (incdirs
-    TARGET ${core}
-    PROPERTY INCLUDE_DIRECTORIES
+
+CUDA_WRAP_SRCS (${core} OBJ
+    obj_generated_files ${src_kernels}
+
+    OPTIONS --expt-relaxed-constexpr
+            --default-stream per-thread
+            -gencode arch=compute_30,code=compute_30
+
+    RELEASE --use_fast_math
 )
-list (APPEND
-    CUDA_NVCC_FLAGS "--expt-relaxed-constexpr --default-stream per-thread"
-)
-cuda_include_directories (${incdirs})
-cuda_add_library (${core}_cuda
-    STATIC ${SRC_CUDA}
-    OPTIONS "-gencode arch=compute_30,code=compute_30 -cudart static"
-)
+
+list (APPEND mwe_generated ${obj_generated_files})
+list (APPEND mwe_libs ${CUDA_LIBRARIES})

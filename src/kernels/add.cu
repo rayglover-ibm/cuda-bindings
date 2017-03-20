@@ -13,9 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.  */
 
 #include "add.h"
-#include "kernel.h"
-#include "types.h"
-#include "device_util.h"
+
+#include <kernelpp/types.h>
+#include <kernelpp/kernel.h>
+#include <kernelpp/device_util.h>
 
 #include <gsl.h>
 #include <stdio.h>
@@ -41,9 +42,9 @@ namespace
 namespace mwe {
 namespace kernels
 {
-    using device_util::device_ptr;
+    using kernelpp::device_ptr;
 
-    template <> variant<int, error_code> add::op<compute_mode::CUDA>(
+    template <> kernelpp::variant<int, error_code> add::op<compute_mode::CUDA>(
         int a, int b
         )
     {

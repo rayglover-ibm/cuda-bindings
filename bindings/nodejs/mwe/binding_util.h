@@ -46,16 +46,16 @@ namespace util
     }
 
     template <typename R>
-    bool try_throw(const mwe::maybe<R>& r)
+    bool try_throw(const kernelpp::maybe<R>& r)
     {
-        if (r.template is<mwe::error>())
-            throw std::invalid_argument(r.template get<mwe::error>().data());
+        if (r.template is<kernelpp::error>())
+            throw std::invalid_argument(r.template get<kernelpp::error>().data());
 
         return false;
     }
 
     inline
-    bool try_throw(const mwe::status& r)
+    bool try_throw(const kernelpp::status& r)
     {
         if (r) { throw std::invalid_argument(r.get().data()); }
         return false;
@@ -98,17 +98,17 @@ namespace v8pp
 
 
     /*
-     *  Conversion to v8::Value from a mwe::maybe<T>; will
-     *  throw an exception if the incoming mwe::maybe<T> is
+     *  Conversion to v8::Value from a kernelpp::maybe<T>; will
+     *  throw an exception if the incoming kernelpp::maybe<T> is
      *  in an error state.
      */
     template<typename T>
-    struct convert<mwe::maybe<T>>
+    struct convert<kernelpp::maybe<T>>
     {
-        using from_type = mwe::maybe<T>;
+        using from_type = kernelpp::maybe<T>;
         using to_type = v8::Local<v8::Value>;
 
-        static to_type to_v8(v8::Isolate* iso, const mwe::maybe<T>& val)
+        static to_type to_v8(v8::Isolate* iso, const kernelpp::maybe<T>& val)
         {
             util::try_throw(val);
 
@@ -120,5 +120,5 @@ namespace v8pp
     };
 
     template<typename T>
-    struct is_wrapped_class<mwe::maybe<T>> : std::false_type {};
+    struct is_wrapped_class<kernelpp::maybe<T>> : std::false_type {};
 }

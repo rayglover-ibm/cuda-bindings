@@ -12,13 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.  */
 
-#include "types.h"
 #include "kernels/add.h"
+#include <kernelpp/types.h>
 
 namespace mwe {
 namespace kernels
 {
-    template <> variant<int, error_code> add::op<compute_mode::CPU>(
+    template <> kernelpp::variant<int, error_code> add::op<compute_mode::CPU>(
         int a, int b)
     {
         return a + b;

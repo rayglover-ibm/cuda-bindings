@@ -14,35 +14,33 @@ limitations under the License.  */
 
 #pragma once
 
-#include "types.h"
-#include "kernel.h"
+#include <kernelpp/types.h>
+#include <kernelpp/kernel.h>
 
 #include <gsl.h>
 
 namespace mwe {
 namespace kernels
 {
-    using kernel::compute_mode;
-    using kernel::error_code;
-    
-    /*  Declare a kernel, 'add' which is overloaded to operate
+    using kernelpp::compute_mode;
+    using kernelpp::error_code;
+
+    /*  Declare a kernel 'add' which is overloaded to operate
      *  on single or array-like inputs.
-     *  
-     *  We also declare the compute modes (CPU/GPU) which 
+     *
+     *  Also, declare the compute modes (CPU,GPU) which
      *  this kernel will support.
      */
     KERNEL_DECL(add,
         compute_mode::CPU, compute_mode::CUDA)
     {
-        template <compute_mode> static variant<int, error_code> op(
+        template <compute_mode> static kernelpp::variant<int, error_code> op(
             int a, int b
             );
-        
+
         template <compute_mode> static error_code op(
             const gsl::span<int> a, const gsl::span<int> b, gsl::span<int> result
             );
     };
-
-
 }
 }

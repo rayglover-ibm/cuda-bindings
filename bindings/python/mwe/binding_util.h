@@ -26,16 +26,16 @@ namespace util
     }
 
     template<typename R>
-    bool try_throw(const mwe::maybe<R>& r)
+    bool try_throw(const kernelpp::maybe<R>& r)
     {
-        if (r.template is<mwe::error>())
-            throw std::runtime_error(r.template get<mwe::error>().data());
+        if (r.template is<kernelpp::error>())
+            throw std::runtime_error(r.template get<kernelpp::error>().data());
 
         return false;
     }
 
     inline
-    bool try_throw(const mwe::status& r)
+    bool try_throw(const kernelpp::status& r)
     {
         if (r) throw std::runtime_error(r.get().data());
         return false;
@@ -50,15 +50,15 @@ namespace pybind11 {
 namespace detail
 {
     /*
-     *  Conversion to handle from a mwe::maybe<T>; will
-     *  throw an exception if the incoming mwe::maybe<T> is
+     *  Conversion to handle from a kernelpp::maybe<T>; will
+     *  throw an exception if the incoming kernelpp::maybe<T> is
      *  in an error state.
      */
     template <typename T>
-    class type_caster<mwe::maybe<T>> {
+    class type_caster<kernelpp::maybe<T>> {
     public:
         static handle cast(
-            mwe::maybe<T> &&src, return_value_policy policy, handle parent)
+            kernelpp::maybe<T> &&src, return_value_policy policy, handle parent)
         {
             util::try_throw(src);
             return type_caster<T>::cast(src.template get<T>(), policy, parent);

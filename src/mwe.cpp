@@ -13,17 +13,18 @@ See the License for the specific language governing permissions and
 limitations under the License.  */
 
 #include "mwe.h"
-#include "kernel_invoke.h"
 #include "kernels/add.h"
+
+#include <kernelpp/kernel_invoke.h>
 
 #include <gsl.h>
 #include <type_traits>
 #include <iostream>
 
+using namespace kernelpp;
+
 namespace mwe
 {
-    using namespace kernel;
-
     maybe<int> add(int a, int b) {
         return run<kernels::add>(a, b);
     }

@@ -25,19 +25,19 @@ namespace util
     }
 
     template<typename R>
-    bool try_throw(jni::JNIEnv& env, const mwe::maybe<R>& r)
+    bool try_throw(jni::JNIEnv& env, const kernelpp::maybe<R>& r)
     {
-        if (r.template is<mwe::error>()) {
+        if (r.template is<kernelpp::error>()) {
             jni::ThrowNew(env,
                 jni::FindClass(env, "java/lang/Error"),
-                r.template get<mwe::error>().data());
+                r.template get<kernelpp::error>().data());
             return true;
         }
         return false;
     }
 
     inline
-    bool try_throw(jni::JNIEnv& env, const mwe::status& r)
+    bool try_throw(jni::JNIEnv& env, const kernelpp::status& r)
     {
         if (r) {
             jni::ThrowNew(env,
@@ -66,7 +66,7 @@ struct Binding
 
     static jint add(JNIEnv& env, _this, jint a, jint b)
     {
-        mwe::maybe<int> r = mwe::add(a, b);
+        kernelpp::maybe<int> r = mwe::add(a, b);
         return util::try_throw(env, r) ? 0 : r.get<int>();
     }
 
