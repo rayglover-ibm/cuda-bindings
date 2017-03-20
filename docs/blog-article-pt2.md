@@ -21,7 +21,7 @@ Other than adding numbers, we'd also like our kernel to allow us to:
 - permit building `mwe` with or without a GPU present.
 - permit running `mwe` with or without a GPU, and be able to control this behavior at runtime.
 
-These two requirements are particularly useful for real-world cross-platform applications, although it's also a missing piece in a typical GPGPU tutorial. I'll spend some time describing how to accomplish this with a small utility I wrote called `kernel.h`.
+These two requirements are particularly useful for real-world cross-platform applications, although it's also a missing piece in a typical GPGPU tutorial. I'll spend some time describing how to accomplish this with a small kernel execution utility I wrote called `kernelpp`.
 
 <br>
 
@@ -29,7 +29,7 @@ These two requirements are particularly useful for real-world cross-platform app
 
 ![img](./fig-1.PNG)
 
-With `kernel.h` we declare our kernel with a simple macro, `KERNEL_DECL` in `src/kernels/add.h`:
+By including `kernelpp/kernel.h`, we can declare our kernel with a simple macro `KERNEL_DECL` in `src/kernels/add.h`:
 
 ```c++
 KERNEL_DECL(add,
@@ -133,11 +133,11 @@ Note the introduction of the `maybe<T>` type, which is how we will propagate pot
 In `src/mwe.cpp`, the implementation looks like:
 
 ```c++
-#include "kernels/add.h"            (1)
-#include "kernel_invoke.h"          (2)
+#include "kernels/add.h"                             (1)
+#include <kernelpp/kernel_invoke.h>                  (2)
 
 maybe<int> add(int a, int b) {
-    return kernel::run<add>(a, b);  (3)
+    return kernel::run<add>(a, b);                   (3)
 }
 ```
 
@@ -170,7 +170,7 @@ Here, if `<some condition>` evaluated to true, we'd _force_ the kernel runner to
 
 ### custom `kernel::runner`'s
 
-Lastly, it's also possible to supply a non-default or custom `kernel::runner`. `kernel.h` comes with the `log_runner<K>` runner which when supplied to `run_with` will log various things during the kernel invocation. For example:
+Lastly, it's also possible to supply a non-default or custom `kernel::runner`. `kernelpp` comes with the `log_runner<K>` runner, which when supplied to `run_with` will log various things during the kernel invocation. For example:
 
 ```c++
 log_runner<kernels::add> log(&std::cout);
@@ -190,17 +190,17 @@ You could probably imagine other runners which could help you write tests or ben
 
 So far we've only touched on handling the return values of operations, and as part of this how we deal with errors.
 
-Firstly, `kernel.h` doesn't throw C++ exceptions, and doesn't catch any; if your operation can throw one, then it's your users responsibility to catch it. Instead `kernel.h` internally uses the `kernel::error_code` enum to communicate various possible error states.
+Firstly, `kernelpp` doesn't throw C++ exceptions, and doesn't catch any; if your operation can throw one, then it's your users responsibility to catch it. Instead `kernelpp` internally uses the `kernel::error_code` enum to communicate various possible error states.
 
-A kernel operation (specifically, an `op` method) is just a normal method, and so it can return any value, or `void`. However, `kernel.h` also recognizes several special return types, designed to make error handling more ergonomic.
+A kernel operation (specifically, an `op` method) is just a normal method, and so it can return any value, or `void`. However, `kernelpp` also recognizes several special return types, designed to make error handling more ergonomic.
 
 So, lets take our `add` operation. We really want to be able to return an `int` _or_ an error. Errors can occur in CUDA, for instance, when we allocate memory. To accommodate these two possible outcomes, we can use the `variant` type, which is being [introduced in C++17](http://en.cppreference.com/w/cpp/utility/variant). `variant` is capable of holding a value that can be one of a number of possible types, and do so in a type safe way. If you want to become more familiar with variant, I suggest watching [this](https://www.youtube.com/watch?v=k3O4EKX4z1c) presentation by D. Sankel.
 
 With `variant`, our operation changes from `int op(int, int)` to `variant<int, error_code> op(int, int)`.
 
-The `variant<T, error_code>` return type pattern is recognized by the kernel runner. Upon encountering an error, the runner will convert this error to our library's more generic error type, `error`. Altogether, we can tabulate the return type patterns that `kernel.h` recognizes and will automatically convert:
+The `variant<T, error_code>` return type pattern is recognized by the kernel runner. Upon encountering an error, the runner will convert this error to our library's more generic error type, `error`. Altogether, we can tabulate the return type patterns that `kernelpp` recognizes and will automatically convert:
 
-#### Return type conversions
+#### `kernelpp` Return type conversions
 
 | `op()` type              | `kernel::run()` type   |
 |-------------------------:|:-----------------------|

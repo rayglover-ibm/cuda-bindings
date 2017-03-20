@@ -2,7 +2,7 @@
 
 #### By Raymond Glover - March 2017
 
-_In this tutorial I explain the basics of writing cross-platform CUDA-enabled C++ extensions for Python/Node.js/Java applications, and introduce `kernel.h`, a miniature header-only utility for heterogeneous computing. The accompanying code for this tutorial is available here._
+_In this tutorial I explain the basics of writing cross-platform CUDA-enabled C++ extensions for Python/Node.js/Java applications, and introduce `kernelpp`, a miniature header-only utility for heterogeneous computing. The accompanying code for this tutorial is available here._
 
 ---
 
