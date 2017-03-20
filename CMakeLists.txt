@@ -23,13 +23,12 @@ set (src
     "src/mwe.cpp"
 )
 
+# language requirements/compiler opts
+set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # kernelpp
 add_subdirectory ("third_party/kernelpp")
-
-# language requirements/compiler opts
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    add_definitions (-std=c++14)
-endif ()
 
 if (kernelpp_WITH_CUDA)
     # add cuda kernels; appends mwe_generated and mwe_libs
@@ -47,7 +46,8 @@ set_target_properties (${core} PROPERTIES
 )
 
 # config header
-configure_file ("include/${core}_config.h.in"
+configure_file (
+    "include/${core}_config.h.in"
     "include/${core}_config.h"
 )
 
