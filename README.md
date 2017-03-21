@@ -1,6 +1,6 @@
 # *CUDA language bindings* – Minimum working examples
 
-_This is the accompanying code for the tutorial **CUDA language bindings – with modern C++** (available [here](./docs/blog-article.md).) This repository contains everything you need to follow that tutorial, and serves as a reference for your own projects._
+_This is the accompanying code for the tutorial **CUDA language bindings – with modern C++** (available [here](https://rayglover-ibm.github.io/cuda-bindings/).) This repository contains everything you need to follow that tutorial, and serves as a reference for your own projects._
 
 ### Example Bindings
 
