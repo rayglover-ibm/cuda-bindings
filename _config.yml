@@ -1,0 +1,29 @@
+# Permalinks
+permalink:           pretty
+
+# Setup
+title:               CUDA bindings
+tagline:             With modern C++
+description:         Simple CUDA bindings with modern C++ – A tutorial
+url:                 //rayglover-ibm.github.io/hyde/
+paginate:            1
+baseurl:             ""
+
+# Assets
+sass:
+  style:            :compressed
+
+# About/contact
+author:
+  name:              Ray Glover
+  email:             ray.glover@uk.ibm.com
+
+# Custom vars
+version:             0.1.0
+github:
+  repo:              https://github.com/rayglover-ibm/cuda-bindings
+
+# Gems
+gems:
+  - jekyll-paginate
+  - jekyll-gist

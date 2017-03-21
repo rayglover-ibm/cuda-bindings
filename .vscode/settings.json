@@ -1,0 +1,25 @@
+{
+    "cSpell.enabled": true,
+    "cmake.cmakePath": "c:/Program Files/CMake/bin/cmake",
+    "files.associations": {
+        "xlocale": "cpp",
+        "deque": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp",
+        "iterator": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "vector": "cpp",
+        "xhash": "cpp",
+        "xtree": "cpp",
+        "istream": "cpp",
+        "xlocmes": "cpp",
+        "xlocmon": "cpp",
+        "xlocnum": "cpp",
+        "xloctime": "cpp",
+        "*.cuh": "cpp",
+        "random": "cpp",
+        "codecvt": "cpp"
+    }
+}
