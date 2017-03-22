@@ -8,6 +8,7 @@ environment:
   matrix:
   - CORE: true
   - CONDA: 36
+  - JAVA: 7
 matrix:
   fast_finish: true  # Stop remaining jobs after a job failure
 install:
@@ -18,7 +19,10 @@ install:
     if ($env:CONDA) {
       $env:PATH = "C:\Miniconda$env:CONDA\;C:\Miniconda$env:CONDA\Scripts\;$env:PATH"
       conda install -y -q numpy
-      $env:EXTRA_CMAKE_ARGS = "-Dmwe_WITH_PYTHON"
+      $env:EXTRA_CMAKE_ARGS = "-Dmwe_WITH_PYTHON=ON"
+    }
+    if ($env:JAVA) {
+      $env:EXTRA_CMAKE_ARGS = "-Dmwe_WITH_JAVA=ON"
     }
 build_script:
 - mkdir build && cd build
