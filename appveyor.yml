@@ -20,7 +20,7 @@ install:
       $env:EXTRA_CMAKE_ARGS = "-Dmwe_WITH_PYTHON"
     }
 build_script:
-- mkdir build && build
+- mkdir build && cd build
 - cmake -G "%CMAKE_GENERATOR%" "%EXTRA_CMAKE_ARGS%" ..
 - set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 - cmake --build . --config Debug
