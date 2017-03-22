@@ -1,0 +1,27 @@
+version: 0.1.{build}
+image:
+- Visual Studio 2015
+test: off
+platform:
+- x64
+environment:
+  matrix:
+  - CORE: true
+  - CONDA: 36
+matrix:
+  fast_finish: true  # Stop remaining jobs after a job failure
+install:
+- ps: |
+    $env:CMAKE_GENERATOR = "Visual Studio 14 2015 Win64"
+    $env:EXTRA_CMAKE_ARGS = ""
+    if ($env:CONDA) {
+      $env:PATH = "C:\Miniconda$env:CONDA\;C:\Miniconda$env:CONDA\Scripts\;$env:PATH"
+      conda install -y -q numpy
+      $env:EXTRA_CMAKE_ARGS = "-Dmwe_WITH_PYTHON"
+    }
+build_script:
+- mkdir build && build
+- cmake -G "%CMAKE_GENERATOR%" "%EXTRA_CMAKE_ARGS%" ..
+- set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+- cmake --build . --config Debug
+- ctest . -VV -C Debug
