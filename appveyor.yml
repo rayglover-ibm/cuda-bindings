@@ -27,7 +27,7 @@ install:
       $env:EXTRA_CMAKE_ARGS = "-Dmwe_WITH_JAVA=ON"
     }
     if ($env:NODE) {
-      $env:EXTRA_CMAKE_ARGS = "-Dmwe_WITH_NODE=ON"
+      $env:EXTRA_CMAKE_ARGS = "-Dmwe_WITH_NODEJS=ON"
     }
 build_script:
 - mkdir build && cd build
