@@ -4,7 +4,7 @@ _This is the accompanying code for the tutorial **CUDA language bindings – wit
 
 ### Example Bindings
 
-|                | Linux <br> [![Build Status](https://travis-ci.org/rayglover-ibm/cuda-bindings.svg?branch=master)](https://travis-ci.org/rayglover-ibm/cuda-bindings) | Mac <br> [![Build Status](https://travis-ci.org/rayglover-ibm/cuda-bindings.svg?branch=master)](https://travis-ci.org/rayglover-ibm/cuda-bindings)   | Windows <br> &nbsp; |  Android  <br> &nbsp;    |
+|                | Linux <br> [![Build Status](https://travis-ci.org/rayglover-ibm/cuda-bindings.svg?branch=master)](https://travis-ci.org/rayglover-ibm/cuda-bindings) | Mac <br> [![Build Status](https://travis-ci.org/rayglover-ibm/cuda-bindings.svg?branch=master)](https://travis-ci.org/rayglover-ibm/cuda-bindings)   | Windows <br> [![Build status](https://ci.appveyor.com/api/projects/status/olqlbbylv2kx0vxn/branch/master?svg=true)](https://ci.appveyor.com/project/rayglover-ibm/cuda-bindings/branch/master) |  Android  <br> &nbsp;    |
 |----------------|:----------:|:--------:|:---------------------:|:-------------:|
 | _Python_       |    3       |  3       | 3                     |  ✗           |
 | _Node.js (v8)_ |    4/5     |  4/5     | 4/5                   |  ✗           |
