@@ -17,6 +17,7 @@ install:
     $env:CMAKE_GENERATOR = "Visual Studio 14 2015 Win64"
     $env:EXTRA_CMAKE_ARGS = ""
     if ($env:CONDA) {
+      if ($env:PLATFORM -eq "x64") { $env:CONDA = "$env:CONDA-x64" }
       $env:PATH = "C:\Miniconda$env:CONDA\;C:\Miniconda$env:CONDA\Scripts\;$env:PATH"
       conda install -y -q numpy
       $env:EXTRA_CMAKE_ARGS = "-Dmwe_WITH_PYTHON=ON"
