@@ -9,7 +9,7 @@ environment:
   - CORE: true
   - CONDA: 36
   - JAVA: 7
-  - NODE: 5
+  - NODEJS: 5
 matrix:
   fast_finish: true  # Stop remaining jobs after a job failure
 install:
@@ -26,7 +26,8 @@ install:
     if ($env:JAVA) {
       $env:EXTRA_CMAKE_ARGS = "-Dmwe_WITH_JAVA=ON"
     }
-    if ($env:NODE) {
+    if ($env:NODEJS) {
+      Install-Product node $env:NODEJS x64
       $env:EXTRA_CMAKE_ARGS = "-Dmwe_WITH_NODEJS=ON"
     }
 build_script:
