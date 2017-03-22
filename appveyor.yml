@@ -12,6 +12,7 @@ matrix:
   fast_finish: true  # Stop remaining jobs after a job failure
 install:
 - ps: |
+    git submodule update --init --recursive
     $env:CMAKE_GENERATOR = "Visual Studio 14 2015 Win64"
     $env:EXTRA_CMAKE_ARGS = ""
     if ($env:CONDA) {
