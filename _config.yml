@@ -5,7 +5,7 @@ permalink:           pretty
 title:               CUDA bindings
 tagline:             With modern C++
 description:         Simple CUDA bindings with modern C++ – A tutorial
-url:                 //rayglover-ibm.github.io/hyde/
+url:                 //rayglover-ibm.github.io/cuda-bindings/
 paginate:            1
 baseurl:             ""
 
