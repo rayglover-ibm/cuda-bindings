@@ -29,9 +29,23 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # kernelpp
 add_subdirectory ("third_party/kernelpp")
+get_target_property (inc kernelpp
+    INCLUDE_DIRECTORIES
+)
 
+# include dirs
+list (APPEND inc
+    "${CMAKE_CURRENT_SOURCE_DIR}/third_party/gsl_lite/include"
+    "${CMAKE_CURRENT_BINARY_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"
+)
+
+# cuda
 if (kernelpp_WITH_CUDA)
     # add cuda kernels; appends mwe_generated and mwe_libs
+    find_package (CUDA REQUIRED)
+    cuda_include_directories (${inc})
     include ("cuda.cmake")
 endif ()
 
@@ -44,21 +58,13 @@ set_target_properties (${core} PROPERTIES
     LINKER_LANGUAGE CXX
     POSITION_INDEPENDENT_CODE ON
 )
-
-# config header
 configure_file (
     "include/${core}_config.h.in"
     "include/${core}_config.h"
 )
-
-# project includes
 target_include_directories (${core}
-    PUBLIC "third_party/gsl_lite/include"
-    PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/include"
-    PUBLIC "include"
-    PUBLIC "src"
+    PUBLIC ${inc}
 )
-
 target_link_libraries (${core}
     PUBLIC kernelpp
     PRIVATE ${mwe_libs}
