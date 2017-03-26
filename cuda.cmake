@@ -6,6 +6,10 @@ set (src_kernels
     "src/kernels/add.cu"
 )
 
+if (UNIX AND CMAKE_POSITION_INDEPENDENT_CODE)
+    list (APPEND CMAKE_CXX_FLAGS "-fPIC")
+endif ()
+
 cuda_wrap_srcs (${core} OBJ
     obj_generated_files ${src_kernels}
 
@@ -17,5 +21,5 @@ cuda_wrap_srcs (${core} OBJ
     RELEASE --use_fast_math
 )
 
-list (APPEND mwe_generated ${obj_generated_files})
-list (APPEND mwe_libs ${CUDA_LIBRARIES})
+target_sources (${core} PRIVATE ${obj_generated_files})
+target_link_libraries (${core} PRIVATE ${CUDA_LIBRARIES})

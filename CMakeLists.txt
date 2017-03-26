@@ -26,6 +26,7 @@ set (src
 # language requirements/compiler opts
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
+set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # kernelpp
 add_subdirectory ("third_party/kernelpp")
@@ -40,35 +41,26 @@ list (APPEND inc
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
+add_library (${core} STATIC
+    ${src}
+)
+set_target_properties (${core} PROPERTIES
+    LINKER_LANGUAGE CXX
+)
 
 # cuda
 if (kernelpp_WITH_CUDA)
-    # add cuda kernels; appends mwe_generated and mwe_libs
     find_package (CUDA REQUIRED)
     cuda_include_directories (${inc})
     include ("cuda.cmake")
 endif ()
 
-# create the core library
-add_library (${core} STATIC
-    ${mwe_generated}
-    ${src}
-)
-set_target_properties (${core} PROPERTIES
-    LINKER_LANGUAGE CXX
-    POSITION_INDEPENDENT_CODE ON
-)
 configure_file (
     "include/${core}_config.h.in"
     "include/${core}_config.h"
 )
-target_include_directories (${core}
-    PUBLIC ${inc}
-)
-target_link_libraries (${core}
-    PUBLIC kernelpp
-    PRIVATE ${mwe_libs}
-)
+target_include_directories (${core} PUBLIC ${inc})
+target_link_libraries (${core} PUBLIC kernelpp)
 
 # core library unit tests
 if (${core}_WITH_TESTS)
