@@ -41,8 +41,6 @@ add_jar ("${core}-java"
 # tests
 if (mwe_WITH_TESTS)
     include (CTest)
-    include (join)
-
     set (test ${PROJECT_NAME}_test)
 
     add_jar (${test} ${src_test}
@@ -52,13 +50,16 @@ if (mwe_WITH_TESTS)
         $<TARGET_PROPERTY:${test},JAR_FILE>
         $<TARGET_PROPERTY:${core}-java,JAR_FILE>
     )
-    join_paths ("${classpath}" cp)
+    if (NOT WIN32)
+        set (classpath "$<JOIN:${classpath},:>")
+    endif ()
+
     add_test (
         NAME ${PROJECT_NAME}_test_suite
         COMMAND java -enableassertions
                      -Xcheck:jni
                      -Djava.library.path=$<TARGET_FILE_DIR:${binding}>
-                     -cp "${cp}"
+                     -cp "${classpath}"
                      "com.mwe.tests.BindingTest"
     )
 endif ()
